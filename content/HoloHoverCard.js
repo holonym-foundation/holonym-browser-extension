@@ -73,6 +73,11 @@ class HoloHoverCard {
     if (uNameDiv && uNameDiv.contains(element)) {
       isUserName = true;
     }
+    let isAccountSwitcherButton = false;
+    const accountSwitcherButtonDiv = document.querySelector("[data-testid=SideNav_AccountSwitcher_Button]");
+    if (accountSwitcherButtonDiv && accountSwitcherButtonDiv.contains(element)) {
+      isAccountSwitcherButton = true;
+    }
 
     const twitterHoverCardHeight = 300;
 
@@ -86,7 +91,7 @@ class HoloHoverCard {
     const elementMiddle = elDimensions.left + elDimensions.width / 2;
 
     let popupLeft = elDimensions.left + 200;
-    if (isUserName) {
+    if (isUserName || isAccountSwitcherButton) {
       popupLeft = elementMiddle - popup.offsetWidth / 2;
     }
 
@@ -119,6 +124,9 @@ class HoloHoverCard {
     if (notEnoughRoomBelowElement) {
       placingBelow = false;
       this.element.style.top = elDimensions.top - popup.offsetHeight - spacing + 10 + "px";
+      if (isAccountSwitcherButton) {
+        this.element.style.top = elDimensions.top - popup.offsetHeight - spacing - 10 + "px";
+      }
     }
 
     const notEnoughRoomBelowForTwitterHC = elDimensions.bottom + twitterHoverCardHeight > windowHeight;

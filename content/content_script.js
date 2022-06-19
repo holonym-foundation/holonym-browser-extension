@@ -56,8 +56,8 @@ let movedOffAddr = null;
 let allowedToHideAddr = null;
 
 const hoverCard = new HoloHoverCard();
-const OPEN_DELAY = 0; // 400;
-const CLOSE_DELAY = 100; // 250;
+const OPEN_DELAY = 625;
+const CLOSE_DELAY = 325;
 
 hoverCard.element.addEventListener("mouseover", () => {
   if (hoverCard.closeId !== null) {
