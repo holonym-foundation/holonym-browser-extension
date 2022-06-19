@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Holonym",
+  "description": "View Holos by hovering over Twitter handles.",
+  "version": "1.0.0",
+  "browser_action": {
+    "default_title": "Holonym",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content/HoloHoverCard.js", "content/content_script.js"],
+      "css": ["content/HoverCard.css", "content/holo-wtf.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": ["http://twitter.com/", "https://twitter.com/", "storage"]
+}

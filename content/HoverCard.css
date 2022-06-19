@@ -1,0 +1,22 @@
+#hover-card * {
+  font-family: "TwitterChirp" !important;
+}
+#hover-card {
+  position: fixed;
+  width: 500px;
+  font-family: "TwitterChirp" !important;
+  background-color: white;
+  overflow: hidden;
+  visibility: hidden;
+  border: 1px solid lightgray;
+  border-radius: 16px;
+  transition: 200ms height;
+}
+
+#hover-card.visible #holo-container {
+  display: block;
+}
+
+#hover-card span {
+  display: block;
+}
