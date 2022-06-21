@@ -63,11 +63,11 @@ class HoloHoverCard {
   }
 
   /**
-   *
-   * @param {*} element The element relative to which the hover card will be placed.
-   * @param {*} spacing The spacing (in px) between element and hover card and between hover card and page border.
+   * @param element The element relative to which the hover card will be placed.
+   * @param twitterHoverCardHeight The height of the card that Twitter displays when you hover over a handle.
+   * @param spacing The spacing (in px) between element and hover card and between hover card and page border.
    */
-  positionAroundElement(element, spacing = 20) {
+  positionAroundElement(element, twitterHoverCardHeight = 250, spacing = 20) {
     let isUserName = false;
     const uNameDiv = document.querySelector("[data-testid=UserName]");
     if (uNameDiv && uNameDiv.contains(element)) {
@@ -78,8 +78,6 @@ class HoloHoverCard {
     if (accountSwitcherButtonDiv && accountSwitcherButtonDiv.contains(element)) {
       isAccountSwitcherButton = true;
     }
-
-    const twitterHoverCardHeight = 250;
 
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;

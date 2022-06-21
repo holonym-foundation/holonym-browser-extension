@@ -50,6 +50,8 @@ const addressToHolo = {
     address: "0xc8834c1fcf0df6623fc8c8ed25064a4148d99388",
   },
 };
+let handleToHeight = {}; // height == height of twitter user hover card (not holo hover card)
+let latestHandle = null;
 let nextAllowedUpdate = null;
 let showingAddr = false;
 let movedOffAddr = null;
@@ -84,7 +86,7 @@ hoverCard.element.addEventListener("mouseleave", () => {
 function loadAndDisplayHolo(handle, targetElement, openId) {
   return new Promise((resolve) => {
     hoverCard.setHolo(addressToHolo[handleToAddr[handle]]);
-    hoverCard.positionAroundElement(targetElement);
+    hoverCard.positionAroundElement(targetElement, handleToHeight[handle]);
     hoverCard.open();
     resolve();
   });
@@ -100,7 +102,6 @@ async function setAddress(handle) {
     .then((address) => {
       if (address) {
         handleToAddr[handle] = address;
-        // console.log(`loaded user. handle: ${handle}. address: ${address}`);
 
         const getHoloUrl = `http://localhost:3001/getHolo?address=${address}`;
         fetch(getHoloUrl)
@@ -108,7 +109,6 @@ async function setAddress(handle) {
           .then((holo) => {
             if (holo) {
               addressToHolo[address] = holo;
-              // console.log(`loaded user holo. handle: ${handle}. address: ${address}`);
             }
           });
       } else {
@@ -158,6 +158,7 @@ document.addEventListener(
 
     if (isHandle) {
       const handle = text.substring(1);
+      latestHandle = handle;
 
       const openId = setTimeout(() => {
         if (hoverCard.openId === openId) {
@@ -181,7 +182,7 @@ document.addEventListener(
                 return;
               }
               target.addEventListener("mouseleave", closePopup, { passive: true, once: true });
-              hoverCard.positionAroundElement(target);
+              // hoverCard.positionAroundElement(target, handleToHeight[handle]);
             })
             .catch(() => {
               target.removeEventListener("mouseleave", mouseOffBeforeLoad, { passive: true, once: true });
@@ -211,6 +212,34 @@ document.addEventListener(
   { passive: true }
 );
 
-// window.addEventListener("mousemove", (event) => {
-//   console.log(`x: ${event.clientX}. y: ${event.clientY}`);
-// });
+function printNodeTree(node) {
+  console.log(node);
+  if (node.childNodes.length > 0) {
+    for (const child of node.childNodes) {
+      printNodeTree(child);
+    }
+  }
+}
+
+// Listen for HTML nodes being added. The Twitter user hover card is inserted into the document
+// when a user hovers over a Twitter handle. We use the position of this hover card when placing
+// the Holo hover card.
+let observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    for (const node of mutation.addedNodes) {
+      if (node.textContent.includes("@")) {
+        const rect = node.getBoundingClientRect();
+        const height = rect.bottom - rect.top;
+        // console.log(`node height: ${height}`);
+
+        // console.log("start printNodeTree");
+        // printNodeTree(node);
+        // console.log("end printNodeTree");
+        if (!handleToHeight[latestHandle]) {
+          handleToHeight[latestHandle] = height;
+        }
+      }
+    }
+  });
+});
+observer.observe(document.body, { childList: true, subtree: true });
