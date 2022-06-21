@@ -94,7 +94,7 @@ async function setAddress(handle) {
   if (handleToAddr[handle]) {
     return;
   }
-  const url = `https://sciverse.id/addressForCredentials?credentials=${handle}&service=twitter`;
+  const url = `http://localhost:3001/addressForCredentials?credentials=${handle}&service=twitter`;
   fetch(url)
     .then((resp) => resp.json())
     .then((address) => {
@@ -102,7 +102,7 @@ async function setAddress(handle) {
         handleToAddr[handle] = address;
         console.log(`loaded user. handle: ${handle}. address: ${address}`);
 
-        const getHoloUrl = `https://sciverse.id/api/getHolo?address=${address}`;
+        const getHoloUrl = `http://localhost:3001/getHolo?address=${address}`;
         fetch(getHoloUrl)
           .then((resp) => resp.json())
           .then((holo) => {
