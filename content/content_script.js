@@ -212,15 +212,6 @@ document.addEventListener(
   { passive: true }
 );
 
-function printNodeTree(node) {
-  console.log(node);
-  if (node.childNodes.length > 0) {
-    for (const child of node.childNodes) {
-      printNodeTree(child);
-    }
-  }
-}
-
 // Listen for HTML nodes being added. The Twitter user hover card is inserted into the document
 // when a user hovers over a Twitter handle. We use the position of this hover card when placing
 // the Holo hover card.
@@ -232,10 +223,8 @@ let observer = new MutationObserver((mutations) => {
         const height = rect.bottom - rect.top;
         // console.log(`node height: ${height}`);
 
-        // console.log("start printNodeTree");
-        // printNodeTree(node);
-        // console.log("end printNodeTree");
-        if (!handleToHeight[latestHandle]) {
+        const validHeight = height > 200 && height < 500;
+        if (!handleToHeight[latestHandle] || (handleToHeight[latestHandle] && validHeight)) {
           handleToHeight[latestHandle] = height;
         }
       }

@@ -68,6 +68,7 @@ class HoloHoverCard {
    * @param spacing The spacing (in px) between element and hover card and between hover card and page border.
    */
   positionAroundElement(element, twitterHoverCardHeight = 250, spacing = 20) {
+    // console.log(`twitterHoverCardHeight: ${twitterHoverCardHeight}`);
     let isUserName = false;
     const uNameDiv = document.querySelector("[data-testid=UserName]");
     if (uNameDiv && uNameDiv.contains(element)) {
@@ -133,10 +134,12 @@ class HoloHoverCard {
 
     // Default to placing hover card above element
     const twitterHcIsAbove = elDimensions.bottom + twitterHoverCardHeight + spacing > windowHeight;
-    if (!placingBelow && twitterHcIsAbove && !isUserName && !isAccountSwitcherButton) {
+    const shiftRight = ((!placingBelow && twitterHcIsAbove) || (placingBelow && !twitterHcIsAbove)) && !isUserName && !isAccountSwitcherButton;
+    if (shiftRight) {
       popupLeft = elDimensions.left + 200;
       this.element.style.left = popupLeft + "px";
     }
+    // console.log(`this.element height: ${popup.offsetHeight}`);
   }
   getHoloHtml() {
     const parentDiv = document.createElement("div");
