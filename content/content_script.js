@@ -100,7 +100,7 @@ async function setAddress(handle) {
     .then((address) => {
       if (address) {
         handleToAddr[handle] = address;
-        console.log(`loaded user. handle: ${handle}. address: ${address}`);
+        // console.log(`loaded user. handle: ${handle}. address: ${address}`);
 
         const getHoloUrl = `http://localhost:3001/getHolo?address=${address}`;
         fetch(getHoloUrl)
@@ -108,7 +108,7 @@ async function setAddress(handle) {
           .then((holo) => {
             if (holo) {
               addressToHolo[address] = holo;
-              console.log(`loaded user holo. handle: ${handle}. address: ${address}`);
+              // console.log(`loaded user holo. handle: ${handle}. address: ${address}`);
             }
           });
       } else {
@@ -195,7 +195,7 @@ document.addEventListener(
       hoverCard.openId = openId;
 
       const mouseOffBeforeLoad = function () {
-        console.log("mouseoff before load", openId, hoverCard.openId, handle, hoverCard.loadedSymbol, hoverCard.closeId);
+        // console.log("mouseoff before load", openId, hoverCard.openId, handle, hoverCard.closeId);
         if (hoverCard.isLoading && hoverCard.closeId === null) {
           hoverCard.closeId = 1;
           hoverCard.close().then(() => {

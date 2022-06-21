@@ -79,7 +79,7 @@ class HoloHoverCard {
       isAccountSwitcherButton = true;
     }
 
-    const twitterHoverCardHeight = 300;
+    const twitterHoverCardHeight = 250;
 
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
@@ -90,10 +90,7 @@ class HoloHoverCard {
 
     const elementMiddle = elDimensions.left + elDimensions.width / 2;
 
-    let popupLeft = elDimensions.left + 200;
-    if (isUserName || isAccountSwitcherButton) {
-      popupLeft = elementMiddle - popup.offsetWidth / 2;
-    }
+    let popupLeft = elementMiddle - popup.offsetWidth / 2;
 
     this.element.style.left = popupLeft + "px";
 
@@ -103,35 +100,43 @@ class HoloHoverCard {
       this.element.style.left = windowWidth - popup.offsetWidth - spacing + "px";
     }
 
-    // const popupTop = elDimensions.top - popup.offsetHeight - spacing; // Default to placing hover card above element
-    // const popupTop = elDimensions.top - popup.offsetHeight - spacing + 10; // Default to placing hover card above element
-    const popupTop = elDimensions.top + spacing + 10; // Default to placing hover card below element
-
+    let popupTop = elDimensions.top - popup.offsetHeight - spacing + 10; // Default to placing hover card above element
+    if (isAccountSwitcherButton) popupTop -= 20; // Default to placing hover card above element
+    // const popupTop = elDimensions.top + spacing + 10; // Default to placing hover card below element
     this.element.style.top = popupTop + "px";
 
     // Default to placing hover card above element
-    // const bottomHeightRemaining = windowHeight - elDimensions.top - elDimensions.height - popup.offsetHeight;
-    // const notEnoughRoomAboveElement =
-    //   elDimensions.top - Math.max(popup.offsetHeight, 210) - spacing < spacing ||
-    //   (popupTop < spacing && bottomHeightRemaining > popup.offsetHeight + popupTop);
-    // if (isUserName || notEnoughRoomAboveElement) {
-    //   this.element.style.top = elDimensions.top + elDimensions.height + spacing + "px";
+    let placingBelow = false;
+    const bottomHeightRemaining = windowHeight - elDimensions.top - elDimensions.height - popup.offsetHeight;
+    const notEnoughRoomAboveElement =
+      elDimensions.top - popup.offsetHeight - spacing < spacing || (popupTop < spacing && bottomHeightRemaining > popup.offsetHeight + popupTop);
+    if (isUserName || notEnoughRoomAboveElement) {
+      placingBelow = true;
+      this.element.style.top = elDimensions.top + elDimensions.height + spacing + "px";
+    }
+
+    // Default to placing hover card below element
+    // let placingBelow = true;
+    // const notEnoughRoomBelowElement = popupTop + popup.offsetHeight + spacing > windowHeight;
+    // if (notEnoughRoomBelowElement) {
+    //   placingBelow = false;
+    //   this.element.style.top = elDimensions.top - popup.offsetHeight - spacing + 10 + "px";
+    //   if (isAccountSwitcherButton) {
+    //     this.element.style.top = elDimensions.top - popup.offsetHeight - spacing - 10 + "px";
+    //   }
     // }
 
     // Default to placing hover card below element
-    let placingBelow = true;
-    const notEnoughRoomBelowElement = popupTop + popup.offsetHeight + spacing > windowHeight;
-    if (notEnoughRoomBelowElement) {
-      placingBelow = false;
-      this.element.style.top = elDimensions.top - popup.offsetHeight - spacing + 10 + "px";
-      if (isAccountSwitcherButton) {
-        this.element.style.top = elDimensions.top - popup.offsetHeight - spacing - 10 + "px";
-      }
-    }
+    // const notEnoughRoomBelowForTwitterHC = elDimensions.bottom + twitterHoverCardHeight > windowHeight;
+    // if (placingBelow && notEnoughRoomBelowForTwitterHC) {
+    //   popupLeft = elementMiddle - popup.offsetWidth / 2;
+    //   this.element.style.left = popupLeft + "px";
+    // }
 
-    const notEnoughRoomBelowForTwitterHC = elDimensions.bottom + twitterHoverCardHeight > windowHeight;
-    if (placingBelow && notEnoughRoomBelowForTwitterHC) {
-      popupLeft = elementMiddle - popup.offsetWidth / 2;
+    // Default to placing hover card above element
+    const twitterHcIsAbove = elDimensions.bottom + twitterHoverCardHeight + spacing > windowHeight;
+    if (!placingBelow && twitterHcIsAbove && !isUserName && !isAccountSwitcherButton) {
+      popupLeft = elDimensions.left + 200;
       this.element.style.left = popupLeft + "px";
     }
   }
