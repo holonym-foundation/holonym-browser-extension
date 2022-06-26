@@ -92,29 +92,31 @@ function loadAndDisplayHolo(handle, targetElement, openId) {
   });
 }
 
+/**
+ * Utility function.
+ */
+async function fetchWithTimeout(url) {
+  const abortController = new AbortController();
+  const timeoutId = setTimeout(() => abortController.abort(), 1000);
+  const response = await fetch(url, { signal: abortController.signal });
+  clearTimeout(timeoutId);
+  return response;
+}
+
 async function setAddress(handle) {
   if (handleToAddr[handle]) {
     return;
   }
-  const url = `https://sciverse.id/api/addressForCredentials?credentials=${handle}&service=twitter`;
-  fetch(url)
-    .then((resp) => resp.json())
-    .then((address) => {
-      if (address) {
-        handleToAddr[handle] = address;
-
-        const getHoloUrl = `https://sciverse.id/api/getHolo?address=${address}`;
-        fetch(getHoloUrl)
-          .then((resp) => resp.json())
-          .then((holo) => {
-            if (holo) {
-              addressToHolo[address] = holo;
-            }
-          });
-      } else {
-        handleToAddr[handle] = "";
-      }
-    });
+  try {
+    const url = `https://sciverse.id/api/addressForCredentials?credentials=${handle}&service=twitter`;
+    const address = await (await fetchWithTimeout(url)).json();
+    handleToAddr[handle] = address;
+    const getHoloUrl = `https://sciverse.id/api/getHolo?address=${address}`;
+    const holo = await (await fetchWithTimeout(getHoloUrl)).json();
+    addressToHolo[address] = holo;
+  } catch (error) {
+    handleToAddr[handle] = "";
+  }
 }
 
 async function updateHolos() {
