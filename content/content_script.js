@@ -96,14 +96,14 @@ async function setAddress(handle) {
   if (handleToAddr[handle]) {
     return;
   }
-  const url = `http://localhost:3001/addressForCredentials?credentials=${handle}&service=twitter`;
+  const url = `https://sciverse.id/api/addressForCredentials?credentials=${handle}&service=twitter`;
   fetch(url)
     .then((resp) => resp.json())
     .then((address) => {
       if (address) {
         handleToAddr[handle] = address;
 
-        const getHoloUrl = `http://localhost:3001/getHolo?address=${address}`;
+        const getHoloUrl = `https://sciverse.id/api/getHolo?address=${address}`;
         fetch(getHoloUrl)
           .then((resp) => resp.json())
           .then((holo) => {
