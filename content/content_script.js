@@ -225,8 +225,8 @@ let observer = new MutationObserver((mutations) => {
         const height = rect.bottom - rect.top;
         // console.log(`node height: ${height}`);
 
-        const validHeight = height > 200 && height < 500;
-        if (!handleToHeight[latestHandle] || (handleToHeight[latestHandle] && validHeight)) {
+        const validHeight = height > 200 && height < 400;
+        if (validHeight) {
           handleToHeight[latestHandle] = height;
         }
       }
