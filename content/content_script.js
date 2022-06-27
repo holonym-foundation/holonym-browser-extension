@@ -229,10 +229,7 @@ let observer = new MutationObserver((mutations) => {
         try {
           const hcParentElement = document.getElementById("layers").childNodes[1];
           const hcElement = hcParentElement.childNodes[0].childNodes[0].childNodes[0];
-          console.log(hcElement);
           const rect = hcElement.getBoundingClientRect();
-          console.log(`---\n@${latestHandle} hover card. height: ${rect.height}, width: ${rect.width}\n---`);
-
           const validHeight = rect.height > 200 && rect.height < 400;
           if (validHeight) {
             handleToHeight[latestHandle] = rect.height;
