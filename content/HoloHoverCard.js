@@ -68,14 +68,14 @@ class HoloHoverCard {
    * @param twitterHoverCardHeight The height of the card that Twitter displays when you hover over a handle.
    * @param spacing The spacing (in px) between element and hover card and between hover card and page border.
    */
-  positionAroundElement(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+  positionAroundElement(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20) {
     console.log(`twitterHoverCardWidth: ${twitterHoverCardWidth}`);
     console.log(`twitterHoverCardHeight: ${twitterHoverCardHeight}`);
 
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
     console.log(`windowHeight: ${windowHeight}`);
-    const hc = this.element; // hover card
+    const hc = this.element; // holo hover card
     const elDimensions = targetElement.getBoundingClientRect();
 
     // Establish conditions
@@ -134,7 +134,7 @@ class HoloHoverCard {
   /**
    * Position hover card above element and centered (relative to target element).
    */
-  positionAboveAndCentered(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20, isAccountSwitcherButton = false) {
+  positionAboveAndCentered(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20, isAccountSwitcherButton = false) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -161,7 +161,7 @@ class HoloHoverCard {
   /**
    * Position hover card above element and to the right (relative to target element).
    */
-  positionAboveAndToRight(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+  positionAboveAndToRight(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -187,7 +187,7 @@ class HoloHoverCard {
   /**
    * Position hover card below element and centered (relative to target element).
    */
-  positionBelowAndCentered(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+  positionBelowAndCentered(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -212,7 +212,7 @@ class HoloHoverCard {
   /**
    * Position hover card below element and to the right (relative to target element).
    */
-  positionBelowAndToRight(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+  positionBelowAndToRight(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -220,7 +220,7 @@ class HoloHoverCard {
 
     const elDimensions = targetElement.getBoundingClientRect();
 
-    this.element.style.top = elDimensions.bottom + spacing + "px";
+    this.element.style.top = elDimensions.bottom + spacing - 10 + "px";
 
     const elementMiddle = elDimensions.left + elDimensions.width / 2;
     const hcLeft = elementMiddle + twitterHoverCardWidth / 2;

@@ -225,15 +225,24 @@ document.addEventListener(
 let observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     for (const node of mutation.addedNodes) {
-      if (node.textContent.includes("@")) {
-        const rect = node.getBoundingClientRect();
-        const validHeight = rect.height > 200 && rect.height < 400;
-        if (validHeight) {
-          handleToHeight[latestHandle] = rect.height;
-        }
-        const validWidth = rect.width > 100 && rect.width < 350;
-        if (validWidth) {
-          handleToWidth[latestHandle] = rect.width;
+      if (node.textContent.includes(latestHandle)) {
+        try {
+          const hcParentElement = document.getElementById("layers").childNodes[1];
+          const hcElement = hcParentElement.childNodes[0].childNodes[0].childNodes[0];
+          console.log(hcElement);
+          const rect = hcElement.getBoundingClientRect();
+          console.log(`---\n@${latestHandle} hover card. height: ${rect.height}, width: ${rect.width}\n---`);
+
+          const validHeight = rect.height > 200 && rect.height < 400;
+          if (validHeight) {
+            handleToHeight[latestHandle] = rect.height;
+          }
+          const validWidth = rect.width > 100 && rect.width < 350;
+          if (validWidth) {
+            handleToWidth[latestHandle] = rect.width;
+          }
+        } catch (error) {
+          console.log(error);
         }
       }
     }
