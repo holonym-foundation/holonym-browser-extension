@@ -63,23 +63,78 @@ class HoloHoverCard {
   }
 
   /**
-   * @param element The element relative to which the hover card will be placed.
+   * @param targetElement The element relative to which the hover card will be placed.
+   * @param twitterHoverCardWidth The width of the card that Twitter displays when you hover over a handle.
    * @param twitterHoverCardHeight The height of the card that Twitter displays when you hover over a handle.
    * @param spacing The spacing (in px) between element and hover card and between hover card and page border.
    */
-  positionAroundElement(element, twitterHoverCardHeight = 250, spacing = 20) {
-    // console.log(`twitterHoverCardHeight: ${twitterHoverCardHeight}`);
+  positionAroundElement(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+    console.log(`twitterHoverCardWidth: ${twitterHoverCardWidth}`);
+    console.log(`twitterHoverCardHeight: ${twitterHoverCardHeight}`);
+
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    console.log(`windowHeight: ${windowHeight}`);
+    const hc = this.element; // hover card
+    const elDimensions = targetElement.getBoundingClientRect();
+
+    // Establish conditions
     let isUserName = false;
     const uNameDiv = document.querySelector("[data-testid=UserName]");
-    if (uNameDiv && uNameDiv.contains(element)) {
+    if (uNameDiv && uNameDiv.contains(targetElement)) {
       isUserName = true;
     }
     let isAccountSwitcherButton = false;
     const accountSwitcherButtonDiv = document.querySelector("[data-testid=SideNav_AccountSwitcher_Button]");
-    if (accountSwitcherButtonDiv && accountSwitcherButtonDiv.contains(element)) {
+    if (accountSwitcherButtonDiv && accountSwitcherButtonDiv.contains(targetElement)) {
       isAccountSwitcherButton = true;
     }
+    const twitterHCPotentialBottom = elDimensions.bottom + twitterHoverCardHeight;
+    const twitterHCIsBelow = twitterHCPotentialBottom < windowHeight;
+    const holoHCCanBeAbove = elDimensions.top - hc.offsetHeight - spacing > 0;
+    const holoHCCanBeBelow = elDimensions.bottom + hc.offsetHeight + spacing < windowHeight;
 
+    console.log(`twitterHCIsBelow: ${twitterHCIsBelow}`);
+    console.log(`holoHCCanBeAbove: ${holoHCCanBeAbove}`);
+    console.log(`holoHCCanBeBelow: ${holoHCCanBeBelow}`);
+
+    // Special cases
+    if (isAccountSwitcherButton) {
+      console.log("isAccountSwitcherButton");
+      this.positionAboveAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing, isAccountSwitcherButton);
+    } else if (isUserName) {
+      console.log("isUserName");
+      this.positionBelowAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+    }
+
+    // Case 1. Above, centered.
+    else if (twitterHCIsBelow && holoHCCanBeAbove) {
+      console.log("above, centered");
+      this.positionAboveAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+    }
+    // Case 2. Below, centered.
+    else if (!twitterHCIsBelow && holoHCCanBeBelow) {
+      console.log("below, centered");
+      this.positionBelowAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+    }
+    // Case 3. Above, on the right.
+    else if (!twitterHCIsBelow && !holoHCCanBeBelow) {
+      console.log("above, on the right");
+      this.positionAboveAndToRight(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+    }
+    // Case 4. Below, on the right.
+    else if (twitterHCIsBelow && !holoHCCanBeAbove) {
+      console.log("below, on the right");
+      this.positionBelowAndToRight(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+    }
+    console.log(`hc height: ${hc.offsetHeight}`);
+    console.log("----\n----");
+  }
+
+  /**
+   * Position hover card above element and centered (relative to target element).
+   */
+  positionAboveAndCentered(element, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20, isAccountSwitcherButton = false) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -87,60 +142,98 @@ class HoloHoverCard {
 
     const elDimensions = element.getBoundingClientRect();
 
+    let popupTop = elDimensions.top - popup.offsetHeight - spacing + 10;
+    if (isAccountSwitcherButton) popupTop -= 20;
+    this.element.style.top = popupTop + "px";
+
     const elementMiddle = elDimensions.left + elDimensions.width / 2;
-
     let popupLeft = elementMiddle - popup.offsetWidth / 2;
-
     this.element.style.left = popupLeft + "px";
 
+    // Shift left or right if popup is falling off either side of the page
     if (popupLeft < spacing) {
       this.element.style.left = spacing + "px";
     } else if (popupLeft + popup.offsetWidth > windowWidth - spacing) {
       this.element.style.left = windowWidth - popup.offsetWidth - spacing + "px";
     }
+  }
 
-    let popupTop = elDimensions.top - popup.offsetHeight - spacing + 10; // Default to placing hover card above element
-    if (isAccountSwitcherButton) popupTop -= 20; // Default to placing hover card above element
-    // const popupTop = elDimensions.top + spacing + 10; // Default to placing hover card below element
+  /**
+   * Position hover card above element and to the right (relative to target element).
+   */
+  positionAboveAndToRight(element, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    const popup = this.element;
+
+    const elDimensions = element.getBoundingClientRect();
+
+    let popupTop = elDimensions.top - popup.offsetHeight - spacing + 10;
     this.element.style.top = popupTop + "px";
 
-    // Default to placing hover card above element
-    let placingBelow = false;
-    const bottomHeightRemaining = windowHeight - elDimensions.top - elDimensions.height - popup.offsetHeight;
-    const notEnoughRoomAboveElement =
-      elDimensions.top - popup.offsetHeight - spacing < spacing || (popupTop < spacing && bottomHeightRemaining > popup.offsetHeight + popupTop);
-    if (isUserName || notEnoughRoomAboveElement) {
-      placingBelow = true;
-      this.element.style.top = elDimensions.top + elDimensions.height + spacing + "px";
+    const elementMiddle = elDimensions.left + elDimensions.width / 2;
+    let popupLeft = elementMiddle + twitterHoverCardWidth / 2;
+    this.element.style.left = popupLeft + "px";
+
+    // Shift left or right if popup is falling off either side of the page
+    if (popupLeft < spacing) {
+      this.element.style.left = spacing + "px";
+    } else if (popupLeft + popup.offsetWidth > windowWidth - spacing) {
+      this.element.style.left = windowWidth - popup.offsetWidth - spacing + "px";
     }
-
-    // Default to placing hover card below element
-    // let placingBelow = true;
-    // const notEnoughRoomBelowElement = popupTop + popup.offsetHeight + spacing > windowHeight;
-    // if (notEnoughRoomBelowElement) {
-    //   placingBelow = false;
-    //   this.element.style.top = elDimensions.top - popup.offsetHeight - spacing + 10 + "px";
-    //   if (isAccountSwitcherButton) {
-    //     this.element.style.top = elDimensions.top - popup.offsetHeight - spacing - 10 + "px";
-    //   }
-    // }
-
-    // Default to placing hover card below element
-    // const notEnoughRoomBelowForTwitterHC = elDimensions.bottom + twitterHoverCardHeight > windowHeight;
-    // if (placingBelow && notEnoughRoomBelowForTwitterHC) {
-    //   popupLeft = elementMiddle - popup.offsetWidth / 2;
-    //   this.element.style.left = popupLeft + "px";
-    // }
-
-    // Default to placing hover card above element
-    const twitterHcIsAbove = elDimensions.bottom + twitterHoverCardHeight + spacing > windowHeight;
-    const shiftRight = ((!placingBelow && twitterHcIsAbove) || (placingBelow && !twitterHcIsAbove)) && !isUserName && !isAccountSwitcherButton;
-    if (shiftRight) {
-      popupLeft = elDimensions.left + 200;
-      this.element.style.left = popupLeft + "px";
-    }
-    // console.log(`this.element height: ${popup.offsetHeight}`);
   }
+
+  /**
+   * Position hover card below element and centered (relative to target element).
+   */
+  positionBelowAndCentered(element, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    const popup = this.element;
+
+    const elDimensions = element.getBoundingClientRect();
+
+    this.element.style.top = elDimensions.bottom + spacing + "px";
+
+    const elementMiddle = elDimensions.left + elDimensions.width / 2;
+    let popupLeft = elementMiddle - popup.offsetWidth / 2;
+    this.element.style.left = popupLeft + "px";
+
+    // Shift left or right if popup is falling off either side of the page
+    if (popupLeft < spacing) {
+      this.element.style.left = spacing + "px";
+    } else if (popupLeft + popup.offsetWidth > windowWidth - spacing) {
+      this.element.style.left = windowWidth - popup.offsetWidth - spacing + "px";
+    }
+  }
+
+  /**
+   * Position hover card below element and to the right (relative to target element).
+   */
+  positionBelowAndToRight(element, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    const popup = this.element;
+
+    const elDimensions = element.getBoundingClientRect();
+
+    this.element.style.top = elDimensions.bottom + spacing + "px";
+
+    const elementMiddle = elDimensions.left + elDimensions.width / 2;
+    const popupLeft = elementMiddle + twitterHoverCardWidth / 2;
+    this.element.style.left = popupLeft + "px";
+
+    // Shift left or right if popup is falling off either side of the page
+    if (popupLeft < spacing) {
+      this.element.style.left = spacing + "px";
+    } else if (popupLeft + popup.offsetWidth > windowWidth - spacing) {
+      this.element.style.left = windowWidth - popup.offsetWidth - spacing + "px";
+    }
+  }
+
   getHoloHtml() {
     const parentDiv = document.createElement("div");
     parentDiv.classList.add("x-card");

@@ -51,6 +51,7 @@ const addressToHolo = {
   },
 };
 let handleToHeight = {}; // height == height of twitter user hover card (not holo hover card)
+let handleToWidth = {}; // width == width of twitter user hover card (not holo hover card)
 let latestHandle = null;
 let nextAllowedUpdate = null;
 let showingAddr = false;
@@ -86,7 +87,11 @@ hoverCard.element.addEventListener("mouseleave", () => {
 function loadAndDisplayHolo(handle, targetElement, openId) {
   return new Promise((resolve) => {
     hoverCard.setHolo(addressToHolo[handleToAddr[handle]]);
-    hoverCard.positionAroundElement(targetElement, handleToHeight[handle]);
+
+    const elemRect = targetElement.getBoundingClientRect();
+    console.log(`targetElement top: ${elemRect.top}`);
+
+    hoverCard.positionAroundElement(targetElement, handleToWidth[handle], handleToHeight[handle]);
     hoverCard.open();
     resolve();
   });
@@ -222,12 +227,13 @@ let observer = new MutationObserver((mutations) => {
     for (const node of mutation.addedNodes) {
       if (node.textContent.includes("@")) {
         const rect = node.getBoundingClientRect();
-        const height = rect.bottom - rect.top;
-        // console.log(`node height: ${height}`);
-
-        const validHeight = height > 200 && height < 400;
+        const validHeight = rect.height > 200 && rect.height < 400;
         if (validHeight) {
-          handleToHeight[latestHandle] = height;
+          handleToHeight[latestHandle] = rect.height;
+        }
+        const validWidth = rect.width > 100 && rect.width < 350;
+        if (validWidth) {
+          handleToWidth[latestHandle] = rect.width;
         }
       }
     }
