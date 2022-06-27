@@ -90,10 +90,11 @@ class HoloHoverCard {
       isAccountSwitcherButton = true;
     }
     const twitterHCPotentialBottom = elDimensions.bottom + twitterHoverCardHeight + 20;
-    const twitterHCIsBelow = twitterHCPotentialBottom < windowHeight;
+    const twitterHCIsBelow = twitterHCPotentialBottom < windowHeight - 6;
     const holoHCCanBeAbove = elDimensions.top - hc.offsetHeight - spacing > 0;
     const holoHCCanBeBelow = elDimensions.bottom + hc.offsetHeight + spacing < windowHeight;
 
+    console.log(`elDimensions.bottom + twitterHoverCardHeight + 20: ${twitterHCPotentialBottom}`);
     console.log(`twitterHCIsBelow: ${twitterHCIsBelow}`);
     console.log(`holoHCCanBeAbove: ${holoHCCanBeAbove}`);
     console.log(`holoHCCanBeBelow: ${holoHCCanBeBelow}`);
