@@ -169,7 +169,7 @@ document.addEventListener(
 
       const openId = setTimeout(() => {
         if (hoverCard.openId === openId) {
-          const closePopup = function () {
+          const closeHoverCard = function () {
             if (hoverCard.closeId !== null) {
               clearTimeout(hoverCard.closeId);
             }
@@ -188,12 +188,12 @@ document.addEventListener(
               if (hoverCard.openId !== openId) {
                 return;
               }
-              target.addEventListener("mouseleave", closePopup, { passive: true, once: true });
+              target.addEventListener("mouseleave", closeHoverCard, { passive: true, once: true });
               // hoverCard.positionAroundElement(target, handleToHeight[handle]);
             })
             .catch(() => {
               target.removeEventListener("mouseleave", mouseOffBeforeLoad, { passive: true, once: true });
-              target.addEventListener("mouseleave", closePopup, { passive: true, once: true });
+              target.addEventListener("mouseleave", closeHoverCard, { passive: true, once: true });
             });
         }
       }, OPEN_DELAY);

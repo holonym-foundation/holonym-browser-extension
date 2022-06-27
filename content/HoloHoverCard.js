@@ -39,7 +39,7 @@ class HoloHoverCard {
 
   open() {
     return new Promise((resolve, reject) => {
-      this.closePopup = false;
+      this.closeHoverCard = false;
       this.element.style.visibility = "visible";
       const anim = this.element.animate([{ opacity: 0 }, { opacity: 1, offset: 0.75 }, { opacity: 1 }], { duration: 200, easing: "ease-in-out" });
       anim.addEventListener("finish", () => {
@@ -50,11 +50,11 @@ class HoloHoverCard {
   }
   close() {
     return new Promise((resolve, reject) => {
-      this.closePopup = true;
+      this.closeHoverCard = true;
       this.element.style.pointerEvents = "none";
       const anim = this.element.animate([{ opacity: 1 }, { opacity: 0, offset: 0.75 }, { opacity: 0 }], { duration: 200, easing: "ease-in-out" });
       anim.addEventListener("finish", () => {
-        if (this.closePopup) {
+        if (this.closeHoverCard) {
           this.element.style.visibility = "hidden";
         }
         resolve();
@@ -89,7 +89,7 @@ class HoloHoverCard {
     if (accountSwitcherButtonDiv && accountSwitcherButtonDiv.contains(targetElement)) {
       isAccountSwitcherButton = true;
     }
-    const twitterHCPotentialBottom = elDimensions.bottom + twitterHoverCardHeight;
+    const twitterHCPotentialBottom = elDimensions.bottom + twitterHoverCardHeight + 20;
     const twitterHCIsBelow = twitterHCPotentialBottom < windowHeight;
     const holoHCCanBeAbove = elDimensions.top - hc.offsetHeight - spacing > 0;
     const holoHCCanBeBelow = elDimensions.bottom + hc.offsetHeight + spacing < windowHeight;
@@ -134,103 +134,103 @@ class HoloHoverCard {
   /**
    * Position hover card above element and centered (relative to target element).
    */
-  positionAboveAndCentered(element, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20, isAccountSwitcherButton = false) {
+  positionAboveAndCentered(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20, isAccountSwitcherButton = false) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    const popup = this.element;
+    const hc = this.element; // holo hover card
 
-    const elDimensions = element.getBoundingClientRect();
+    const elDimensions = targetElement.getBoundingClientRect();
 
-    let popupTop = elDimensions.top - popup.offsetHeight - spacing + 10;
-    if (isAccountSwitcherButton) popupTop -= 20;
-    this.element.style.top = popupTop + "px";
+    let hcTop = elDimensions.top - hc.offsetHeight - spacing + 10;
+    if (isAccountSwitcherButton) hcTop -= 20;
+    this.element.style.top = hcTop + "px";
 
     const elementMiddle = elDimensions.left + elDimensions.width / 2;
-    let popupLeft = elementMiddle - popup.offsetWidth / 2;
-    this.element.style.left = popupLeft + "px";
+    let hcLeft = elementMiddle - hc.offsetWidth / 2;
+    this.element.style.left = hcLeft + "px";
 
-    // Shift left or right if popup is falling off either side of the page
-    if (popupLeft < spacing) {
+    // Shift left or right if hc is falling off either side of the page
+    if (hcLeft < spacing) {
       this.element.style.left = spacing + "px";
-    } else if (popupLeft + popup.offsetWidth > windowWidth - spacing) {
-      this.element.style.left = windowWidth - popup.offsetWidth - spacing + "px";
+    } else if (hcLeft + hc.offsetWidth > windowWidth - spacing) {
+      this.element.style.left = windowWidth - hc.offsetWidth - spacing + "px";
     }
   }
 
   /**
    * Position hover card above element and to the right (relative to target element).
    */
-  positionAboveAndToRight(element, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+  positionAboveAndToRight(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    const popup = this.element;
+    const hc = this.element; // holo hover card
 
-    const elDimensions = element.getBoundingClientRect();
+    const elDimensions = targetElement.getBoundingClientRect();
 
-    let popupTop = elDimensions.top - popup.offsetHeight - spacing + 10;
-    this.element.style.top = popupTop + "px";
+    let hcTop = elDimensions.top - hc.offsetHeight - spacing + 10;
+    this.element.style.top = hcTop + "px";
 
     const elementMiddle = elDimensions.left + elDimensions.width / 2;
-    let popupLeft = elementMiddle + twitterHoverCardWidth / 2;
-    this.element.style.left = popupLeft + "px";
+    let hcLeft = elementMiddle + twitterHoverCardWidth / 2;
+    this.element.style.left = hcLeft + "px";
 
-    // Shift left or right if popup is falling off either side of the page
-    if (popupLeft < spacing) {
+    // Shift left or right if hc is falling off either side of the page
+    if (hcLeft < spacing) {
       this.element.style.left = spacing + "px";
-    } else if (popupLeft + popup.offsetWidth > windowWidth - spacing) {
-      this.element.style.left = windowWidth - popup.offsetWidth - spacing + "px";
+    } else if (hcLeft + hc.offsetWidth > windowWidth - spacing) {
+      this.element.style.left = windowWidth - hc.offsetWidth - spacing + "px";
     }
   }
 
   /**
    * Position hover card below element and centered (relative to target element).
    */
-  positionBelowAndCentered(element, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+  positionBelowAndCentered(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    const popup = this.element;
+    const hc = this.element; // holo hover card
 
-    const elDimensions = element.getBoundingClientRect();
+    const elDimensions = targetElement.getBoundingClientRect();
 
     this.element.style.top = elDimensions.bottom + spacing + "px";
 
     const elementMiddle = elDimensions.left + elDimensions.width / 2;
-    let popupLeft = elementMiddle - popup.offsetWidth / 2;
-    this.element.style.left = popupLeft + "px";
+    let hcLeft = elementMiddle - hc.offsetWidth / 2;
+    this.element.style.left = hcLeft + "px";
 
-    // Shift left or right if popup is falling off either side of the page
-    if (popupLeft < spacing) {
+    // Shift left or right if hc is falling off either side of the page
+    if (hcLeft < spacing) {
       this.element.style.left = spacing + "px";
-    } else if (popupLeft + popup.offsetWidth > windowWidth - spacing) {
-      this.element.style.left = windowWidth - popup.offsetWidth - spacing + "px";
+    } else if (hcLeft + hc.offsetWidth > windowWidth - spacing) {
+      this.element.style.left = windowWidth - hc.offsetWidth - spacing + "px";
     }
   }
 
   /**
    * Position hover card below element and to the right (relative to target element).
    */
-  positionBelowAndToRight(element, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
+  positionBelowAndToRight(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 250, spacing = 20) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    const popup = this.element;
+    const hc = this.element;
 
-    const elDimensions = element.getBoundingClientRect();
+    const elDimensions = targetElement.getBoundingClientRect();
 
     this.element.style.top = elDimensions.bottom + spacing + "px";
 
     const elementMiddle = elDimensions.left + elDimensions.width / 2;
-    const popupLeft = elementMiddle + twitterHoverCardWidth / 2;
-    this.element.style.left = popupLeft + "px";
+    const hcLeft = elementMiddle + twitterHoverCardWidth / 2;
+    this.element.style.left = hcLeft + "px";
 
-    // Shift left or right if popup is falling off either side of the page
-    if (popupLeft < spacing) {
+    // Shift left or right if hc is falling off either side of the page
+    if (hcLeft < spacing) {
       this.element.style.left = spacing + "px";
-    } else if (popupLeft + popup.offsetWidth > windowWidth - spacing) {
-      this.element.style.left = windowWidth - popup.offsetWidth - spacing + "px";
+    } else if (hcLeft + hc.offsetWidth > windowWidth - spacing) {
+      this.element.style.left = windowWidth - hc.offsetWidth - spacing + "px";
     }
   }
 
