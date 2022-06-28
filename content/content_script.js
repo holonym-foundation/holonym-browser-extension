@@ -87,10 +87,6 @@ hoverCard.element.addEventListener("mouseleave", () => {
 function loadAndDisplayHolo(handle, targetElement, openId) {
   return new Promise((resolve) => {
     hoverCard.setHolo(addressToHolo[handleToAddr[handle]]);
-
-    const elemRect = targetElement.getBoundingClientRect();
-    console.log(`targetElement top: ${elemRect.top}`);
-
     hoverCard.positionAroundElement(targetElement, handleToWidth[handle], handleToHeight[handle]);
     hoverCard.open();
     resolve();

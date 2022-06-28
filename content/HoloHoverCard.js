@@ -69,12 +69,8 @@ class HoloHoverCard {
    * @param spacing The spacing (in px) between element and hover card and between hover card and page border.
    */
   positionAroundElement(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20) {
-    console.log(`twitterHoverCardWidth: ${twitterHoverCardWidth}`);
-    console.log(`twitterHoverCardHeight: ${twitterHoverCardHeight}`);
-
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
-    console.log(`windowHeight: ${windowHeight}`);
     const hc = this.element; // holo hover card
     const hcDimensions = hc.getBoundingClientRect();
     const elDimensions = targetElement.getBoundingClientRect();
@@ -96,47 +92,33 @@ class HoloHoverCard {
     const holoHCCanBeBelow = elDimensions.bottom + hcDimensions.height + spacing < windowHeight;
     const holoHCCanBeToRight = elDimensions.right + hcDimensions.width + spacing < windowWidth;
 
-    console.log(`elDimensions.bottom + twitterHoverCardHeight + 20: ${twitterHCPotentialBottom}`);
-    console.log(`twitterHCIsBelow: ${twitterHCIsBelow}`);
-    console.log(`holoHCCanBeAbove: ${holoHCCanBeAbove}`);
-    console.log(`holoHCCanBeBelow: ${holoHCCanBeBelow}`);
-
     // Special cases
     if (isAccountSwitcherButton) {
-      console.log("isAccountSwitcherButton");
       this.positionAboveAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing, isAccountSwitcherButton);
     } else if (isUserName) {
-      console.log("isUserName");
       this.positionBelowAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
     }
 
     // Case 1. Above, centered.
     else if (twitterHCIsBelow && holoHCCanBeAbove) {
-      console.log("above, centered");
       this.positionAboveAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
     }
     // Case 2. Below, centered.
     else if (!twitterHCIsBelow && holoHCCanBeBelow) {
-      console.log("below, centered");
       this.positionBelowAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
     }
     // Case 3. Above, on the right.
     else if (!twitterHCIsBelow && !holoHCCanBeBelow && holoHCCanBeToRight) {
-      console.log("above, on the right");
       this.positionAboveAndToRight(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
     }
     // Case 4. Below, on the right.
     else if (twitterHCIsBelow && !holoHCCanBeAbove && holoHCCanBeToRight) {
-      console.log("below, on the right");
       this.positionBelowAndToRight(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
     }
     // Case 5. Above, on the left.
     else if (!twitterHCIsBelow && holoHCCanBeAbove && !holoHCCanBeToRight) {
-      console.log("above, on the left");
       this.positionAboveAndToLeft(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
     }
-    console.log(`hc height: ${hc.offsetHeight}`);
-    console.log("----\n----");
   }
 
   /**
