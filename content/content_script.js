@@ -242,3 +242,34 @@ let observer = new MutationObserver((mutations) => {
   });
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
+/**
+ * API for storing Holo credentials
+ */
+
+const holoStore = new HoloStore();
+
+window.addEventListener("message", async function (event) {
+  if (event.source != window) return;
+
+  const message = event.data.message;
+  const newCreds = event.data.credentials;
+
+  // Get
+  if (message == "getHoloCredentials") {
+    holoStore.getCredentials().then((credentials) => {
+      injectCredentials(credentials);
+    });
+  }
+  // Set
+  else if (message == "setHoloCredentials") {
+    holoStore.setCredentials(newCreds);
+    injectCredentials(newCreds);
+  }
+});
+
+// In webpage:
+// set:
+// window.postMessage({message: 'setHoloCredentials', credentials: credentialsObject}, '*')
+// get (this tells extension to inject holoCredentials):
+// window.postMessage({message: 'getHoloCredentials'}, '*')

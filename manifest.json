@@ -10,10 +10,13 @@
   "content_scripts": [
     {
       "matches": ["file:///*", "http://*/*", "https://*/*"],
-      "js": ["content/HoloHoverCard.js", "content/content_script.js"],
+      "js": ["content/HoloHoverCard.js", "content/HoloStore.js", "content/content_script.js"],
       "css": ["content/HoverCard.css", "content/holo-wtf.css"],
       "run_at": "document_idle"
     }
   ],
-  "permissions": ["http://twitter.com/", "https://twitter.com/", "storage"]
+  "permissions": ["storage"],
+  "externally_connectable": {
+    "matches": ["http://*/*", "https://*/*"]
+  }
 }
