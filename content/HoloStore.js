@@ -5,6 +5,8 @@ class HoloStore {
   setCredentials(credentials) {
     // TODO: lots of validation checks.
     // TODO: popup that asks, "Are you sure you want to store this?"
+    const holoStorePopup = new HoloStorePopup();
+
     chrome.storage.sync.set({ holoCredentials: credentials }, () => {
       console.log(`HoloStore: Set credentials`);
     });
@@ -12,6 +14,7 @@ class HoloStore {
 
   getCredentials() {
     return new Promise((resolve, reject) => {
+      // const holoStorePopup = new HoloStorePopup();
       chrome.storage.sync.get(["holoCredentials"], (result) => {
         console.log("HoloStore: holoCredentials...");
         console.log(result);

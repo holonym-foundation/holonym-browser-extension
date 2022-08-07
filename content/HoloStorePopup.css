@@ -1,0 +1,23 @@
+/* #holo-store-popup {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  display: block;
+
+  height: 200px;
+  width: 300px;
+  background-color: white;
+  overflow: hidden;
+  visibility: hidden;
+  border: 1px solid lightgray;
+  border-radius: 16px;
+  transition: 200ms height;
+}
+
+#holo-store-popup.visible #holo-store-container {
+  display: block;
+}
+
+#holo-store-popup span {
+  display: block;
+} */
