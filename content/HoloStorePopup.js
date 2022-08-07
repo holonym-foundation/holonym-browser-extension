@@ -22,8 +22,10 @@ class HoloStorePopup {
   setCreds(creds) {
     this.creds = creds;
     this.credsPara.replaceChildren();
-    const credsEl = this.createCredsElement(creds.unencryptedCreds);
-    this.credsPara.appendChild(credsEl);
+    if (creds) {
+      const credsEl = this.createCredsElement(creds.unencryptedCreds);
+      this.credsPara.appendChild(credsEl);
+    }
   }
 
   /**

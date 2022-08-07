@@ -4,12 +4,25 @@
 
 const holoStorePopup = new HoloStorePopup();
 
+/**
+ * Ask user to confirm that they want to store their credentials.
+ * @returns True if user chooses to store creds, false if not.
+ */
 function displayPopup(creds) {
   return new Promise((resolve) => {
     holoStorePopup.setCreds(creds);
     holoStorePopup.open();
-    holoStorePopup.closeBtn.addEventListener("click", () => holoStorePopup.close(), { once: true });
-    resolve();
+
+    const closeFunc = () => {
+      holoStorePopup.close();
+      resolve(false);
+    };
+    const confirmFunc = () => {
+      holoStorePopup.close();
+      resolve(true);
+    };
+    holoStorePopup.closeBtn.addEventListener("click", closeFunc, { once: true });
+    holoStorePopup.confirmBtn.addEventListener("click", confirmFunc, { once: true });
   });
 }
 
@@ -22,12 +35,19 @@ class HoloStore {
         resolve(false);
       }
       console.log("HoloStore: credentials object has required keys. displaying popup");
-      // TODO: popup that asks, "Are you sure you want to store this?"
-      displayPopup(credentials);
+      const encryptedCreds = credentials.encryptedCreds;
 
-      chrome.storage.sync.set({ holoCredentials: credentials }, () => {
-        console.log(`HoloStore: Set credentials`);
-        resolve(true);
+      displayPopup(credentials).then((storeCreds) => {
+        if (storeCreds) {
+          chrome.storage.sync.set({ holoCredentials: encryptedCreds }, () => {
+            console.log(`HoloStore: Storing credentials`);
+            resolve(true);
+          });
+        } else {
+          console.log(`HoloStore: Not storing credentials`);
+          holoStorePopup.setCreds(undefined);
+          resolve(false);
+        }
       });
     });
   }
