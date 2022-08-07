@@ -91,13 +91,24 @@ class HoloStorePopup {
     this.credsPara.style.fontSize = "14px";
     parentDiv.appendChild(this.credsPara);
 
+    this.buttonsDiv = document.createElement("div");
+    this.buttonsDiv.style.display = "flex";
+    parentDiv.appendChild(this.buttonsDiv);
+
     this.closeBtn = document.createElement("button");
     this.closeBtn.textContent = "Close";
-    this.closeBtn.style.backgroundColor = "#ffffff";
+    this.closeBtn.style.float = "left";
+    this.closeBtn.style.color = "#ffffff";
     this.closeBtn.style.backgroundColor = "#000000";
     parentDiv.appendChild(this.closeBtn);
 
     // TODO: Confirmation button that removes unencryptedCreds from this.creds
+    this.confirmBtn = document.createElement("button");
+    this.confirmBtn.textContent = "Confirm";
+    this.confirmBtn.style.float = "right";
+    this.confirmBtn.style.color = "#000000";
+    this.confirmBtn.style.backgroundColor = "#ffffff";
+    parentDiv.appendChild(this.confirmBtn);
 
     return parentDiv;
   }
