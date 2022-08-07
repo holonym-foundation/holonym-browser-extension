@@ -1,12 +1,22 @@
 /**
  * API for storing Holo credentials
  */
+
+const holoStorePopup = new HoloStorePopup();
+
+function displayPopup(creds) {
+  return new Promise((resolve) => {
+    holoStorePopup.setCreds(creds);
+    holoStorePopup.open();
+    holoStorePopup.closeBtn.addEventListener("click", () => holoStorePopup.close(), { once: true });
+    resolve();
+  });
+}
+
 class HoloStore {
   setCredentials(credentials) {
     // TODO: lots of validation checks.
     // TODO: popup that asks, "Are you sure you want to store this?"
-    const holoStorePopup = new HoloStorePopup();
-
     chrome.storage.sync.set({ holoCredentials: credentials }, () => {
       console.log(`HoloStore: Set credentials`);
     });
@@ -14,11 +24,14 @@ class HoloStore {
 
   getCredentials() {
     return new Promise((resolve, reject) => {
-      // const holoStorePopup = new HoloStorePopup();
-      chrome.storage.sync.get(["holoCredentials"], (result) => {
+      chrome.storage.sync.get(["holoCredentials"], (creds) => {
         console.log("HoloStore: holoCredentials...");
-        console.log(result);
-        resolve(result?.holoCredentials);
+        console.log(creds);
+
+        // TODO: Delete the following line. Move it to setCredentials
+        displayPopup({ encryptedCreds: creds?.holoCredentials });
+
+        resolve(creds?.holoCredentials);
       });
     });
   }

@@ -2,7 +2,11 @@ class HoloStorePopup {
   constructor() {
     this.createElement();
     document.body.append(this.element);
-    // this.element.style.visibility = "hidden";
+    this.element.style.visibility = "hidden";
+    this.creds = {
+      unencryptedCreds: {},
+      encryptedCreds: "",
+    };
   }
   createElement() {
     this.element = document.createElement("div");
@@ -14,10 +18,13 @@ class HoloStorePopup {
     this.container.append(this.popupElement);
     this.element.append(this.container);
   }
+  setCreds(creds) {
+    this.creds = creds;
+  }
 
   open() {
     return new Promise((resolve, reject) => {
-      this.closeHoverCard = false;
+      this.closePopup = false;
       this.element.style.visibility = "visible";
       const anim = this.element.animate([{ opacity: 0 }, { opacity: 1, offset: 0.75 }, { opacity: 1 }], { duration: 200, easing: "ease-in-out" });
       anim.addEventListener("finish", () => {
@@ -28,11 +35,12 @@ class HoloStorePopup {
   }
   close() {
     return new Promise((resolve, reject) => {
-      this.closeHoverCard = true;
+      console.log("entered close()");
+      this.closePopup = true;
       this.element.style.pointerEvents = "none";
       const anim = this.element.animate([{ opacity: 1 }, { opacity: 0, offset: 0.75 }, { opacity: 0 }], { duration: 200, easing: "ease-in-out" });
       anim.addEventListener("finish", () => {
-        if (this.closeHoverCard) {
+        if (this.closePopup) {
           this.element.style.visibility = "hidden";
         }
         resolve();
@@ -44,12 +52,13 @@ class HoloStorePopup {
     const parentDiv = document.createElement("div");
     parentDiv.style.position = "fixed";
     parentDiv.style.display = "block";
-    parentDiv.style.top = "10px";
-    parentDiv.style.left = window.innerWidth / 2 + "px";
+    parentDiv.style.top = "0px";
+    parentDiv.style.right = "0%";
     parentDiv.style.zIndex = 99999;
-    parentDiv.style.backgroundColor = "black";
-    parentDiv.style.color = "white";
+    parentDiv.style.backgroundColor = "#0e2433";
+    parentDiv.style.color = "#ffffff";
     parentDiv.style.padding = "10px";
+    parentDiv.style.borderRadius = "5px";
 
     const titleElement = document.createElement("h2");
     titleElement.textContent = "Title";
@@ -59,6 +68,11 @@ class HoloStorePopup {
     credsPara.textContent = "{credential1: credential1, credential2: credential2}";
     credsPara.style.right = window.innerWidth;
     parentDiv.appendChild(credsPara);
+
+    this.closeBtn = document.createElement("button");
+    this.closeBtn.textContent = "Close";
+    // this.closeBtn.onclick = this.close;
+    parentDiv.appendChild(this.closeBtn);
 
     return parentDiv;
   }
