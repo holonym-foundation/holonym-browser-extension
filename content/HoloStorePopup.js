@@ -80,6 +80,8 @@ class HoloStorePopup {
     parentDiv.style.color = "#ffffff";
     parentDiv.style.padding = "10px";
     parentDiv.style.borderRadius = "5px";
+    parentDiv.style.maxWidth = "350px"; // TODO: Adjust according to screen size
+    parentDiv.style.overflowWrap = "break-word";
 
     const titleElement = document.createElement("h3");
     titleElement.textContent = "The following credentials will be encrypted and stored";
@@ -104,7 +106,6 @@ class HoloStorePopup {
     this.closeBtn.style.backgroundColor = "#000000";
     parentDiv.appendChild(this.closeBtn);
 
-    // TODO: Confirmation button that removes unencryptedCreds from this.creds
     this.confirmBtn = document.createElement("button");
     this.confirmBtn.textContent = "Confirm";
     this.confirmBtn.style.float = "right";
