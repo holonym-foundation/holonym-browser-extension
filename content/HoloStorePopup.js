@@ -18,8 +18,28 @@ class HoloStorePopup {
     this.container.append(this.popupElement);
     this.element.append(this.container);
   }
+
   setCreds(creds) {
     this.creds = creds;
+    this.credsPara.replaceChildren();
+    const credsEl = this.createCredsElement(creds.unencryptedCreds);
+    this.credsPara.appendChild(credsEl);
+  }
+
+  /**
+   * Helper function for formatting creds object for display. For each
+   * key-value pair in creds, a <p> element is created. All <p> elements
+   * are appended to a single div.
+   * @param {object} creds
+   */
+  createCredsElement(creds) {
+    const parentDiv = document.createElement("div");
+    for (const key of Object.keys(creds)) {
+      const para = document.createElement("p");
+      para.textContent = key + ": " + creds[key];
+      parentDiv.appendChild(para);
+    }
+    return parentDiv;
   }
 
   open() {
@@ -35,7 +55,6 @@ class HoloStorePopup {
   }
   close() {
     return new Promise((resolve, reject) => {
-      console.log("entered close()");
       this.closePopup = true;
       this.element.style.pointerEvents = "none";
       const anim = this.element.animate([{ opacity: 1 }, { opacity: 0, offset: 0.75 }, { opacity: 0 }], { duration: 200, easing: "ease-in-out" });
@@ -60,19 +79,25 @@ class HoloStorePopup {
     parentDiv.style.padding = "10px";
     parentDiv.style.borderRadius = "5px";
 
-    const titleElement = document.createElement("h2");
-    titleElement.textContent = "Title";
+    const titleElement = document.createElement("h3");
+    titleElement.textContent = "The following credentials will be encrypted and stored";
+    titleElement.style.fontSize = "20px";
     parentDiv.appendChild(titleElement);
 
-    const credsPara = document.createElement("p");
-    credsPara.textContent = "{credential1: credential1, credential2: credential2}";
-    credsPara.style.right = window.innerWidth;
-    parentDiv.appendChild(credsPara);
+    this.credsPara = document.createElement("p");
+    // this.credsPara.textContent = "{credential1: credential1, credential2: credential2}";
+    this.credsPara.textContent = JSON.stringify(this.creds?.unencryptedCreds);
+    this.credsPara.style.right = window.innerWidth;
+    this.credsPara.style.fontSize = "14px";
+    parentDiv.appendChild(this.credsPara);
 
     this.closeBtn = document.createElement("button");
     this.closeBtn.textContent = "Close";
-    // this.closeBtn.onclick = this.close;
+    this.closeBtn.style.backgroundColor = "#ffffff";
+    this.closeBtn.style.backgroundColor = "#000000";
     parentDiv.appendChild(this.closeBtn);
+
+    // TODO: Confirmation button that removes unencryptedCreds from this.creds
 
     return parentDiv;
   }

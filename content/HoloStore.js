@@ -15,10 +15,20 @@ function displayPopup(creds) {
 
 class HoloStore {
   setCredentials(credentials) {
-    // TODO: lots of validation checks.
-    // TODO: popup that asks, "Are you sure you want to store this?"
-    chrome.storage.sync.set({ holoCredentials: credentials }, () => {
-      console.log(`HoloStore: Set credentials`);
+    return new Promise((resolve) => {
+      // TODO: lots of validation checks.
+      if (!credentials.unencryptedCreds || !credentials.encryptedCreds) {
+        console.log("HoloStore: credentials object missing required keys");
+        resolve(false);
+      }
+      console.log("HoloStore: credentials object has required keys. displaying popup");
+      // TODO: popup that asks, "Are you sure you want to store this?"
+      displayPopup(credentials);
+
+      chrome.storage.sync.set({ holoCredentials: credentials }, () => {
+        console.log(`HoloStore: Set credentials`);
+        resolve(true);
+      });
     });
   }
 

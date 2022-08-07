@@ -263,8 +263,11 @@ window.addEventListener("message", async function (event) {
   }
   // Set
   else if (message == "setHoloCredentials") {
-    holoStore.setCredentials(newCreds);
-    injectCredentials(newCreds);
+    console.log("content_script: setting credentials");
+    const success = await holoStore.setCredentials(newCreds);
+    if (success) {
+      injectCredentials(newCreds);
+    }
   }
 });
 
