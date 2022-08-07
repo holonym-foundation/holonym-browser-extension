@@ -84,7 +84,7 @@ class HoloStorePopup {
     parentDiv.style.overflowWrap = "break-word";
 
     const titleElement = document.createElement("h3");
-    titleElement.textContent = "The following credentials will be encrypted and stored";
+    titleElement.textContent = "The following credentials will be stored";
     titleElement.style.fontSize = "20px";
     parentDiv.appendChild(titleElement);
 

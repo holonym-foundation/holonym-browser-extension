@@ -57,10 +57,6 @@ class HoloStore {
       chrome.storage.sync.get(["holoCredentials"], (creds) => {
         console.log("HoloStore: holoCredentials...");
         console.log(creds);
-
-        // TODO: Delete the following line. Move it to setCredentials
-        displayPopup({ encryptedCreds: creds?.holoCredentials });
-
         resolve(creds?.holoCredentials);
       });
     });
