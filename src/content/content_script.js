@@ -4,6 +4,9 @@
  * Stiqur: https://chrome.google.com/webstore/detail/stiqur/hoghhgffedpllikjpoaknoaaapagkpcf?hl=en
  */
 
+import HoloHoverCard from "./HoloHoverCard";
+import { HoloStore, injectCredentials } from "./HoloStore";
+
 const handleToAddr = {
   hebbianloop: "0xd638f5c8d434ebf6ba3a2527ba76b08813b4598e",
   "0xCaleb": "0x2a3a52b3335699c4064f5e13907192de42d89575",

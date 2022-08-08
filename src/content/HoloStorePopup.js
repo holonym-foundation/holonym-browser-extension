@@ -48,7 +48,10 @@ class HoloStorePopup {
     return new Promise((resolve, reject) => {
       this.closePopup = false;
       this.element.style.visibility = "visible";
-      const anim = this.element.animate([{ opacity: 0 }, { opacity: 1, offset: 0.75 }, { opacity: 1 }], { duration: 200, easing: "ease-in-out" });
+      const anim = this.element.animate(
+        [{ opacity: 0 }, { opacity: 1, offset: 0.75 }, { opacity: 1 }],
+        { duration: 200, easing: "ease-in-out" }
+      );
       anim.addEventListener("finish", () => {
         this.element.style.pointerEvents = "auto";
         resolve();
@@ -59,7 +62,10 @@ class HoloStorePopup {
     return new Promise((resolve, reject) => {
       this.closePopup = true;
       this.element.style.pointerEvents = "none";
-      const anim = this.element.animate([{ opacity: 1 }, { opacity: 0, offset: 0.75 }, { opacity: 0 }], { duration: 200, easing: "ease-in-out" });
+      const anim = this.element.animate(
+        [{ opacity: 1 }, { opacity: 0, offset: 0.75 }, { opacity: 0 }],
+        { duration: 200, easing: "ease-in-out" }
+      );
       anim.addEventListener("finish", () => {
         if (this.closePopup) {
           this.element.style.visibility = "hidden";
@@ -123,3 +129,5 @@ class HoloStorePopup {
     return this.element.classList.contains("loading");
   }
 }
+
+export default HoloStorePopup;

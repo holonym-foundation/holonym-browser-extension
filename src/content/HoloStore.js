@@ -2,6 +2,8 @@
  * API for storing Holo credentials
  */
 
+import HoloStorePopup from "./HoloStorePopup";
+
 // These keys must be present in unencryptedCreds
 const requiredCredsKeys = [
   "firstName",
@@ -131,3 +133,4 @@ function injectCredentials(credentials) {
  * - Perform checks on unencrypted creds.
  *    - Check that server signature is valid
  */
+export { HoloStore, injectCredentials };

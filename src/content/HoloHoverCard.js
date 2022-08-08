@@ -41,7 +41,10 @@ class HoloHoverCard {
     return new Promise((resolve, reject) => {
       this.closeHoverCard = false;
       this.element.style.visibility = "visible";
-      const anim = this.element.animate([{ opacity: 0 }, { opacity: 1, offset: 0.75 }, { opacity: 1 }], { duration: 200, easing: "ease-in-out" });
+      const anim = this.element.animate(
+        [{ opacity: 0 }, { opacity: 1, offset: 0.75 }, { opacity: 1 }],
+        { duration: 200, easing: "ease-in-out" }
+      );
       anim.addEventListener("finish", () => {
         this.element.style.pointerEvents = "auto";
         resolve();
@@ -52,7 +55,10 @@ class HoloHoverCard {
     return new Promise((resolve, reject) => {
       this.closeHoverCard = true;
       this.element.style.pointerEvents = "none";
-      const anim = this.element.animate([{ opacity: 1 }, { opacity: 0, offset: 0.75 }, { opacity: 0 }], { duration: 200, easing: "ease-in-out" });
+      const anim = this.element.animate(
+        [{ opacity: 1 }, { opacity: 0, offset: 0.75 }, { opacity: 0 }],
+        { duration: 200, easing: "ease-in-out" }
+      );
       anim.addEventListener("finish", () => {
         if (this.closeHoverCard) {
           this.element.style.visibility = "hidden";
@@ -68,7 +74,12 @@ class HoloHoverCard {
    * @param twitterHoverCardHeight The height of the card that Twitter displays when you hover over a handle.
    * @param spacing The spacing (in px) between element and hover card and between hover card and page border.
    */
-  positionAroundElement(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20) {
+  positionAroundElement(
+    targetElement,
+    twitterHoverCardWidth = 300,
+    twitterHoverCardHeight = 265,
+    spacing = 20
+  ) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
     const hc = this.element; // holo hover card
@@ -82,49 +93,95 @@ class HoloHoverCard {
       isUserName = true;
     }
     let isAccountSwitcherButton = false;
-    const accountSwitcherButtonDiv = document.querySelector("[data-testid=SideNav_AccountSwitcher_Button]");
+    const accountSwitcherButtonDiv = document.querySelector(
+      "[data-testid=SideNav_AccountSwitcher_Button]"
+    );
     if (accountSwitcherButtonDiv && accountSwitcherButtonDiv.contains(targetElement)) {
       isAccountSwitcherButton = true;
     }
     const twitterHCPotentialBottom = elDimensions.bottom + twitterHoverCardHeight + 20;
     const twitterHCIsBelow = twitterHCPotentialBottom < windowHeight - 6;
     const holoHCCanBeAbove = elDimensions.top - hcDimensions.height - spacing > 0;
-    const holoHCCanBeBelow = elDimensions.bottom + hcDimensions.height + spacing < windowHeight;
-    const holoHCCanBeToRight = elDimensions.right + hcDimensions.width + spacing < windowWidth;
+    const holoHCCanBeBelow =
+      elDimensions.bottom + hcDimensions.height + spacing < windowHeight;
+    const holoHCCanBeToRight =
+      elDimensions.right + hcDimensions.width + spacing < windowWidth;
 
     // Special cases
     if (isAccountSwitcherButton) {
-      this.positionAboveAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing, isAccountSwitcherButton);
+      this.positionAboveAndCentered(
+        targetElement,
+        twitterHoverCardWidth,
+        twitterHoverCardHeight,
+        spacing,
+        isAccountSwitcherButton
+      );
     } else if (isUserName) {
-      this.positionBelowAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+      this.positionBelowAndCentered(
+        targetElement,
+        twitterHoverCardWidth,
+        twitterHoverCardHeight,
+        spacing
+      );
     }
 
     // Case 1. Above, centered.
     else if (twitterHCIsBelow && holoHCCanBeAbove) {
-      this.positionAboveAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+      this.positionAboveAndCentered(
+        targetElement,
+        twitterHoverCardWidth,
+        twitterHoverCardHeight,
+        spacing
+      );
     }
     // Case 2. Below, centered.
     else if (!twitterHCIsBelow && holoHCCanBeBelow) {
-      this.positionBelowAndCentered(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+      this.positionBelowAndCentered(
+        targetElement,
+        twitterHoverCardWidth,
+        twitterHoverCardHeight,
+        spacing
+      );
     }
     // Case 3. Above, on the right.
     else if (!twitterHCIsBelow && !holoHCCanBeBelow && holoHCCanBeToRight) {
-      this.positionAboveAndToRight(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+      this.positionAboveAndToRight(
+        targetElement,
+        twitterHoverCardWidth,
+        twitterHoverCardHeight,
+        spacing
+      );
     }
     // Case 4. Below, on the right.
     else if (twitterHCIsBelow && !holoHCCanBeAbove && holoHCCanBeToRight) {
-      this.positionBelowAndToRight(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+      this.positionBelowAndToRight(
+        targetElement,
+        twitterHoverCardWidth,
+        twitterHoverCardHeight,
+        spacing
+      );
     }
     // Case 5. Above, on the left.
     else if (!twitterHCIsBelow && holoHCCanBeAbove && !holoHCCanBeToRight) {
-      this.positionAboveAndToLeft(targetElement, twitterHoverCardWidth, twitterHoverCardHeight, spacing);
+      this.positionAboveAndToLeft(
+        targetElement,
+        twitterHoverCardWidth,
+        twitterHoverCardHeight,
+        spacing
+      );
     }
   }
 
   /**
    * Position hover card above target element and centered (relative to target element).
    */
-  positionAboveAndCentered(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20, isAccountSwitcherButton = false) {
+  positionAboveAndCentered(
+    targetElement,
+    twitterHoverCardWidth = 300,
+    twitterHoverCardHeight = 265,
+    spacing = 20,
+    isAccountSwitcherButton = false
+  ) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -151,7 +208,12 @@ class HoloHoverCard {
   /**
    * Position hover card above target element and to the right (relative to target element).
    */
-  positionAboveAndToRight(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20) {
+  positionAboveAndToRight(
+    targetElement,
+    twitterHoverCardWidth = 300,
+    twitterHoverCardHeight = 265,
+    spacing = 20
+  ) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -177,7 +239,12 @@ class HoloHoverCard {
   /**
    * Position hover card above target element and to the left (relative to target element).
    */
-  positionAboveAndToLeft(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20) {
+  positionAboveAndToLeft(
+    targetElement,
+    twitterHoverCardWidth = 300,
+    twitterHoverCardHeight = 265,
+    spacing = 20
+  ) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -203,7 +270,12 @@ class HoloHoverCard {
   /**
    * Position hover card below target element and centered (relative to target element).
    */
-  positionBelowAndCentered(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20) {
+  positionBelowAndCentered(
+    targetElement,
+    twitterHoverCardWidth = 300,
+    twitterHoverCardHeight = 265,
+    spacing = 20
+  ) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -228,7 +300,12 @@ class HoloHoverCard {
   /**
    * Position hover card below target element and to the right (relative to target element).
    */
-  positionBelowAndToRight(targetElement, twitterHoverCardWidth = 300, twitterHoverCardHeight = 265, spacing = 20) {
+  positionBelowAndToRight(
+    targetElement,
+    twitterHoverCardWidth = 300,
+    twitterHoverCardHeight = 265,
+    spacing = 20
+  ) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -378,3 +455,5 @@ class HoloHoverCard {
     return this.element.classList.contains("loading");
   }
 }
+
+export default HoloHoverCard;

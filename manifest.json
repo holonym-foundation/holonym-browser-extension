@@ -10,8 +10,17 @@
   "content_scripts": [
     {
       "matches": ["file:///*", "http://*/*", "https://*/*"],
-      "js": ["content/HoloHoverCard.js", "content/HoloStorePopup.js", "content/HoloStore.js", "content/content_script.js"],
-      "css": ["content/HoverCard.css", "content/holo-wtf.css"],
+      "js": [
+        "src/content/HoloHoverCard.js",
+        "src/content/HoloStorePopup.js",
+        "src/content/HoloStore.js",
+        "src/content/content_script.js"
+      ],
+      "css": [
+        "src/content/HoverCard.css",
+        "src/content/holo-wtf.css",
+        "src/content/HoloStorePopup.css"
+      ],
       "run_at": "document_idle"
     }
   ],
