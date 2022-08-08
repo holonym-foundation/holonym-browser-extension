@@ -2,9 +2,13 @@
  * API for storing Holo credentials
  */
 
+import { ethers } from "ethers";
 import HoloStorePopup from "./HoloStorePopup";
+import { getStateAsBytes, getDateAsBytes } from "./utils";
+import { serverAddress, threeZeroedBytes } from "./constants";
+// const Buffer = require("buffer/").Buffer;
+import { Buffer } from "buffer";
 
-// These keys must be present in unencryptedCreds
 const requiredCredsKeys = [
   "firstName",
   "lastName",
@@ -79,9 +83,9 @@ class HoloStore {
       return false;
     }
     console.log("HoloStore: credentials object has required keys. displaying popup");
-    const unencryptedCredsKeys = Object.keys(credentials.unencryptedCreds);
 
     // Ensure unencryptedCreds object has all and only the required keys
+    const unencryptedCredsKeys = Object.keys(credentials.unencryptedCreds);
     const keysDiff = unencryptedCredsKeys
       .filter((key) => !requiredCredsKeys.includes(key))
       .concat(requiredCredsKeys.filter((key) => !unencryptedCredsKeys.includes(key)));
@@ -90,8 +94,48 @@ class HoloStore {
       return false;
     }
 
-    // TODO: Check serverSignature
+    const validSignature = this.validateServerSignature(credentials.unencryptedCreds);
+    if (!validSignature) {
+      console.log("HoloStore: Invalid server signature");
+      return false;
+    }
 
+    return true;
+  }
+  async validateServerSignature(unencryptedCreds) {
+    const arrayifiedAddr = ethers.utils.arrayify(serverAddress);
+    const arrayifiedSecret = ethers.utils.arrayify(unencryptedCreds.secret);
+    const credsArr = [
+      Buffer.concat([Buffer.from(unencryptedCreds.firstName || "")], 14),
+      Buffer.concat([Buffer.from(unencryptedCreds.lastName || "")], 14),
+      Buffer.concat([Buffer.from(unencryptedCreds.middleInitial || "")], 1),
+      Buffer.concat([Buffer.from(unencryptedCreds.countryCode || "")], 3),
+      Buffer.concat([Buffer.from(unencryptedCreds.streetAddr1 || "")], 16),
+      Buffer.concat([Buffer.from(unencryptedCreds.streetAddr2 || "")], 12),
+      Buffer.concat([Buffer.from(unencryptedCreds.city || "")], 16),
+      getStateAsBytes(unencryptedCreds.subdivision), // 2 bytes
+      Buffer.concat([Buffer.from(unencryptedCreds.postalCode || "")], 8),
+      unencryptedCreds.completedAt
+        ? getDateAsBytes(unencryptedCreds.completedAt)
+        : threeZeroedBytes,
+      unencryptedCreds.birthdate
+        ? getDateAsBytes(unencryptedCreds.birthdate)
+        : threeZeroedBytes,
+    ];
+    const arrayifiedCreds = ethers.utils.arrayify(Buffer.concat(credsArr));
+    const msg = Uint8Array.from([
+      ...arrayifiedAddr,
+      ...arrayifiedSecret,
+      ...arrayifiedCreds,
+    ]);
+    const signer = await ethers.utils.verifyMessage(
+      msg,
+      unencryptedCreds.serverSignature
+    );
+    if (signer.toLowerCase() != serverAddress.toLowerCase()) {
+      console.log("HoloStore: signer != serverAddress");
+      return false;
+    }
     return true;
   }
 
@@ -108,6 +152,7 @@ class HoloStore {
     });
   }
 }
+
 /**
  * @param {string} credentials An encrypted string.
  */
@@ -128,9 +173,4 @@ function injectCredentials(credentials) {
   }
 }
 
-/**
- * Store creds scheme:
- * - Perform checks on unencrypted creds.
- *    - Check that server signature is valid
- */
 export { HoloStore, injectCredentials };
