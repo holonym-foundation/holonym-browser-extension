@@ -62,7 +62,8 @@ class HoloStore {
           requiredCredsKeys.filter((key) => !unencryptedCredsKeys.includes(key))
         );
       if (keysDiff.length > 0) {
-        throw new Error("HoloStore: Incorrect creds keys");
+        console.log("HoloStore: Incorrect creds keys");
+        resolve(false);
       }
 
       displayPopup(credentials).then((storeCreds) => {
