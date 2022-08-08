@@ -2,6 +2,23 @@
  * API for storing Holo credentials
  */
 
+// These keys must be present in unencryptedCreds
+const requiredCredsKeys = [
+  "firstName",
+  "lastName",
+  "middleInitial",
+  "countryCode",
+  "streetAddr1",
+  "streetAddr2",
+  "city",
+  "subdivision",
+  "postalCode",
+  "completedAt",
+  "birthdate",
+  "serverSignature",
+  "secret",
+];
+
 const holoStorePopup = new HoloStorePopup();
 
 /**
@@ -35,7 +52,18 @@ class HoloStore {
         resolve(false);
       }
       console.log("HoloStore: credentials object has required keys. displaying popup");
+      const unencryptedCredsKeys = Object.keys(credentials.unencryptedCreds);
       const encryptedCreds = credentials.encryptedCreds;
+
+      // Ensure unencryptedCreds object has all and only the required keys
+      const keysDiff = unencryptedCredsKeys
+        .filter((key) => !requiredCredsKeys.includes(key))
+        .concat(
+          requiredCredsKeys.filter((key) => !unencryptedCredsKeys.includes(key))
+        );
+      if (keysDiff.length > 0) {
+        throw new Error("HoloStore: Incorrect creds keys");
+      }
 
       displayPopup(credentials).then((storeCreds) => {
         if (storeCreds) {
