@@ -247,6 +247,8 @@ observer.observe(document.body, { childList: true, subtree: true });
  * API for storing Holo credentials
  */
 
+const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
+
 const holoStore = new HoloStore();
 
 window.addEventListener("message", async function (event) {
@@ -254,6 +256,12 @@ window.addEventListener("message", async function (event) {
 
   const message = event.data.message;
   const newCreds = event.data.credentials;
+
+  if (message != "getHoloCredentials" && message != "setHoloCredentials") {
+    return;
+  } else if (!allowedOrigins.includes(event.origin)) {
+    throw new Error("Disallowed origin attempting to access or modify HoloStore.");
+  }
 
   // Get
   if (message == "getHoloCredentials") {
