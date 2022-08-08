@@ -46,7 +46,14 @@ const addressToHolo = {
       orcid: "0000-0002-2308-9517",
       google: "wtfprotocol@gmail.com",
     },
-    mumbai: { name: "", bio: "", twitter: "NanakNihal", discord: "nnsk#4182", github: "nanaknihal", orcid: "0000-0002-2308-9517" },
+    mumbai: {
+      name: "",
+      bio: "",
+      twitter: "NanakNihal",
+      discord: "nnsk#4182",
+      github: "nanaknihal",
+      orcid: "0000-0002-2308-9517",
+    },
     address: "0xc8834c1fcf0df6623fc8c8ed25064a4148d99388",
   },
 };
@@ -87,7 +94,11 @@ hoverCard.element.addEventListener("mouseleave", () => {
 function loadAndDisplayHolo(handle, targetElement, openId) {
   return new Promise((resolve) => {
     hoverCard.setHolo(addressToHolo[handleToAddr[handle]]);
-    hoverCard.positionAroundElement(targetElement, handleToWidth[handle], handleToHeight[handle]);
+    hoverCard.positionAroundElement(
+      targetElement,
+      handleToWidth[handle],
+      handleToHeight[handle]
+    );
     hoverCard.open();
     resolve();
   });
@@ -180,16 +191,28 @@ document.addEventListener(
 
           loadAndDisplayHolo(handle, target, openId)
             .then(() => {
-              target.removeEventListener("mouseleave", mouseOffBeforeLoad, { passive: true, once: true });
+              target.removeEventListener("mouseleave", mouseOffBeforeLoad, {
+                passive: true,
+                once: true,
+              });
               if (hoverCard.openId !== openId) {
                 return;
               }
-              target.addEventListener("mouseleave", closeHoverCard, { passive: true, once: true });
+              target.addEventListener("mouseleave", closeHoverCard, {
+                passive: true,
+                once: true,
+              });
               // hoverCard.positionAroundElement(target, handleToHeight[handle]);
             })
             .catch(() => {
-              target.removeEventListener("mouseleave", mouseOffBeforeLoad, { passive: true, once: true });
-              target.addEventListener("mouseleave", closeHoverCard, { passive: true, once: true });
+              target.removeEventListener("mouseleave", mouseOffBeforeLoad, {
+                passive: true,
+                once: true,
+              });
+              target.addEventListener("mouseleave", closeHoverCard, {
+                passive: true,
+                once: true,
+              });
             });
         }
       }, OPEN_DELAY);
@@ -209,7 +232,10 @@ document.addEventListener(
         hoverCard.openId = null;
         clearTimeout(openId);
       };
-      target.addEventListener("mouseleave", mouseOffBeforeLoad, { passive: true, once: true });
+      target.addEventListener("mouseleave", mouseOffBeforeLoad, {
+        passive: true,
+        once: true,
+      });
     }
   },
   { passive: true }

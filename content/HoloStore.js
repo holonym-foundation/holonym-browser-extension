@@ -44,27 +44,17 @@ function displayPopup(creds) {
 }
 
 class HoloStore {
+  /**
+   * @param {object} credentials Object containing: unencryptedCreds (obj) & encryptedCreds (str)
+   * @returns True if the given credentials get stored, false otherwise.
+   */
   setCredentials(credentials) {
     return new Promise((resolve) => {
-      // TODO: lots of validation checks.
-      if (!credentials.unencryptedCreds || !credentials.encryptedCreds) {
-        console.log("HoloStore: credentials object missing required keys");
+      if (!this.validateCredentials(credentials)) {
         resolve(false);
       }
-      console.log("HoloStore: credentials object has required keys. displaying popup");
-      const unencryptedCredsKeys = Object.keys(credentials.unencryptedCreds);
-      const encryptedCreds = credentials.encryptedCreds;
 
-      // Ensure unencryptedCreds object has all and only the required keys
-      const keysDiff = unencryptedCredsKeys
-        .filter((key) => !requiredCredsKeys.includes(key))
-        .concat(
-          requiredCredsKeys.filter((key) => !unencryptedCredsKeys.includes(key))
-        );
-      if (keysDiff.length > 0) {
-        console.log("HoloStore: Incorrect creds keys");
-        resolve(false);
-      }
+      const encryptedCreds = credentials.encryptedCreds;
 
       displayPopup(credentials).then((storeCreds) => {
         if (storeCreds) {
@@ -81,6 +71,31 @@ class HoloStore {
     });
   }
 
+  validateCredentials(credentials) {
+    if (!credentials.unencryptedCreds || !credentials.encryptedCreds) {
+      console.log("HoloStore: credentials object missing required keys");
+      return false;
+    }
+    console.log("HoloStore: credentials object has required keys. displaying popup");
+    const unencryptedCredsKeys = Object.keys(credentials.unencryptedCreds);
+
+    // Ensure unencryptedCreds object has all and only the required keys
+    const keysDiff = unencryptedCredsKeys
+      .filter((key) => !requiredCredsKeys.includes(key))
+      .concat(requiredCredsKeys.filter((key) => !unencryptedCredsKeys.includes(key)));
+    if (keysDiff.length > 0) {
+      console.log("HoloStore: Incorrect creds keys");
+      return false;
+    }
+
+    // TODO: Check serverSignature
+
+    return true;
+  }
+
+  /**
+   * @returns The last valid value that was supplied to setCredentials as credentials.encryptedCreds
+   */
   getCredentials() {
     return new Promise((resolve, reject) => {
       chrome.storage.sync.get(["holoCredentials"], (creds) => {
@@ -113,8 +128,6 @@ function injectCredentials(credentials) {
 
 /**
  * Store creds scheme:
- * - Require unencrypted creds object and encrypted creds object
  * - Perform checks on unencrypted creds.
  *    - Check that server signature is valid
- *    - Check that all keys are present
  */
