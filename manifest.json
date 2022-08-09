@@ -17,6 +17,6 @@
   ],
   "permissions": ["storage"],
   "externally_connectable": {
-    "matches": ["http://*/*", "https://*/*"]
+    "matches": ["https://app.holonym.id/*"]
   }
 }
