@@ -276,9 +276,8 @@ observer.observe(document.body, { childList: true, subtree: true });
  * API for storing Holo credentials
  */
 
-const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
-
 const holoStore = new HoloStore();
+const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
 
 window.addEventListener("message", async function (event) {
   if (event.source != window) return;
@@ -294,9 +293,8 @@ window.addEventListener("message", async function (event) {
 
   // Get
   if (message == "getHoloCredentials") {
-    holoStore.getCredentials().then((credentials) => {
-      injectCredentials(credentials);
-    });
+    const creds = await holoStore.getCredentials();
+    injectCredentials(creds);
   }
   // Set
   else if (message == "setHoloCredentials") {
