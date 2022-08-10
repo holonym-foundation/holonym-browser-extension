@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "build": "cp ./manifest.json ./dist/manifest.json && cp ./src/content/*.css ./dist && rollup --config rollup.config.js"
+    "build": "rm -rf ./dist/* && cp ./manifest.json ./dist/manifest.json && cp ./src/content/*.css ./dist && rollup --config rollup.config.js"
   },
   "dependencies": {
     "@rollup/plugin-commonjs": "^22.0.2",
