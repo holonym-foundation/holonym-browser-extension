@@ -36,7 +36,16 @@ class HoloStorePopup {
    */
   createCredsElement(creds) {
     const parentDiv = document.createElement("div");
-    for (const key of Object.keys(creds)) {
+
+    const defaultCredsToIgnore = ["completedAt", "serverSignature", "secret"];
+    const credsToDisplay = Object.keys(creds).filter(
+      (key) => !defaultCredsToIgnore.includes(key)
+    );
+
+    for (const key of credsToDisplay) {
+      // Ignore null credential unless it is countryCode
+      if (!creds[key] && key != "countryCode") continue;
+
       const para = document.createElement("p");
       para.textContent = key + ": " + creds[key];
       parentDiv.appendChild(para);
