@@ -1,5 +1,5 @@
 /**
- * EncryptionController handles encryption and decryption of user's
+ * CryptoController handles encryption and decryption of user's
  * public-private keypair, which are used to encrypt and decrypt secrets
  * when they need to be sent accross a compromised communication channel or displayed.
  */
@@ -12,7 +12,7 @@
 
 import passworder from "browser-passworder";
 
-class EncryptionController {
+class CryptoController {
   #store;
 
   constructor() {
@@ -104,7 +104,7 @@ class EncryptionController {
   #setEncryptedKeyPair(keyPair) {
     return new Promise((resolve) => {
       chrome.storage.sync.set({ holoKeyPair: keyPair }, () => {
-        console.log(`EncryptionController: Stored encrypted key pair`); // TODO: Delete. For tests only
+        console.log(`CryptoController: Stored encrypted key pair`); // TODO: Delete. For tests only
         resolve();
       });
     });
@@ -113,7 +113,7 @@ class EncryptionController {
   #getEncryptedKeyPair() {
     return new Promise((resolve) => {
       chrome.storage.sync.get(["holoKeyPair"], (encryptedKeyPair) => {
-        console.log(`EncryptionController: Getting encrypted key pair`); // TODO: Delete. For tests only
+        console.log(`CryptoController: Getting encrypted key pair`); // TODO: Delete. For tests only
         resolve(encryptedKeyPair);
       });
     });
@@ -152,7 +152,7 @@ class EncryptionController {
   #setPasswordHash(passwordHash) {
     return new Promise((resolve) => {
       chrome.storage.sync.set({ holoPasswordHash: passwordHash }, () => {
-        console.log(`EncryptionController: Stored password hash`); // TODO: Delete. For tests only
+        console.log(`CryptoController: Stored password hash`); // TODO: Delete. For tests only
         resolve();
       });
     });
@@ -161,7 +161,7 @@ class EncryptionController {
   #getPasswordHash() {
     return new Promise((resolve) => {
       chrome.storage.sync.get(["holoPasswordHash"], (passwordHash) => {
-        console.log(`EncryptionController: Getting password hash`); // TODO: Delete. For tests only
+        console.log(`CryptoController: Getting password hash`); // TODO: Delete. For tests only
         resolve(passwordHash);
       });
     });
@@ -178,4 +178,4 @@ class EncryptionController {
   // those messages with the user's private key.
 }
 
-export { EncryptionController };
+export { CryptoController };
