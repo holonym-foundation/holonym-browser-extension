@@ -47,7 +47,13 @@ class HoloStorePopup {
       if (!creds[key] && key != "countryCode") continue;
 
       const para = document.createElement("p");
-      para.textContent = key + ": " + creds[key];
+      const keySpan = document.createElement("span");
+      keySpan.textContent = key;
+      keySpan.style.textDecoration = "underline";
+      para.appendChild(keySpan);
+      const credsSpan = document.createElement("span");
+      credsSpan.textContent = ": " + creds[key];
+      para.appendChild(credsSpan);
       parentDiv.appendChild(para);
     }
     return parentDiv;
