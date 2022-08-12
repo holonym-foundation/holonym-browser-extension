@@ -13,24 +13,28 @@ window.addEventListener("message", async function (event) {
   const message = event.data.message;
   const newCreds = event.data.credentials;
 
-  if (message != "getHoloCredentials" && message != "setHoloCredentials") {
+  // if (message != "getHoloCredentials" && message != "setHoloCredentials") {
+  if (message != "setHoloCredentials") {
     return;
   } else if (!allowedOrigins.includes(event.origin)) {
     throw new Error("Disallowed origin attempting to access or modify HoloStore.");
   }
 
   // Get
-  if (message == "getHoloCredentials") {
-    const creds = await holoStore.getCredentials();
-    injectCredentials(creds);
-  }
+  // if (message == "getHoloCredentials") {
+  //   const creds = await holoStore.getCredentials();
+  //   injectCredentials(creds);
+  // }
   // Set
-  else if (message == "setHoloCredentials") {
+  if (message == "setHoloCredentials") {
     console.log("content_script: setting credentials");
-    const success = await holoStore.setCredentials(newCreds);
-    if (success) {
-      injectCredentials(newCreds);
-    }
+    await holoStore.setLatestMessage(newCreds);
+    chrome.action.openPopup();
+
+    // const success = await holoStore.setCredentials(newCreds);
+    // if (success) {
+    //   injectCredentials(newCreds);
+    // }
   }
 });
 

@@ -1,5 +1,11 @@
 class HoloStorePopup {
-  constructor() {
+  constructor(window) {
+    console.log("HoloStorePopup: window...");
+    console.log(window);
+    console.log("HoloStorePopup: window.document...");
+    console.log(window.document);
+    this.window = window;
+    document = window.document;
     this.createElement();
     document.body.append(this.element);
     this.element.style.visibility = "hidden";
@@ -77,16 +83,19 @@ class HoloStorePopup {
     return new Promise((resolve, reject) => {
       this.closePopup = true;
       this.element.style.pointerEvents = "none";
-      const anim = this.element.animate(
-        [{ opacity: 1 }, { opacity: 0, offset: 0.75 }, { opacity: 0 }],
-        { duration: 200, easing: "ease-in-out" }
-      );
-      anim.addEventListener("finish", () => {
-        if (this.closePopup) {
-          this.element.style.visibility = "hidden";
-        }
-        resolve();
-      });
+
+      chrome.windows.remove(this.window.id, () => resolve());
+
+      // const anim = this.element.animate(
+      //   [{ opacity: 1 }, { opacity: 0, offset: 0.75 }, { opacity: 0 }],
+      //   { duration: 200, easing: "ease-in-out" }
+      // );
+      // anim.addEventListener("finish", () => {
+      //   if (this.closePopup) {
+      //     this.element.style.visibility = "hidden";
+      //   }
+      //   resolve();
+      // });
     });
   }
 
@@ -145,4 +154,4 @@ class HoloStorePopup {
   }
 }
 
-export default HoloStorePopup;
+export { HoloStorePopup };

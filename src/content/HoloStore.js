@@ -1,12 +1,11 @@
 /**
- * API for storing Holo credentials
+ * API for storing Holo credentials.
  */
 
 import { ethers } from "ethers";
-import HoloStorePopup from "./HoloStorePopup";
+import { HoloStorePopup } from "./HoloStorePopup";
 import { getStateAsBytes, getDateAsBytes } from "./utils";
 import { serverAddress, threeZeroedBytes } from "./constants";
-// const Buffer = require("buffer/").Buffer;
 import { Buffer } from "buffer";
 
 const requiredCredsKeys = [
@@ -25,32 +24,97 @@ const requiredCredsKeys = [
   "secret",
 ];
 
-const holoStorePopup = new HoloStorePopup();
-
 /**
  * Ask user to confirm that they want to store their credentials.
  * @returns True if user chooses to store creds, false if not.
  */
-function displayPopup(creds) {
-  return new Promise((resolve) => {
-    holoStorePopup.setCreds(creds);
-    holoStorePopup.open();
+// function displayPopup(creds) {
+//   return new Promise((resolve) => {
+//     console.log("creating window");
+//     const config = {
+//       setSelfAsOpener: false,
+//       url: "index.html",
+//       focused: true,
+//       type: "popup",
+//       width: 500,
+//       height: 600,
+//       left: 0,
+//       top: 0,
+//     };
+//     const callback = (window) => {
+//       console.log("window created");
 
-    const closeFunc = () => {
-      holoStorePopup.close();
-      resolve(false);
-    };
-    const confirmFunc = () => {
-      holoStorePopup.close();
-      resolve(true);
-    };
-    holoStorePopup.closeBtn.addEventListener("click", closeFunc, { once: true });
-    holoStorePopup.confirmBtn.addEventListener("click", confirmFunc, { once: true });
-  });
-}
+//       const holoStorePopup = new HoloStorePopup(window);
+//       holoStorePopup.setCreds(creds);
+//       holoStorePopup.open();
 
+//       const closeFunc = () => {
+//         holoStorePopup.close();
+//         resolve(false);
+//       };
+//       const confirmFunc = () => {
+//         holoStorePopup.close();
+//         resolve(true);
+//       };
+//       holoStorePopup.closeBtn.addEventListener("click", closeFunc, { once: true });
+//       holoStorePopup.confirmBtn.addEventListener("click", confirmFunc, { once: true });
+//     };
+//     chrome.windows.create(config, callback);
+//   });
+// }
+
+/**
+ * HoloStore has two stores:
+ * (1) "latestHoloMessage"--This stores the latest message sent to the user.
+ * (2) "holoCredentials"--This stores the user's encrypted credentials.
+ *
+ * Credentials should be stored in (1) before being stored in (2). The
+ * user must submit confirmation that they want their credentials to be
+ * stored before the credentials can be stored in (1).
+ */
 class HoloStore {
   /**
+   * NOTE: Message will only be added if it passes certain validation checks
+   * @param {string} message
+   * @returns True if successful, false otherwise.
+   */
+  setLatestMessage(message) {
+    return new Promise((resolve) => {
+      console.log("HoloStore: setting latestHoloMessage to...");
+      console.log(message);
+      chrome.storage.sync.set({ latestHoloMessage: message }, () => resolve(true));
+    });
+  }
+
+  getLatestMessage() {
+    return new Promise((resolve) => {
+      chrome.storage.sync.get(["latestHoloMessage"], (message) => {
+        resolve(message);
+      });
+    });
+  }
+
+  /**
+   * Display popup asking user to confirm that they want to store
+   * the provided credentials.
+   */
+  // requestConfirmationToStore() {
+  //   console.log("creating window");
+  //   const config = {
+  //     setSelfAsOpener: false,
+  //     url: "index.html",
+  //     focused: true,
+  //     type: "popup",
+  //     width: 500,
+  //     height: 600,
+  //     left: 0,
+  //     top: 0,
+  //   };
+  //   chrome.windows.create(config, (window) => console.log("window created"));
+  // }
+
+  /**
+   * OUTDATED
    * @param {object} credentials Object containing: unencryptedCreds (obj) & encryptedCreds (str)
    * @returns True if the given credentials get stored, false otherwise.
    */
@@ -70,7 +134,6 @@ class HoloStore {
           });
         } else {
           console.log(`HoloStore: Not storing credentials`);
-          holoStorePopup.setCreds(undefined);
           resolve(false);
         }
       });
