@@ -41,6 +41,7 @@ class CryptoController {
    */
   async #createPassword(password) {
     // if (await this.#getPasswordHash()) return;
+    this.#store.password = password;
     const passwordHash = await this.hash(password);
     await this.#setPasswordHash(passwordHash);
   }
@@ -62,18 +63,8 @@ class CryptoController {
     const keyPair = await window.crypto.subtle.generateKey(algo, true, usage);
     const privateKey = await window.crypto.subtle.exportKey("jwk", keyPair.privateKey);
     const publicKey = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
-
-    console.log("generateKeyPair: privateKey...");
-    console.log(privateKey);
-    console.log("generateKeyPair: public key");
-    console.log(publicKey);
-
     const encryptedPrivateKey = await this.encryptWithPassword(privateKey);
-    const keyPairObj = {
-      privateKey: encryptedPrivateKey,
-      publicKey: publicKey,
-    };
-    await this.#setKeyPair(keyPairObj);
+    await this.#setKeyPair(encryptedPrivateKey, publicKey);
   }
 
   /**
@@ -86,12 +77,6 @@ class CryptoController {
     if (passwordHash != storedPasswordHash) return false;
     this.#store.password = password;
     const keyPair = await this.#getKeyPair();
-
-    console.log("login: keyPair...");
-    console.log(keyPair);
-    console.log("login: keyPair.privateKey...");
-    console.log(keyPair.privateKey);
-
     this.#store.privateKey = await this.decryptWithPassword(keyPair.privateKey);
     return true;
   }
@@ -126,12 +111,6 @@ class CryptoController {
         console.log(
           `CryptoController: Stored encrypted private key and plaintext public key`
         ); // TODO: Delete. For tests only
-
-        console.log("setKeyPair: keyPair...");
-        console.log(keyPair);
-        console.log("setKeyPair: keyPair.privateKey...");
-        console.log(keyPair.privateKey);
-
         resolve();
       });
     });
@@ -139,9 +118,9 @@ class CryptoController {
 
   #getKeyPair() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(["holoKeyPair"], (keyPair) => {
+      chrome.storage.sync.get(["holoKeyPair"], (result) => {
         console.log(`CryptoController: Getting key pair`); // TODO: Delete. For tests only
-        resolve(keyPair);
+        resolve(result.holoKeyPair);
       });
     });
   }
@@ -151,9 +130,9 @@ class CryptoController {
    */
   getPublicKey() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(["holoKeyPair"], (keyPair) => {
+      chrome.storage.sync.get(["holoKeyPair"], (result) => {
         console.log(`CryptoController: Getting public key`); // TODO: Delete. For tests only
-        resolve(keyPair.publicKey);
+        resolve(result.holoKeyPair.publicKey);
       });
     });
   }
@@ -162,6 +141,8 @@ class CryptoController {
    * @param {object} data
    */
   async encryptWithPassword(data) {
+    console.log("encryptWithPassword: this.#store.password...");
+    console.log(this.#store.password);
     return await passworder.encrypt(this.#store.password, data);
   }
 
@@ -169,10 +150,8 @@ class CryptoController {
    * @param {string} data
    */
   async decryptWithPassword(data) {
-    console.log("decryptWithPassword: this.#store.password");
+    console.log("decryptWithPassword: this.#store.password...");
     console.log(this.#store.password);
-    console.log("decryptWithPassword: data");
-    console.log(data);
     return await passworder.decrypt(this.#store.password, data);
   }
 
@@ -203,9 +182,9 @@ class CryptoController {
 
   #getPasswordHash() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(["holoPasswordHash"], (passwordHash) => {
+      chrome.storage.sync.get(["holoPasswordHash"], (result) => {
         console.log(`CryptoController: Getting password hash`); // TODO: Delete. For tests only
-        resolve(passwordHash.holoPasswordHash);
+        resolve(result.holoPasswordHash);
       });
     });
   }
