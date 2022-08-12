@@ -3,9 +3,9 @@
  */
 function getPublicKey() {
   return new Promise((resolve) => {
-    chrome.storage.sync.get(["holoKeyPair"], (keyPair) => {
+    chrome.storage.sync.get(["holoKeyPair"], (result) => {
       console.log(`background: Getting public key`); // TODO: Delete. For tests only
-      resolve(keyPair.publicKey);
+      resolve(result.holoKeyPair.publicKey);
     });
   });
 }
