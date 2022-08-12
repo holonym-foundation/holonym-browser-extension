@@ -9,5 +9,6 @@ window.onload = function () {
     const password = event.target.password.value;
     const loginSuccess = await cryptoController.login(password);
     console.log(`loginSuccess: ${loginSuccess}`);
+    formEl.password.value = "";
   };
 };
