@@ -4,9 +4,9 @@ import commonjs from "@rollup/plugin-commonjs";
 export default [
   {
     // Content script
-    input: "./src/content/content_script.js",
+    input: "./src/content/content.js",
     output: {
-      file: "./dist/content_script.js",
+      file: "./dist/content.js",
       format: "es",
     },
     plugins: [

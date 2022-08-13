@@ -17,7 +17,7 @@ function getPublicKey() {
 const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
 const allowedMessages = [
   // "getHoloCredentials",
-  // "setHoloCredentials",
+  "setHoloCredentials",
   "getHoloPublicKey",
 ];
 
@@ -35,6 +35,7 @@ async function listener(request, sender, sendResponse) {
 
   // Get public key
   if (message == "getHoloPublicKey") {
+    console.log("background: getting public key");
     const publicKey = await getPublicKey();
     console.log("background: public key...");
     console.log(publicKey);
