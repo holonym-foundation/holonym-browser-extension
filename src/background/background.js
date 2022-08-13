@@ -10,15 +10,38 @@ function getPublicKey() {
   });
 }
 
+function createPopupWindow() {
+  const config = {
+    focused: true,
+    height: 500,
+    width: 400,
+    incognito: false,
+    // Re: setSelfAsOpener: When true, can other browser extensions intercept
+    // messages from window.postMessage? Or are the background script (and thus
+    // the new window) in an isolated world? Is their context wholly separate
+    // from the rest of the windows in the browser?
+    setSelfAsOpener: true,
+    type: "popup",
+    url: "confirmation.html",
+  };
+  const callback = (window) => {
+    window.addEventListener("message", (event) => {
+      const message = event.data;
+      console.log("Received message from popup");
+    });
+  };
+  chrome.windows.create(config, callback);
+}
+
 /**
  * API for storing Holo credentials
  */
 
 const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
 const allowedMessages = [
+  "getHoloPublicKey",
   // "getHoloCredentials",
   "setHoloCredentials",
-  "getHoloPublicKey",
 ];
 
 async function listener(request, sender, sendResponse) {
@@ -41,6 +64,8 @@ async function listener(request, sender, sendResponse) {
     console.log(publicKey);
     sendResponse(publicKey);
     return;
+  } else if (message == "setHoloCredentials") {
+    createPopupWindow();
   }
 }
 

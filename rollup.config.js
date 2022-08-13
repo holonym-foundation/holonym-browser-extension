@@ -34,7 +34,7 @@ export default [
   },
   {
     // Popup script
-    input: "./src/popup/popup.js",
+    input: "./src/default_popup/popup.js",
     output: {
       file: "./dist/popup.js",
       format: "es",

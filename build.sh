@@ -2,8 +2,8 @@
 
 rm -rf ./dist/* 
 cp ./manifest.json ./dist/manifest.json
-cp ./src/popup.html ./dist/popup.html
+cp ./src/default_popup/default_popup.html ./dist/default_popup.html
 cp ./src/content/*.css ./dist
-cp ./src/index.html ./dist/index.html
+cp ./src/confirmation.html ./dist/confirmation.html
 
 rollup --config rollup.config.js
