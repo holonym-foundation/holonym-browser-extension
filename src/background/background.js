@@ -20,14 +20,14 @@ function createPopupWindow() {
     // messages from window.postMessage? Or are the background script (and thus
     // the new window) in an isolated world? Is their context wholly separate
     // from the rest of the windows in the browser?
-    setSelfAsOpener: true,
+    setSelfAsOpener: false,
     type: "popup",
     url: "confirmation.html",
   };
   const callback = (window) => {
     window.addEventListener("message", (event) => {
       const message = event.data;
-      console.log("Received message from popup");
+      console.log("Received message from confirmation popup");
     });
   };
   chrome.windows.create(config, callback);
