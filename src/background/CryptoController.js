@@ -21,7 +21,7 @@ class CryptoController {
   constructor() {
     this.#store = {
       password: undefined, // string
-      privateKey: undefined, // SubtleCrypto.JWK
+      privateKey: undefined, // string. SubtleCrypto.JWK when decrypted
       // publicKey: undefined, // SubtleCrypto.JWK
     };
   }
@@ -130,6 +130,33 @@ class CryptoController {
         resolve(result.holoKeyPair.publicKey);
       });
     });
+  }
+
+  async decryptWithPrivateKey(message) {
+    try {
+      const algo = {
+        name: "RSA-OAEP",
+        modulusLength: 4096,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256",
+      };
+      let args = ["jwk", this.#store.privateKey, algo, false, ["decrypt"]];
+      const privateKeyAsCryptoKey = await crypto.subtle.importKey(...args);
+      const encoder = new TextEncoder();
+      const encodedMessage = encoder.encode(message);
+      args = [{ name: "RSA-OAEP" }, privateKeyAsCryptoKey, encodedMessage];
+
+      // TODO: An error throws here. Figure out the problem.
+      const decryptedMessage = await crypto.subtle.decrypt(...args);
+
+      console.log("decryptWithPrivateKey: Reached line 153");
+      const decoder = new TextDecoder("utf-8");
+      console.log("decryptWithPrivateKey: Reached line 155");
+      return decoder.decode(decryptedMessage);
+    } catch (err) {
+      console.log("decryptWithPrivateKey error...");
+      console.log(err);
+    }
   }
 
   /**

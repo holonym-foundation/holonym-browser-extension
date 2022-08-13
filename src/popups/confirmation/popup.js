@@ -14,16 +14,22 @@ function login() {
 }
 
 function requestCredentials() {
-  console.log("confirmation popup is sending message");
-  const message = { message: "getHoloCredentials" };
-  const callback = (resp) =>
-    console.log(`confirmation: resp.success: ${resp.success}`);
-  chrome.runtime.sendMessage(message, callback);
+  return new Promise((resolve) => {
+    console.log("confirmation popup is sending message");
+    const message = { message: "getHoloCredentials" };
+    const callback = (resp) => {
+      console.log("requestCredentials: resp...");
+      console.log(resp);
+      resolve(resp.credentials);
+    };
+    chrome.runtime.sendMessage(message, callback);
+  });
 }
 
 window.onload = async () => {
   const loginSuccess = await login();
   // - Request unencrypted credentials from background script
+  const credentials = await requestCredentials();
   // - Add credentials to popup.html
   // - Add onclick function to confirm button. This function
   //   should send a confirmation message to background script.

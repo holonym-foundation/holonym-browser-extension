@@ -4,13 +4,14 @@
  */
 // import { CryptoController } from "../general/CryptoController";
 import { CryptoController } from "./CryptoController";
-// import { HoloStore } from "../general/HoloStore";
+import { HoloStore } from "../general/HoloStore";
 
 // --------------------------------------------------------
 // Functions for listening to messages from confirmation popup
 // --------------------------------------------------------
 
 const cryptoController = new CryptoController();
+const holoStore = new HoloStore();
 const popupOrigin = "chrome-extension://jmaehplbldnmbeceocaopdolmgbnkoga";
 const allowedPopupMessages = ["holoPopupLogin", "getHoloCredentials"];
 
@@ -31,7 +32,13 @@ function popupListener(request, sender, sendResponse) {
       console.log(`background: login success: ${success}`);
       sendResponse({ success: success });
     });
-    return true; // This is required in order to use sendResponse async
+    return true; // <-- This is required in order to use sendResponse async
+  } else if (message == "getHoloCredentials") {
+    holoStore
+      .getLatestMessage()
+      .then((encryptedMsg) => cryptoController.decryptWithPrivateKey(encryptedMsg))
+      .then((decryptedMsg) => sendResponse(decryptedMsg));
+    return true;
   }
 }
 
@@ -93,6 +100,8 @@ async function webPageListener(request, sender, sendResponse) {
     sendResponse(publicKey);
     return;
   } else if (message == "setHoloCredentials") {
+    console.log("background: setting latest message");
+    await holoStore.setLatestMessage(newCreds);
     createPopupWindow();
   }
 }
