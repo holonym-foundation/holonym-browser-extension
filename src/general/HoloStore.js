@@ -88,8 +88,8 @@ class HoloStore {
 
   getLatestMessage() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(["latestHoloMessage"], (message) => {
-        resolve(message);
+      chrome.storage.sync.get(["latestHoloMessage"], (result) => {
+        resolve(result?.latestHoloMessage);
       });
     });
   }
