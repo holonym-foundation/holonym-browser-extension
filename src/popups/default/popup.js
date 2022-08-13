@@ -3,13 +3,13 @@ import { CryptoController } from "../../general/CryptoController";
 window.onload = function () {
   const cryptoController = new CryptoController();
 
-  const registerFormEl = document.getElementById("register-form");
-  registerFormEl.onsubmit = async (event) => {
+  const loginFormEl = document.getElementById("login-form");
+  loginFormEl.onsubmit = async (event) => {
     event.preventDefault();
     const password = event.target.password.value;
     const loginSuccess = await cryptoController.login(password);
     console.log(`loginSuccess: ${loginSuccess}`);
-    registerFormEl.password.value = "";
+    loginFormEl.password.value = "";
   };
 
   const changePwFormEl = document.getElementById("change-password-form");
