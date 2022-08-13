@@ -1,13 +1,17 @@
 /**
- * @returns {Promise<SubtleCrypto.JWK>} Public key which can be used to encrypt messages to user.
+ * This background script handles messages from both the webpage and
+ * the confirmation popup.
  */
-function getPublicKey() {
-  return new Promise((resolve) => {
-    chrome.storage.sync.get(["holoKeyPair"], (result) => {
-      console.log(`background: Getting public key`); // TODO: Delete. For tests only
-      resolve(result.holoKeyPair.publicKey);
-    });
-  });
+
+// --------------------------------------------------------
+// Functions for listening to messages from confirmation popup
+// --------------------------------------------------------
+
+function confirmationPopupListener(event) {
+  const message = event.data;
+  console.log("Received message from confirmation popup");
+
+  // TODO: Can use window.postMessage. Maybe can use chrome.tabs.sendMessage()
 }
 
 function createPopupWindow() {
@@ -26,18 +30,27 @@ function createPopupWindow() {
   };
   const callback = (window) => {
     window.onload = () => {
-      window.addEventListener("message", (event) => {
-        const message = event.data;
-        console.log("Received message from confirmation popup");
-      });
+      window.addEventListener("message", confirmationPopupListener);
     };
   };
   chrome.windows.create(config, callback);
 }
 
+// --------------------------------------------------------
+// Functions for listening to messages from webpage
+// --------------------------------------------------------
+
 /**
- * API for storing Holo credentials
+ * @returns {Promise<SubtleCrypto.JWK>} Public key which can be used to encrypt messages to user.
  */
+function getPublicKey() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(["holoKeyPair"], (result) => {
+      console.log(`background: Getting public key`); // TODO: Delete. For tests only
+      resolve(result.holoKeyPair.publicKey);
+    });
+  });
+}
 
 const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
 const allowedMessages = [
@@ -46,7 +59,8 @@ const allowedMessages = [
   "setHoloCredentials",
 ];
 
-async function listener(request, sender, sendResponse) {
+// Listener function for messages from webpage
+async function listenerExternal(request, sender, sendResponse) {
   const potentialOrigin = sender.origin || sender.url;
   if (!allowedOrigins.includes(potentialOrigin)) {
     throw new Error("Disallowed origin attempting to access or modify HoloStore.");
@@ -71,4 +85,4 @@ async function listener(request, sender, sendResponse) {
   }
 }
 
-chrome.runtime.onMessageExternal.addListener(listener);
+chrome.runtime.onMessageExternal.addListener(listenerExternal);
