@@ -33,10 +33,25 @@ export default [
     ],
   },
   {
-    // Popup script
-    input: "./src/default_popup/popup.js",
+    // Default popup script
+    input: "./src/popups/default/popup.js",
     output: {
-      file: "./dist/popup.js",
+      file: "./dist/default_popup.js",
+      format: "es",
+    },
+    plugins: [
+      resolve({
+        browser: true,
+        preferBuiltins: false,
+      }),
+      commonjs(),
+    ],
+  },
+  {
+    // Confirmation popup script
+    input: "./src/popups/confirmation/popup.js",
+    output: {
+      file: "./dist/confirmation_popup.js",
       format: "es",
     },
     plugins: [

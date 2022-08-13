@@ -29,8 +29,6 @@ window.addEventListener("message", async function (event) {
   if (message == "setHoloCredentials") {
     console.log("content_script: setting credentials");
     await holoStore.setLatestMessage(newCreds);
-    chrome.action.openPopup();
-
     // const success = await holoStore.setCredentials(newCreds);
     // if (success) {
     //   injectCredentials(newCreds);
