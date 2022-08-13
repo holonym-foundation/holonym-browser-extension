@@ -1,4 +1,4 @@
-import { CryptoController } from "./CryptoController";
+import { CryptoController } from "../../general/CryptoController";
 
 window.onload = function () {
   const cryptoController = new CryptoController();

@@ -1,4 +1,4 @@
-import { HoloStore, injectCredentials } from "./HoloStore";
+import { HoloStore, injectCredentials } from "../general/HoloStore";
 
 /**
  * API for storing Holo credentials

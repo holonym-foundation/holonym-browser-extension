@@ -4,6 +4,9 @@
  * when they need to be sent accross a compromised communication channel or displayed.
  */
 
+// TODO: Figure out how to have a single CryptoController, instead of one
+//        in general/ and one in this directory. Maybe write a cryptoWrapper class.
+
 /**
  * IMPORTANT:
  * - Stores hash of user's password as 'holoPasswordHashHash' in chrome.sync.storage
@@ -57,16 +60,16 @@ class CryptoController {
       hash: "SHA-256",
     };
     const usage = ["encrypt", "decrypt"];
-    const keyPair = await window.crypto.subtle.generateKey(algo, true, usage);
-    const privateKey = await window.crypto.subtle.exportKey("jwk", keyPair.privateKey);
-    const publicKey = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
+    const keyPair = await crypto.subtle.generateKey(algo, true, usage);
+    const privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
+    const publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const encryptedPrivateKey = await this.encryptWithPassword(privateKey);
     await this.#setKeyPair(encryptedPrivateKey, publicKey);
   }
 
   /**
    * @param {string} password
-   * @returns True if successful, false otherwise.
+   * @returns {Promise<boolean>} True if successful, false otherwise.
    */
   async login(password) {
     const passwordHash = await this.hash(password);
@@ -160,10 +163,7 @@ class CryptoController {
   async hash(data) {
     const encoder = new TextEncoder();
     const encodedPassword = encoder.encode(data);
-    const hashArrayBuffer = await window.crypto.subtle.digest(
-      "SHA-256",
-      encodedPassword
-    );
+    const hashArrayBuffer = await crypto.subtle.digest("SHA-256", encodedPassword);
     const decoder = new TextDecoder("utf-8");
     return decoder.decode(hashArrayBuffer);
   }

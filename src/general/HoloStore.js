@@ -3,9 +3,9 @@
  */
 
 import { ethers } from "ethers";
-import { HoloStorePopup } from "./HoloStorePopup";
-import { getStateAsBytes, getDateAsBytes } from "./utils";
-import { serverAddress, threeZeroedBytes } from "./constants";
+import { HoloStorePopup } from "../content/HoloStorePopup";
+import { getStateAsBytes, getDateAsBytes } from "../content/utils";
+import { serverAddress, threeZeroedBytes } from "../content/constants";
 import { Buffer } from "buffer";
 
 const requiredCredsKeys = [

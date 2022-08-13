@@ -2,38 +2,50 @@
  * This background script handles messages from both the webpage and
  * the confirmation popup.
  */
+// import { CryptoController } from "../general/CryptoController";
+import { CryptoController } from "./CryptoController";
+// import { HoloStore } from "../general/HoloStore";
 
 // --------------------------------------------------------
 // Functions for listening to messages from confirmation popup
 // --------------------------------------------------------
 
-function confirmationPopupListener(event) {
-  const message = event.data;
-  console.log("Received message from confirmation popup");
+const cryptoController = new CryptoController();
+const popupOrigin = "chrome-extension://jmaehplbldnmbeceocaopdolmgbnkoga";
+const allowedPopupMessages = ["holoPopupLogin", "getHoloCredentials"];
 
-  // TODO: Can use window.postMessage. Maybe can use chrome.tabs.sendMessage()
+async function popupListener(request, sender, sendResponse) {
+  if (sender.origin != popupOrigin) return;
+  if (!sender.url.includes(popupOrigin)) return;
+  const message = request.message;
+  if (!allowedPopupMessages.includes(message)) return;
+
+  // TODO...
+  // Login
+  // get creds
+  // if (confirm) store creds in HoloStore
+  // if (cancel) simply close popup
+  if (message == "holoPopupLogin") {
+    const password = request.password;
+    console.log(`password: ${password}`);
+    const success = await cryptoController.login(password);
+    sendResponse({ success: success });
+  }
 }
 
 function createPopupWindow() {
+  chrome.runtime.onMessage.addListener(popupListener);
+
   const config = {
     focused: true,
     height: 500,
     width: 400,
     incognito: false,
-    // Re: setSelfAsOpener: When true, can other browser extensions intercept
-    // messages from window.postMessage? Or are the background script (and thus
-    // the new window) in an isolated world? Is their context wholly separate
-    // from the rest of the windows in the browser?
     setSelfAsOpener: false,
     type: "popup",
     url: "confirmation_popup.html",
   };
-  const callback = (window) => {
-    window.onload = () => {
-      window.addEventListener("message", confirmationPopupListener);
-    };
-  };
-  chrome.windows.create(config, callback);
+  chrome.windows.create(config, (window) => {});
 }
 
 // --------------------------------------------------------
@@ -53,14 +65,14 @@ function getPublicKey() {
 }
 
 const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
-const allowedMessages = [
+const allowedWebPageMessages = [
   "getHoloPublicKey",
   // "getHoloCredentials",
   "setHoloCredentials",
 ];
 
 // Listener function for messages from webpage
-async function listenerExternal(request, sender, sendResponse) {
+async function webPageListener(request, sender, sendResponse) {
   const potentialOrigin = sender.origin || sender.url;
   if (!allowedOrigins.includes(potentialOrigin)) {
     throw new Error("Disallowed origin attempting to access or modify HoloStore.");
@@ -68,7 +80,7 @@ async function listenerExternal(request, sender, sendResponse) {
   const message = request.message;
   const newCreds = request.credentials;
 
-  if (!allowedMessages.includes(message)) {
+  if (!allowedWebPageMessages.includes(message)) {
     return;
   }
 
@@ -76,8 +88,6 @@ async function listenerExternal(request, sender, sendResponse) {
   if (message == "getHoloPublicKey") {
     console.log("background: getting public key");
     const publicKey = await getPublicKey();
-    console.log("background: public key...");
-    console.log(publicKey);
     sendResponse(publicKey);
     return;
   } else if (message == "setHoloCredentials") {
@@ -85,4 +95,4 @@ async function listenerExternal(request, sender, sendResponse) {
   }
 }
 
-chrome.runtime.onMessageExternal.addListener(listenerExternal);
+chrome.runtime.onMessageExternal.addListener(webPageListener);
