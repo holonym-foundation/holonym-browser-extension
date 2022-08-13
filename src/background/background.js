@@ -22,13 +22,15 @@ function createPopupWindow() {
     // from the rest of the windows in the browser?
     setSelfAsOpener: false,
     type: "popup",
-    url: "confirmation.html",
+    url: "confirmation_popup.html",
   };
   const callback = (window) => {
-    window.addEventListener("message", (event) => {
-      const message = event.data;
-      console.log("Received message from confirmation popup");
-    });
+    window.onload = () => {
+      window.addEventListener("message", (event) => {
+        const message = event.data;
+        console.log("Received message from confirmation popup");
+      });
+    };
   };
   chrome.windows.create(config, callback);
 }
