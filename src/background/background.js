@@ -14,7 +14,7 @@ const cryptoController = new CryptoController();
 const popupOrigin = "chrome-extension://jmaehplbldnmbeceocaopdolmgbnkoga";
 const allowedPopupMessages = ["holoPopupLogin", "getHoloCredentials"];
 
-async function popupListener(request, sender, sendResponse) {
+function popupListener(request, sender, sendResponse) {
   if (sender.origin != popupOrigin) return;
   if (!sender.url.includes(popupOrigin)) return;
   const message = request.message;
@@ -27,9 +27,11 @@ async function popupListener(request, sender, sendResponse) {
   // if (cancel) simply close popup
   if (message == "holoPopupLogin") {
     const password = request.password;
-    console.log(`password: ${password}`);
-    const success = await cryptoController.login(password);
-    sendResponse({ success: success });
+    cryptoController.login(password).then((success) => {
+      console.log(`background: login success: ${success}`);
+      sendResponse({ success: success });
+    });
+    return true; // This is required in order to use sendResponse async
   }
 }
 

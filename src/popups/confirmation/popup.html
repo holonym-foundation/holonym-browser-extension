@@ -5,10 +5,21 @@
     <h2>TEST HEADING -- This is confirmation.html</h2>
     <h3>The following credentials will be stored</h3>
 
-    <div id="holo-credentials-div"></div>
+    <h3>Login</h3>
+    <form id="login-form">
+      <div>
+        <label>Password: </label>
+        <input type="text" name="password" value="test" />
+      </div>
+      <button type="submit">Submit</button>
+    </form>
 
-    <button type="submit" id="confirmation-button">Confirm</button>
-    <button type="submit" id="cancel-button">Cancel</button>
+    <div id="holo-credentials-div" style="visibility: hidden"></div>
+
+    <div id="confirm-cancel-div" style="visibility: hidden">
+      <button type="submit" id="confirmation-button">Confirm</button>
+      <button type="submit" id="cancel-button">Cancel</button>
+    </div>
   </body>
   <script
     src="./confirmation_popup.js"
