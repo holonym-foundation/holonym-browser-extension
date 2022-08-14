@@ -108,7 +108,6 @@ async function webPageListener(request, sender, sendResponse) {
     return;
   }
 
-  // Get public key
   if (message == "getHoloPublicKey") {
     const publicKey = await getPublicKey();
     sendResponse(publicKey);
