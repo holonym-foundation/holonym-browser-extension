@@ -16,7 +16,6 @@ function App() {
     const loginSuccess = await login();
     const credentials = await requestCredentials();
     displayCredentials(credentials);
-    displayConfirmCancelButtons();
   }
 
   function requestCredentials() {
@@ -59,11 +58,14 @@ function App() {
       }
       return parentDiv;
     }
-    const credentialsContainer = document.getElementById("holo-credentials-div");
+    const credentialsContainer = document.getElementById("holo-credentials-container");
     credentialsContainer.replaceChildren();
-    credentialsContainer.style.visibility = "visible";
     const credentialsEl = createCredsElement(credentials);
     credentialsContainer.appendChild(credentialsEl);
+    const credentialsHeader = document.getElementById(
+      "credentials-confirmation-container"
+    );
+    credentialsHeader.style.visibility = "visible";
   }
 
   function handleConfirm() {
@@ -80,35 +82,33 @@ function App() {
     window.close();
   }
 
-  function displayConfirmCancelButtons() {
-    const buttonsDiv = document.getElementById("confirm-cancel-div");
-    buttonsDiv.style.visibility = "visible";
-  }
-
   return (
     <>
-      <h1>Holonym</h1>
+      <div>
+        <h1>Holonym</h1>
 
-      <h3>Login</h3>
-      <form id="login-form" onSubmit={handleLogin}>
-        <div>
+        <h3>Login</h3>
+        <form id="login-form" onSubmit={handleLogin}>
           <label>Password: </label>
           <input type="text" name="password" defaultValue="test" />
+          <button type="submit" className="submit-password">
+            Submit
+          </button>
+        </form>
+
+        <div id="credentials-confirmation-container" style={{ visibility: "hidden" }}>
+          <h3>The following credentials will be stored</h3>
+          <div id="holo-credentials-container"></div>
+
+          <div id="confirm-cancel-div">
+            <button type="submit" onClick={handleConfirm}>
+              Confirm
+            </button>
+            <button type="submit" onClick={handleCancel}>
+              Cancel
+            </button>
+          </div>
         </div>
-        <button type="submit">Submit</button>
-      </form>
-
-      <h3>The following credentials will be stored</h3>
-
-      <div id="holo-credentials-div" style={{ visibility: "hidden" }}></div>
-
-      <div id="confirm-cancel-div" style={{ visibility: "hidden" }}>
-        <button type="submit" id="confirm-button" onClick={handleConfirm}>
-          Confirm
-        </button>
-        <button type="submit" id="cancel-button" onClick={handleCancel}>
-          Cancel
-        </button>
       </div>
     </>
   );
