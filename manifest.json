@@ -14,7 +14,7 @@
     {
       "matches": ["file:///*", "http://*/*", "https://*/*"],
       "js": ["content.js"],
-      "css": ["./HoverCard.css", "./holo-wtf.css", "./HoloStorePopup.css"],
+      "css": ["./HoverCard.css", "./holo-wtf.css"],
       "run_at": "document_idle"
     }
   ],

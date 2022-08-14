@@ -59,7 +59,7 @@ function popupListener(request, sender, sendResponse) {
   }
 }
 
-function createPopupWindow() {
+function displayConfirmationPopup() {
   chrome.runtime.onMessage.addListener(popupListener);
 
   const config = {
@@ -116,7 +116,7 @@ async function webPageListener(request, sender, sendResponse) {
     return;
   } else if (message == "setHoloCredentials") {
     await holoStore.setLatestMessage(newCreds);
-    createPopupWindow();
+    displayConfirmationPopup();
   }
 }
 

@@ -198,9 +198,6 @@ class CryptoController {
       });
     });
   }
-
-  // TODO: Implement way to receive encrypted messages and to then securely decrypt
-  // those messages with the user's private key.
 }
 
 export { CryptoController };
