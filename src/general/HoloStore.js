@@ -80,8 +80,6 @@ class HoloStore {
    */
   setLatestMessage(message) {
     return new Promise((resolve) => {
-      console.log("HoloStore: setting latestHoloMessage to...");
-      console.log(message);
       chrome.storage.sync.set({ latestHoloMessage: message }, () => resolve(true));
     });
   }

@@ -29,7 +29,6 @@ function popupListener(request, sender, sendResponse) {
   if (message == "holoPopupLogin") {
     const password = request.password;
     cryptoController.login(password).then((success) => {
-      console.log(`background: login success: ${success}`);
       sendResponse({ success: success });
     });
     return true; // <-- This is required in order to use sendResponse async
@@ -37,7 +36,7 @@ function popupListener(request, sender, sendResponse) {
     holoStore
       .getLatestMessage()
       .then((encryptedMsg) => cryptoController.decryptWithPrivateKey(encryptedMsg))
-      .then((decryptedMsg) => sendResponse(decryptedMsg));
+      .then((decryptedMsg) => sendResponse({ credentials: JSON.parse(decryptedMsg) }));
     return true;
   }
 }
@@ -67,7 +66,6 @@ function createPopupWindow() {
 function getPublicKey() {
   return new Promise((resolve) => {
     chrome.storage.sync.get(["holoKeyPair"], (result) => {
-      console.log(`background: Getting public key`); // TODO: Delete. For tests only
       resolve(result.holoKeyPair.publicKey);
     });
   });
@@ -95,12 +93,10 @@ async function webPageListener(request, sender, sendResponse) {
 
   // Get public key
   if (message == "getHoloPublicKey") {
-    console.log("background: getting public key");
     const publicKey = await getPublicKey();
     sendResponse(publicKey);
     return;
   } else if (message == "setHoloCredentials") {
-    console.log("background: setting latest message");
     await holoStore.setLatestMessage(newCreds);
     createPopupWindow();
   }
