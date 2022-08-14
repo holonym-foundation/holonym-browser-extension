@@ -62,11 +62,13 @@ class HoloStore {
   setCredentials(credentials) {
     return new Promise((resolve) => {
       if (!this.validateCredentials(credentials)) {
+        // TODO: Display error message to user
         console.log(`HoloStore: Not storing credentials`);
         resolve(false);
       }
       const encryptedCreds = credentials.encryptedCreds;
       chrome.storage.sync.set({ holoCredentials: encryptedCreds }, () => {
+        // TODO: Display success message to user
         console.log(`HoloStore: Storing credentials`);
         resolve(true);
       });
