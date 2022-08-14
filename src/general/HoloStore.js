@@ -3,7 +3,7 @@
  */
 
 import { ethers } from "ethers";
-import { HoloStorePopup } from "../content/HoloStorePopup";
+// import { HoloStorePopup } from "../content/HoloStorePopup";
 import { getStateAsBytes, getDateAsBytes } from "../content/utils";
 import { serverAddress, threeZeroedBytes } from "../content/constants";
 import { Buffer } from "buffer";
@@ -23,45 +23,6 @@ const requiredCredsKeys = [
   "serverSignature",
   "secret",
 ];
-
-/**
- * Ask user to confirm that they want to store their credentials.
- * @returns True if user chooses to store creds, false if not.
- */
-// function displayPopup(creds) {
-//   return new Promise((resolve) => {
-//     console.log("creating window");
-//     const config = {
-//       setSelfAsOpener: false,
-//       url: "index.html",
-//       focused: true,
-//       type: "popup",
-//       width: 500,
-//       height: 600,
-//       left: 0,
-//       top: 0,
-//     };
-//     const callback = (window) => {
-//       console.log("window created");
-
-//       const holoStorePopup = new HoloStorePopup(window);
-//       holoStorePopup.setCreds(creds);
-//       holoStorePopup.open();
-
-//       const closeFunc = () => {
-//         holoStorePopup.close();
-//         resolve(false);
-//       };
-//       const confirmFunc = () => {
-//         holoStorePopup.close();
-//         resolve(true);
-//       };
-//       holoStorePopup.closeBtn.addEventListener("click", closeFunc, { once: true });
-//       holoStorePopup.confirmBtn.addEventListener("click", confirmFunc, { once: true });
-//     };
-//     chrome.windows.create(config, callback);
-//   });
-// }
 
 /**
  * HoloStore has two stores:
@@ -93,47 +54,22 @@ class HoloStore {
   }
 
   /**
-   * Display popup asking user to confirm that they want to store
-   * the provided credentials.
-   */
-  // requestConfirmationToStore() {
-  //   console.log("creating window");
-  //   const config = {
-  //     setSelfAsOpener: false,
-  //     url: "index.html",
-  //     focused: true,
-  //     type: "popup",
-  //     width: 500,
-  //     height: 600,
-  //     left: 0,
-  //     top: 0,
-  //   };
-  //   chrome.windows.create(config, (window) => console.log("window created"));
-  // }
-
-  /**
-   * OUTDATED
-   * @param {object} credentials Object containing: unencryptedCreds (obj) & encryptedCreds (str)
+   * Validates unencrypted unencryptedCreds. If unencryptedCreds are valid,
+   * encryptedCreds are stored.
+   * @param {object} credentials Object containing: unencryptedCreds (obj)
+   *                             & encryptedCreds (str)
    * @returns True if the given credentials get stored, false otherwise.
    */
   setCredentials(credentials) {
     return new Promise((resolve) => {
       if (!this.validateCredentials(credentials)) {
+        console.log(`HoloStore: Not storing credentials`);
         resolve(false);
       }
-
       const encryptedCreds = credentials.encryptedCreds;
-
-      displayPopup(credentials).then((storeCreds) => {
-        if (storeCreds) {
-          chrome.storage.sync.set({ holoCredentials: encryptedCreds }, () => {
-            console.log(`HoloStore: Storing credentials`);
-            resolve(true);
-          });
-        } else {
-          console.log(`HoloStore: Not storing credentials`);
-          resolve(false);
-        }
+      chrome.storage.sync.set({ holoCredentials: encryptedCreds }, () => {
+        console.log(`HoloStore: Storing credentials`);
+        resolve(true);
       });
     });
   }

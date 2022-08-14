@@ -60,6 +60,23 @@ function displayCredentials(credentials) {
   credentialsContainer.appendChild(credentialsEl);
 }
 
+function setButtonFunctionality() {
+  function onConfirm() {
+    const message = { message: "confirmCredentials" };
+    const callback = (resp) => resolve(resp.success);
+    chrome.runtime.sendMessage(message, callback);
+    window.close();
+  }
+  function onCancel() {
+    // TODO: delete credentials from latest message store
+    window.close();
+  }
+  const confirmButton = document.getElementById("confirm-button");
+  confirmButton.onclick = onConfirm;
+  const buttonsDiv = document.getElementById("confirm-cancel-div");
+  buttonsDiv.style.visibility = "visible";
+}
+
 window.onload = async () => {
   const loginSuccess = await login();
   // - Request unencrypted credentials from background script
@@ -70,4 +87,5 @@ window.onload = async () => {
   //   should send a confirmation message to background script.
   // - Add onclick function to cancel button. This function
   //   should send only a "close window" message to background script.
+  setButtonFunctionality();
 };
