@@ -18,7 +18,7 @@ class CryptoController {
   constructor() {
     this.#store = {
       password: undefined, // string
-      privateKey: undefined, // SubtleCrypto.JWK
+      privateKey: undefined, // string. SubtleCrypto.JWK when decrypted
       // publicKey: undefined, // SubtleCrypto.JWK
     };
   }
@@ -57,9 +57,9 @@ class CryptoController {
       hash: "SHA-256",
     };
     const usage = ["encrypt", "decrypt"];
-    const keyPair = await window.crypto.subtle.generateKey(algo, true, usage);
-    const privateKey = await window.crypto.subtle.exportKey("jwk", keyPair.privateKey);
-    const publicKey = await window.crypto.subtle.exportKey("jwk", keyPair.publicKey);
+    const keyPair = await crypto.subtle.generateKey(algo, true, usage);
+    const privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
+    const publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const encryptedPrivateKey = await this.encryptWithPassword(privateKey);
     await this.#setKeyPair(encryptedPrivateKey, publicKey);
   }
@@ -105,9 +105,6 @@ class CryptoController {
         publicKey: publicKey,
       };
       chrome.storage.sync.set({ holoKeyPair: keyPair }, () => {
-        console.log(
-          `CryptoController: Stored encrypted private key and plaintext public key`
-        ); // TODO: Delete. For tests only
         resolve();
       });
     });
@@ -116,7 +113,6 @@ class CryptoController {
   #getKeyPair() {
     return new Promise((resolve) => {
       chrome.storage.sync.get(["holoKeyPair"], (result) => {
-        console.log(`CryptoController: Getting key pair`); // TODO: Delete. For tests only
         resolve(result.holoKeyPair);
       });
     });
@@ -128,18 +124,39 @@ class CryptoController {
   getPublicKey() {
     return new Promise((resolve) => {
       chrome.storage.sync.get(["holoKeyPair"], (result) => {
-        console.log(`CryptoController: Getting public key`); // TODO: Delete. For tests only
         resolve(result.holoKeyPair.publicKey);
       });
     });
+  }
+
+  async decryptWithPrivateKey(message) {
+    const algo = {
+      name: "RSA-OAEP",
+      modulusLength: 4096,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: "SHA-256",
+    };
+    const privateKeyAsCryptoKey = await crypto.subtle.importKey(
+      "jwk",
+      this.#store.privateKey,
+      algo,
+      false,
+      ["decrypt"]
+    );
+    const encodedMessage = new Uint8Array(JSON.parse(message)).buffer;
+    const decryptedMessage = await crypto.subtle.decrypt(
+      { name: "RSA-OAEP" },
+      privateKeyAsCryptoKey,
+      encodedMessage
+    );
+    const decoder = new TextDecoder("utf-8");
+    return decoder.decode(decryptedMessage);
   }
 
   /**
    * @param {object} data
    */
   async encryptWithPassword(data) {
-    console.log("encryptWithPassword: this.#store.password...");
-    console.log(this.#store.password);
     return await passworder.encrypt(this.#store.password, data);
   }
 
@@ -147,8 +164,6 @@ class CryptoController {
    * @param {string} data
    */
   async decryptWithPassword(data) {
-    console.log("decryptWithPassword: this.#store.password...");
-    console.log(this.#store.password);
     return await passworder.decrypt(this.#store.password, data);
   }
 
@@ -160,10 +175,7 @@ class CryptoController {
   async hash(data) {
     const encoder = new TextEncoder();
     const encodedPassword = encoder.encode(data);
-    const hashArrayBuffer = await window.crypto.subtle.digest(
-      "SHA-256",
-      encodedPassword
-    );
+    const hashArrayBuffer = await crypto.subtle.digest("SHA-256", encodedPassword);
     const decoder = new TextDecoder("utf-8");
     return decoder.decode(hashArrayBuffer);
   }
@@ -171,7 +183,6 @@ class CryptoController {
   #setPasswordHash(passwordHash) {
     return new Promise((resolve) => {
       chrome.storage.sync.set({ holoPasswordHash: passwordHash }, () => {
-        console.log(`CryptoController: Stored password hash`); // TODO: Delete. For tests only
         resolve();
       });
     });
@@ -180,14 +191,10 @@ class CryptoController {
   #getPasswordHash() {
     return new Promise((resolve) => {
       chrome.storage.sync.get(["holoPasswordHash"], (result) => {
-        console.log(`CryptoController: Getting password hash`); // TODO: Delete. For tests only
         resolve(result.holoPasswordHash);
       });
     });
   }
-
-  // TODO: Implement way to receive encrypted messages and to then securely decrypt
-  // those messages with the user's private key.
 }
 
 export { CryptoController };

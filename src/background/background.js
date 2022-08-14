@@ -2,13 +2,12 @@
  * This background script handles messages from both the webpage and
  * the confirmation popup.
  */
-// import { CryptoController } from "../general/CryptoController";
-import { CryptoController } from "./CryptoController";
+import { CryptoController } from "../general/CryptoController";
 import { HoloStore } from "../general/HoloStore";
 
-// --------------------------------------------------------
+// --------------------------------------------------------------
 // Functions for listening to messages from confirmation popup
-// --------------------------------------------------------
+// --------------------------------------------------------------
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
@@ -74,9 +73,9 @@ function displayConfirmationPopup() {
   chrome.windows.create(config, (window) => {});
 }
 
-// --------------------------------------------------------
+// --------------------------------------------------------------
 // Functions for listening to messages from webpage
-// --------------------------------------------------------
+// --------------------------------------------------------------
 
 /**
  * @returns {Promise<SubtleCrypto.JWK>} Public key which can be used to encrypt messages to user.
