@@ -11,18 +11,23 @@ function ConfirmCredentials({ credentials }) {
 
   return (
     <>
-      <div>
-        <h3>The following credentials will be encrypted and stored</h3>
-        <Credentials credentials={credentials} />
-        <div className="">
-          <button
-            type="submit"
-            onClick={handleConfirm}
-            className="wide-button center-block"
-          >
-            Confirm
-          </button>
-        </div>
+      <div style={{ textAlign: "center" }}>
+        <h2 style={{ fontWeight: "normal", fontSize: "18px" }}>Confirm Credentials</h2>
+        <p style={{ fontSize: "0.9em" }}>
+          Confirm that the following info is accurate. Clicking "confirm" will encrypt
+          this info and store it in your browser. This will allow you to generate zero
+          knowledge proofs about aspects of your identity.
+        </p>
+      </div>
+      <Credentials credentials={credentials} />
+      <div className="">
+        <button
+          type="submit"
+          onClick={handleConfirm}
+          className="wide-button center-block"
+        >
+          Confirm
+        </button>
       </div>
     </>
   );
