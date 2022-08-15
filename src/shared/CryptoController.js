@@ -6,7 +6,7 @@
 
 /**
  * IMPORTANT:
- * - Stores hash of user's password as 'holoPasswordHashHash' in chrome.sync.storage
+ * - Stores hash of user's password+salt as 'holoPasswordHash' in chrome.sync.storage
  * - Stores encrypted privateKey and publicKey as 'holoKeyPair' in chrome.sync.storage
  */
 
@@ -39,7 +39,9 @@ class CryptoController {
   async #createPassword(password) {
     if (await this.#getPasswordHash()) return;
     this.#store.password = password;
-    const passwordHash = await this.hash(password);
+    const salt = crypto.randomUUID();
+    await this.#setPasswordSalt(salt);
+    const passwordHash = await this.hashPassword(password, salt);
     await this.#setPasswordHash(passwordHash);
   }
 
@@ -68,7 +70,8 @@ class CryptoController {
    * @returns {Promise<boolean>} True if successful, false otherwise.
    */
   async login(password) {
-    const passwordHash = await this.hash(password);
+    const salt = await this.#getPasswordSalt();
+    const passwordHash = await this.hashPassword(password, salt);
     const storedPasswordHash = await this.#getPasswordHash();
     if (passwordHash != storedPasswordHash) return false;
     this.#store.password = password;
@@ -87,10 +90,11 @@ class CryptoController {
   }
 
   async changePassword(oldPassword, newPassword) {
-    const oldPasswordHash = await this.hash(oldPassword);
+    const salt = await this.#getPasswordSalt();
+    const oldPasswordHash = await this.hashPassword(oldPassword, salt);
     const storedPasswordHash = await this.#getPasswordHash();
     if (oldPasswordHash != storedPasswordHash) return false;
-    const newPasswordHash = await this.hash(newPassword);
+    const newPasswordHash = await this.hashPassword(newPassword, salt);
     await this.#setPasswordHash(newPasswordHash);
     return true;
   }
@@ -170,10 +174,13 @@ class CryptoController {
 
   /**
    * Hash function to be used for hashing user's password
-   * @param {string} data
+   * @param {string} password
+   * @param {string} salt
    * @returns {Promise<string>} Hash of data.
    */
-  async hash(data) {
+  async hashPassword(password, salt) {
+    if (!password || !salt) throw new Error("Missing argument");
+    const data = password + salt;
     const encoder = new TextEncoder();
     const encodedPassword = encoder.encode(data);
     const hashArrayBuffer = await crypto.subtle.digest("SHA-256", encodedPassword);
@@ -181,6 +188,9 @@ class CryptoController {
     return decoder.decode(hashArrayBuffer);
   }
 
+  /**
+   * @param {string} passwordHash Should be (password + salt)
+   */
   #setPasswordHash(passwordHash) {
     return new Promise((resolve) => {
       chrome.storage.sync.set({ holoPasswordHash: passwordHash }, () => {
@@ -193,6 +203,22 @@ class CryptoController {
     return new Promise((resolve) => {
       chrome.storage.sync.get(["holoPasswordHash"], (result) => {
         resolve(result.holoPasswordHash);
+      });
+    });
+  }
+
+  #setPasswordSalt(salt) {
+    return new Promise((resolve) => {
+      chrome.storage.sync.set({ holoPasswordSalt: salt }, () => {
+        resolve();
+      });
+    });
+  }
+
+  #getPasswordSalt() {
+    return new Promise((resolve) => {
+      chrome.storage.sync.get(["holoPasswordSalt"], (result) => {
+        resolve(result.holoPasswordSalt);
       });
     });
   }
