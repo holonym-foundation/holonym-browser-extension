@@ -18,7 +18,7 @@ class CryptoController {
   constructor() {
     this.#store = {
       password: undefined, // string
-      privateKey: undefined, // string. SubtleCrypto.JWK when decrypted
+      decryptedPrivateKey: undefined, // SubtleCrypto.JWK
       // publicKey: undefined, // SubtleCrypto.JWK
     };
   }
@@ -37,7 +37,7 @@ class CryptoController {
    * @param {string} password
    */
   async #createPassword(password) {
-    if (await this.#getPasswordHash()) return;
+    // if (await this.#getPasswordHash()) return;
     this.#store.password = password;
     const passwordHash = await this.hash(password);
     await this.#setPasswordHash(passwordHash);
@@ -48,8 +48,7 @@ class CryptoController {
    * This should be called only once, when the user creates their fist password.
    */
   async #generateKeyPair() {
-    if (await this.#getKeyPair()) return;
-
+    // if (await this.#getKeyPair()) return;
     const algo = {
       name: "RSA-OAEP",
       modulusLength: 4096,
@@ -74,14 +73,16 @@ class CryptoController {
     if (passwordHash != storedPasswordHash) return false;
     this.#store.password = password;
     const keyPair = await this.#getKeyPair();
-    this.#store.privateKey = await this.decryptWithPassword(keyPair.privateKey);
+    this.#store.decryptedPrivateKey = await this.decryptWithPassword(
+      keyPair.encryptedPrivateKey
+    );
     return true;
   }
 
   logout() {
     this.#store = {
       password: undefined,
-      privateKey: undefined,
+      decryptedPrivateKey: undefined,
     };
   }
 
@@ -95,13 +96,13 @@ class CryptoController {
   }
 
   /**
-   * @param {string} privateKey Encrypted private key
+   * @param {string} encryptedPrivateKey Encrypted private key
    * @param {SubtleCrypto.JWK} publicKey Plaintext public key
    */
-  #setKeyPair(privateKey, publicKey) {
+  #setKeyPair(encryptedPrivateKey, publicKey) {
     return new Promise((resolve) => {
       const keyPair = {
-        privateKey: privateKey,
+        encryptedPrivateKey: encryptedPrivateKey,
         publicKey: publicKey,
       };
       chrome.storage.sync.set({ holoKeyPair: keyPair }, () => {
@@ -138,7 +139,7 @@ class CryptoController {
     };
     const privateKeyAsCryptoKey = await crypto.subtle.importKey(
       "jwk",
-      this.#store.privateKey,
+      this.#store.decryptedPrivateKey,
       algo,
       false,
       ["decrypt"]
