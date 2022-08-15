@@ -34,7 +34,6 @@ const requiredCredsKeys = [
  */
 class HoloStore {
   /**
-   * NOTE: Message will only be added if it passes certain validation checks
    * @param {string} message
    * @returns True if successful, false otherwise.
    */
