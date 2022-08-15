@@ -59,20 +59,6 @@ button:hover {
   font-size: 14px;
 }
 
-.confirm-button {
-  float: right;
-}
-
-.cancel-button {
-  float: left;
-  color: white;
-  border-color: #700000;
-  background-color: #700000;
-}
-
-.cancel-button:hover {
-  cursor: pointer;
-  color: #700000;
-  border-color: #700000;
-  background-color: transparent;
+.holo-credentials-container {
+  font-size: 14px;
 }

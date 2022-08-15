@@ -64,13 +64,6 @@ function App() {
     window.close();
   }
 
-  function handleCancel() {
-    const message = { message: "denyCredentials" };
-    const callback = (resp) => {};
-    chrome.runtime.sendMessage(message, callback);
-    window.close();
-  }
-
   return (
     <>
       <div>
@@ -82,10 +75,7 @@ function App() {
           <div id="holo-credentials-container"></div>
 
           <div>
-            <button type="submit" onClick={handleCancel} className="cancel-button">
-              Cancel
-            </button>
-            <button type="submit" onClick={handleConfirm} className="confirm-button">
+            <button type="submit" onClick={handleConfirm}>
               Confirm
             </button>
           </div>
