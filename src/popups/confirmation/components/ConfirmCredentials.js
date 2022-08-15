@@ -1,7 +1,7 @@
 import React from "react";
 import Credentials from "./Credentials";
 
-function ConfirmCredentials({ isVisible, credentials }) {
+function ConfirmCredentials({ credentials }) {
   function handleConfirm() {
     const message = { message: "confirmCredentials" };
     const callback = (resp) => {};
@@ -11,21 +11,19 @@ function ConfirmCredentials({ isVisible, credentials }) {
 
   return (
     <>
-      {isVisible && (
-        <div>
-          <h3>The following credentials will be encrypted and stored</h3>
-          <Credentials credentials={credentials} />
-          <div className="">
-            <button
-              type="submit"
-              onClick={handleConfirm}
-              className="wide-button center-block"
-            >
-              Confirm
-            </button>
-          </div>
+      <div>
+        <h3>The following credentials will be encrypted and stored</h3>
+        <Credentials credentials={credentials} />
+        <div className="">
+          <button
+            type="submit"
+            onClick={handleConfirm}
+            className="wide-button center-block"
+          >
+            Confirm
+          </button>
         </div>
-      )}
+      </div>
     </>
   );
 }

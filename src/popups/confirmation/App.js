@@ -4,11 +4,13 @@ import PasswordLogin from "./components/PasswordLogin";
 import ConfirmCredentials from "./components/ConfirmCredentials";
 
 function App() {
+  const [loginIsVisible, setLoginIsVisible] = useState(true);
   const [credsContainerIsVisible, setCredsContainerIsVisible] = useState(false);
   const [credentials, setCredentials] = useState();
 
   async function handleLoginSuccess() {
     const credentials = await requestCredentials();
+    setLoginIsVisible(false);
     setCredentials(credentials);
     setCredsContainerIsVisible(true);
   }
@@ -27,11 +29,8 @@ function App() {
       <div>
         <img src={HoloLogo} style={{ height: "25px" }} />
         <div style={{ margin: "10px" }}></div>
-        <PasswordLogin onLoginSuccess={handleLoginSuccess} />
-        <ConfirmCredentials
-          isVisible={credsContainerIsVisible}
-          credentials={credentials}
-        />
+        {loginIsVisible && <PasswordLogin onLoginSuccess={handleLoginSuccess} />}
+        {credsContainerIsVisible && <ConfirmCredentials credentials={credentials} />}
       </div>
     </>
   );
