@@ -24,6 +24,15 @@ content scripts--Doing so would overwrite the styles in the webpage.
   margin-right: auto;
 }
 
+.popup-container {
+  min-width: 350px;
+  max-width: 90vw;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 button {
   color: #000;
   border-color: var(--holo-light-blue);
