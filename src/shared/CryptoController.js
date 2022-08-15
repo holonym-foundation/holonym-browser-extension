@@ -37,7 +37,7 @@ class CryptoController {
    * @param {string} password
    */
   async #createPassword(password) {
-    // if (await this.#getPasswordHash()) return;
+    if (await this.#getPasswordHash()) return;
     this.#store.password = password;
     const passwordHash = await this.hash(password);
     await this.#setPasswordHash(passwordHash);
@@ -48,7 +48,7 @@ class CryptoController {
    * This should be called only once, when the user creates their fist password.
    */
   async #generateKeyPair() {
-    // if (await this.#getKeyPair()) return;
+    if (await this.#getKeyPair()) return;
     const algo = {
       name: "RSA-OAEP",
       modulusLength: 4096,
