@@ -50,6 +50,10 @@ button:hover {
   background-color: transparent;
 }
 
+.wide-button {
+  width: 70vw;
+}
+
 .password-input {
   margin: 10px auto;
 }

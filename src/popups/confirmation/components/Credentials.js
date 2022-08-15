@@ -18,7 +18,7 @@ function Credentials({ credentials }) {
   return (
     <>
       {credsToDisplay && Object.keys(credsToDisplay).length > 0 && (
-        <div>
+        <div className="holo-credentials-container ">
           {Object.keys(credsToDisplay).map((credentialName) => (
             <p>
               <span style={{ textDecoration: "underline" }}>{credentialName}</span>
