@@ -65,7 +65,7 @@ function displayConfirmationPopup() {
 
   const config = {
     focused: true,
-    height: 500,
+    height: 530,
     width: 400,
     incognito: false,
     setSelfAsOpener: false,
