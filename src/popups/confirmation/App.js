@@ -1,19 +1,8 @@
 import React from "react";
+import PasswordLogin from "./components/PasswordLogin";
 
 function App() {
-  async function handleLogin(event) {
-    function login() {
-      return new Promise((resolve) => {
-        event.preventDefault();
-        const password = event.target.password.value;
-        event.target.password.value = "";
-        console.log("confirmation popup is sending login message");
-        const message = { message: "holoPopupLogin", password: password };
-        const callback = (resp) => resolve(resp.success);
-        chrome.runtime.sendMessage(message, callback);
-      });
-    }
-    const loginSuccess = await login();
+  async function handleLoginSuccess() {
     const credentials = await requestCredentials();
     displayCredentials(credentials);
   }
@@ -86,34 +75,18 @@ function App() {
     <>
       <div>
         <h1>Holonym</h1>
-
-        <form id="login-form" onSubmit={handleLogin}>
-          <div className="enter-password-label">
-            <label>Enter Password</label>
-          </div>
-          <div>
-            <input
-              type="text"
-              name="password"
-              defaultValue="test"
-              className="password-input center-block"
-            />
-          </div>
-          <button type="submit" className="submit-password center-block">
-            Submit
-          </button>
-        </form>
+        <PasswordLogin onLoginSuccess={handleLoginSuccess} />
 
         <div id="credentials-confirmation-container" style={{ visibility: "hidden" }}>
           <h3>The following credentials will be stored</h3>
           <div id="holo-credentials-container"></div>
 
-          <div id="confirm-cancel-div">
-            <button type="submit" onClick={handleConfirm}>
-              Confirm
-            </button>
-            <button type="submit" onClick={handleCancel}>
+          <div className="confirm-cancel-div">
+            <button type="submit" onClick={handleCancel} className="cancel-button">
               Cancel
+            </button>
+            <button type="submit" onClick={handleConfirm} className="confirm-button">
+              Confirm
             </button>
           </div>
         </div>

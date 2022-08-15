@@ -62,3 +62,15 @@ button.submit-password {
   font-weight: bold;
   font-size: 14px;
 }
+
+.confirm-cancel-div {
+  margin: 10px 10px;
+}
+
+.confirm-button {
+  float: right;
+}
+
+.cancel-button {
+  float: left;
+}
