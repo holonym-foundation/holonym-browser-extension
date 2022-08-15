@@ -71,7 +71,7 @@ function App() {
         <PasswordLogin onLoginSuccess={handleLoginSuccess} />
 
         <div id="credentials-confirmation-container" style={{ visibility: "hidden" }}>
-          <h3>The following credentials will be stored</h3>
+          <h3>The following credentials will be encrypted and stored</h3>
           <div id="holo-credentials-container"></div>
 
           <div>
