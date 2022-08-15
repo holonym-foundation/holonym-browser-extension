@@ -47,7 +47,7 @@ function popupListener(request, sender, sendResponse) {
       })
       .then((decryptedCreds) => {
         const credentials = {
-          unencryptedCreds: decryptedCreds,
+          unencryptedCreds: JSON.parse(decryptedCreds),
           encryptedCreds: encryptedCreds,
         };
         return holoStore.setCredentials(credentials);
