@@ -1,5 +1,6 @@
 import React from "react";
 import { CryptoController } from "../../shared/CryptoController";
+import Register from "./components/Register";
 
 const cryptoController = new CryptoController();
 
@@ -28,6 +29,7 @@ function App() {
   return (
     <>
       <h1>Holonym</h1>
+      {/* <Register /> */}
       <h3>Login</h3>
       <form id="login-form" onSubmit={handleLogin}>
         <div>

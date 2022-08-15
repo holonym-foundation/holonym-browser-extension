@@ -5,6 +5,8 @@ function ConfirmCredentials({ credentials }) {
   function handleConfirm() {
     const message = { message: "confirmCredentials" };
     const callback = (resp) => {
+      // TODO: Display success message upon confirmation. Close window with separate
+      // 'done' or 'close' button.
       window.close();
     };
     chrome.runtime.sendMessage(message, callback);
