@@ -87,11 +87,19 @@ function App() {
       <div>
         <h1>Holonym</h1>
 
-        <h3>Login</h3>
         <form id="login-form" onSubmit={handleLogin}>
-          <label>Password: </label>
-          <input type="text" name="password" defaultValue="test" />
-          <button type="submit" className="submit-password">
+          <div className="enter-password-label">
+            <label>Enter Password</label>
+          </div>
+          <div>
+            <input
+              type="text"
+              name="password"
+              defaultValue="test"
+              className="password-input center-block"
+            />
+          </div>
+          <button type="submit" className="submit-password center-block">
             Submit
           </button>
         </form>
