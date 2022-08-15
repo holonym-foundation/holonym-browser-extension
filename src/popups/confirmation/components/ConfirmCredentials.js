@@ -1,17 +1,7 @@
 import React from "react";
 import Credentials from "./Credentials";
 
-function ConfirmCredentials({ credentials }) {
-  function handleConfirm() {
-    const message = { message: "confirmCredentials" };
-    const callback = (resp) => {
-      // TODO: Display success message upon confirmation. Close window with separate
-      // 'done' or 'close' button.
-      window.close();
-    };
-    chrome.runtime.sendMessage(message, callback);
-  }
-
+function ConfirmCredentials({ credentials, onConfirmation }) {
   return (
     <>
       <div style={{ textAlign: "center" }}>
@@ -26,7 +16,7 @@ function ConfirmCredentials({ credentials }) {
       <div style={{ marginTop: "10px" }}>
         <button
           type="submit"
-          onClick={handleConfirm}
+          onClick={onConfirmation}
           className="wide-button center-block"
         >
           Confirm
