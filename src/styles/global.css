@@ -35,7 +35,7 @@ button {
   border-width: 1px;
   border-radius: 7px;
   padding: 10px 15px;
-  line-height: 1.5;
+  line-height: 1;
   font-size: 14px;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -49,10 +49,6 @@ button:hover {
   background-color: transparent;
 }
 
-button.submit-password {
-  line-height: 1;
-}
-
 .password-input {
   margin: 10px auto;
 }
@@ -63,14 +59,20 @@ button.submit-password {
   font-size: 14px;
 }
 
-.confirm-cancel-div {
-  margin: 10px 10px;
-}
-
 .confirm-button {
   float: right;
 }
 
 .cancel-button {
   float: left;
+  color: white;
+  border-color: #700000;
+  background-color: #700000;
+}
+
+.cancel-button:hover {
+  cursor: pointer;
+  color: #700000;
+  border-color: #700000;
+  background-color: transparent;
 }

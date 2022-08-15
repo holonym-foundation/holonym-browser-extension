@@ -81,7 +81,7 @@ function App() {
           <h3>The following credentials will be stored</h3>
           <div id="holo-credentials-container"></div>
 
-          <div className="confirm-cancel-div">
+          <div>
             <button type="submit" onClick={handleCancel} className="cancel-button">
               Cancel
             </button>
