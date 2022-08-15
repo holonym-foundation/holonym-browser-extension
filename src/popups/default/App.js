@@ -1,16 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { CryptoController } from "../../shared/CryptoController";
 import Register from "./components/Register";
+import PasswordLogin from "../../shared/components/PasswordLogin";
 
 const cryptoController = new CryptoController();
 
 function App() {
-  async function handleLogin(event) {
-    event.preventDefault();
-    const password = event.target.password.value;
-    const loginSuccess = await cryptoController.login(password);
-    console.log(`loginSuccess: ${loginSuccess}`);
-    event.target.password.value = "";
+  const [loginIsVisible, setLoginIsVisible] = useState(true);
+
+  async function handleLoginSuccess() {
+    setLoginIsVisible(false);
+    setCredentials(credentials);
+    setCredsContainerIsVisible(true);
   }
 
   async function handleChangePassword(event) {
@@ -30,14 +31,7 @@ function App() {
     <>
       <h1>Holonym</h1>
       {/* <Register /> */}
-      <h3>Login</h3>
-      <form id="login-form" onSubmit={handleLogin}>
-        <div>
-          <label>Password: </label>
-          <input type="text" name="password" defaultValue="test" />
-        </div>
-        <button type="submit">Submit</button>
-      </form>
+      {loginIsVisible && <PasswordLogin onLoginSuccess={handleLoginSuccess} />}
       <h3>Change Password</h3>
       <form id="change-password-form" onSubmit={handleChangePassword}>
         <div>

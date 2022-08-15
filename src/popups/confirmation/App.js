@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import HoloLogo from "../../img/Holo-Logo.png";
-import PasswordLogin from "./components/PasswordLogin";
+import PasswordLogin from "../../shared/components/PasswordLogin";
 import ConfirmCredentials from "./components/ConfirmCredentials";
 import Success from "./components/Success";
 
