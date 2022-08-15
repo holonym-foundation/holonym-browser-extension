@@ -13,14 +13,14 @@ function ConfirmCredentials({ credentials }) {
     <>
       <div style={{ textAlign: "center" }}>
         <h2 style={{ fontWeight: "normal", fontSize: "18px" }}>Confirm Credentials</h2>
-        <p style={{ fontSize: "0.9em" }}>
+        <p style={{ fontSize: "0.70rem" }}>
           Confirm that the following info is accurate. Clicking "confirm" will encrypt
           this info and store it in your browser. This will allow you to generate zero
           knowledge proofs about aspects of your identity.
         </p>
       </div>
       <Credentials credentials={credentials} />
-      <div className="">
+      <div style={{ marginTop: "10px" }}>
         <button
           type="submit"
           onClick={handleConfirm}

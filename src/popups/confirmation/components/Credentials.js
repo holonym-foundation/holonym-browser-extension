@@ -18,13 +18,14 @@ function Credentials({ credentials }) {
   return (
     <>
       {credsToDisplay && Object.keys(credsToDisplay).length > 0 && (
-        <div className="holo-credentials-container ">
+        <div className="holo-credentials-container">
           {Object.keys(credsToDisplay).map((credentialName) => (
-            <p>
-              <span style={{ textDecoration: "underline" }}>{credentialName}</span>
-              :&nbsp;
-              {credsToDisplay[credentialName]}
-            </p>
+            <div style={{ display: "flex", margin: "1.05rem" }}>
+              <span style={{ flex: "30%" }} className="credential-name">
+                {credentialName}
+              </span>
+              <span style={{ flex: "70%" }}>{credsToDisplay[credentialName]}</span>
+            </div>
           ))}
         </div>
       )}

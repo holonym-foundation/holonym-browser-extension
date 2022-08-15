@@ -76,3 +76,7 @@ button:hover {
 .holo-credentials-container {
   font-size: 14px;
 }
+
+.credential-name {
+  color: #d8d8e0;
+}
