@@ -9,16 +9,12 @@ function ConfirmCredentials({ isVisible, credentials }) {
     window.close();
   }
 
-  console.log(`ConfirmCredentials: isVisible == ${isVisible}`);
-
   return (
     <>
       {isVisible && (
         <div id="credentials-confirmation-container">
           <h3>The following credentials will be encrypted and stored</h3>
-
           <Credentials credentials={credentials} />
-
           <div>
             <button type="submit" onClick={handleConfirm}>
               Confirm

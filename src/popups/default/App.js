@@ -1,5 +1,5 @@
 import React from "react";
-import { CryptoController } from "../../general/CryptoController";
+import { CryptoController } from "../../shared/CryptoController";
 
 const cryptoController = new CryptoController();
 
