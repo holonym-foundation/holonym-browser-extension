@@ -50,8 +50,10 @@ function popupListener(request, sender, sendResponse) {
           unencryptedCreds: decryptedCreds,
           encryptedCreds: encryptedCreds,
         };
-        holoStore.setCredentials(credentials);
-      });
+        return holoStore.setCredentials(credentials);
+      })
+      .then((setCredsSuccess) => holoStore.setLatestMessage(""))
+      .then((setMsgSuccess) => sendResponse({}));
     return true;
   } else if (message == "denyCredentials") {
     holoStore.setLatestMessage("");

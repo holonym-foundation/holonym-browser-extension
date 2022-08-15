@@ -4,9 +4,10 @@ import Credentials from "./Credentials";
 function ConfirmCredentials({ credentials }) {
   function handleConfirm() {
     const message = { message: "confirmCredentials" };
-    const callback = (resp) => {};
+    const callback = (resp) => {
+      window.close();
+    };
     chrome.runtime.sendMessage(message, callback);
-    window.close();
   }
 
   return (
