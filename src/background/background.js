@@ -6,7 +6,7 @@ import { CryptoController } from "../shared/CryptoController";
 import { HoloStore } from "../shared/HoloStore";
 
 // --------------------------------------------------------------
-// Functions for listening to messages from confirmation popup
+// Functions for listening to messages from popups
 // --------------------------------------------------------------
 
 const cryptoController = new CryptoController();
@@ -61,8 +61,6 @@ function popupListener(request, sender, sendResponse) {
 }
 
 function displayConfirmationPopup() {
-  chrome.runtime.onMessage.addListener(popupListener);
-
   const config = {
     focused: true,
     height: 530,
@@ -120,4 +118,5 @@ async function webPageListener(request, sender, sendResponse) {
   }
 }
 
+chrome.runtime.onMessage.addListener(popupListener);
 chrome.runtime.onMessageExternal.addListener(webPageListener);
