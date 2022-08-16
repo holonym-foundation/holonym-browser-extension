@@ -26,13 +26,23 @@ function ChangePassword() {
             <div>
               <label>Old Password</label>
             </div>
-            <input type="text" name="old-password" defaultValue="test" />
+            <input
+              type="text"
+              name="old-password"
+              defaultValue="test"
+              className="password-input"
+            />
           </div>
           <div>
             <div>
               <label>New Password</label>
             </div>
-            <input type="text" name="new-password" defaultValue="test" />
+            <input
+              type="text"
+              name="new-password"
+              defaultValue="test"
+              className="password-input"
+            />
           </div>
           <button type="submit">Submit</button>
         </form>

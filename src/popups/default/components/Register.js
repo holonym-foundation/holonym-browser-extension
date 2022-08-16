@@ -3,12 +3,13 @@ import { CryptoController } from "../../../shared/CryptoController";
 
 const cryptoController = new CryptoController();
 
-function Register() {
+function Register({ onRegisterSuccess }) {
   async function handleRegister(event) {
     event.preventDefault();
     const password = event.target.password.value;
     await cryptoController.initialize(password);
     event.target.password.value = "";
+    onRegisterSuccess();
   }
 
   return (

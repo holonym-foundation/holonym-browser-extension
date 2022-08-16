@@ -4,23 +4,24 @@ import { CryptoController } from "../../shared/CryptoController";
 import Register from "./components/Register";
 import PasswordLogin from "../../shared/components/PasswordLogin";
 import ChangePassword from "./components/ChangePassword";
+import LandingPage from "./components/LandingPage";
 
 const cryptoController = new CryptoController();
 
 function App() {
-  const [loginIsVisible, setLoginIsVisible] = useState(true);
+  const [landingPageIsVisible, setLandingPageIsVisible] = useState(true);
 
   async function handleLoginSuccess() {
-    setLoginIsVisible(false);
+    setLandingPageIsVisible(false);
   }
 
   return (
     <>
-      <img src={HoloLogo} style={{ height: "25px" }} />
-      <div style={{ margin: "10px" }}></div>
-      {/* <Register /> */}
-      {loginIsVisible && <PasswordLogin onLoginSuccess={handleLoginSuccess} />}
-      <ChangePassword />
+      <div style={{ margin: "5px" }}>
+        <img src={HoloLogo} style={{ height: "25px" }} />
+        <div style={{ margin: "10px" }}></div>
+        {landingPageIsVisible && <LandingPage onLoginSuccess={handleLoginSuccess} />}
+      </div>
     </>
   );
 }

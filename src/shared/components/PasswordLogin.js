@@ -32,9 +32,7 @@ function PasswordLogin({ onLoginSuccess }) {
               className="password-input"
             />
           </div>
-          <button type="submit" className="submit-password">
-            Submit
-          </button>
+          <button type="submit">Submit</button>
         </form>
       </div>
     </>
