@@ -14,6 +14,7 @@ import passworder from "browser-passworder";
 
 class CryptoController {
   #store;
+  #isLoggedIn;
 
   constructor() {
     this.#store = {
@@ -21,6 +22,7 @@ class CryptoController {
       decryptedPrivateKey: undefined, // SubtleCrypto.JWK
       // publicKey: undefined, // SubtleCrypto.JWK
     };
+    this.#isLoggedIn = false;
   }
 
   /**
@@ -30,6 +32,7 @@ class CryptoController {
   async initialize(password) {
     await this.#createPassword(password);
     await this.#generateKeyPair();
+    this.#isLoggedIn = true;
   }
 
   /**
@@ -79,6 +82,7 @@ class CryptoController {
     this.#store.decryptedPrivateKey = await this.decryptWithPassword(
       keyPair.encryptedPrivateKey
     );
+    this.#isLoggedIn = true;
     return true;
   }
 
@@ -87,6 +91,16 @@ class CryptoController {
       password: undefined,
       decryptedPrivateKey: undefined,
     };
+    this.#isLoggedIn = false;
+  }
+
+  getIsLoggedIn() {
+    return this.#isLoggedIn;
+  }
+
+  async getIsRegistered() {
+    const publicKey = await this.getPublicKey();
+    return !!publicKey;
   }
 
   async changePassword(oldPassword, newPassword) {
