@@ -7,7 +7,6 @@ function PasswordLogin({ onLoginSuccess }) {
         event.preventDefault();
         const password = event.target.password.value;
         event.target.password.value = "";
-        console.log("confirmation popup is sending login message");
         const message = { message: "holoPopupLogin", password: password };
         const callback = (resp) => resolve(resp.success);
         chrome.runtime.sendMessage(message, callback);
@@ -21,7 +20,7 @@ function PasswordLogin({ onLoginSuccess }) {
     <>
       <div style={{ textAlign: "center" }}>
         <form id="login-form" onSubmit={handleLogin}>
-          <div className="enter-password-label">
+          <div className="header-base">
             <label>Enter Password</label>
           </div>
           <div>

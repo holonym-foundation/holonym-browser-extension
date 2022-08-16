@@ -19,7 +19,6 @@ function App() {
 
   function requestCredentials() {
     return new Promise((resolve) => {
-      console.log("confirmation popup is sending message");
       const message = { message: "getHoloCredentials" };
       const callback = (resp) => resolve(resp.credentials);
       chrome.runtime.sendMessage(message, callback);

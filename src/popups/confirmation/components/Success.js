@@ -4,7 +4,7 @@ function Success() {
   return (
     <>
       <div style={{ textAlign: "center" }}>
-        <h2 style={{ fontWeight: "normal", fontSize: "18px", margin: "0px" }}>
+        <h2 style={{ margin: "0px" }} className="header-base">
           Success!
         </h2>
         <p>Your credentials have been encrypted and stored.</p>

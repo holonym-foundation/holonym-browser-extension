@@ -11,7 +11,8 @@ function LandingPage({ onLoginSuccess }) {
   const [changePwIsVisible, setChangePwIsVisible] = useState(false);
 
   useEffect(() => {
-    cryptoController.getIsRegistered().then((val) => setRegistered(val));
+    // TODO: Uncomment
+    // cryptoController.getIsRegistered().then((val) => setRegistered(val));
   }, []);
 
   function handleChangePwVisibility() {
