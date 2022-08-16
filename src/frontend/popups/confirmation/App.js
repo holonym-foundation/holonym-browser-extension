@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import HoloLogo from "../../img/Holo-Logo.png";
-import PasswordLogin from "../../shared/components/PasswordLogin";
-import ConfirmCredentials from "./components/ConfirmCredentials";
-import Success from "./components/Success";
+import PasswordLogin from "../../components/PasswordLogin";
+import ConfirmCredentials from "../../components/ConfirmCredentials";
+import Success from "../../components/Success";
 
 function App() {
   const [loginIsVisible, setLoginIsVisible] = useState(true);

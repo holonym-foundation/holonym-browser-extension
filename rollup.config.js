@@ -22,7 +22,7 @@ export default [
   },
   {
     // Background script
-    input: "./src/background/background.js",
+    input: "./src/scripts/background/background.js",
     output: {
       file: "./dist/background.js",
       format: "es",
@@ -37,7 +37,7 @@ export default [
   },
   {
     // Default popup script
-    input: "./src/popups/default/index.js",
+    input: "./src/frontend/popups/default/index.js",
     output: {
       file: "./dist/default_popup.js",
       format: "es",
@@ -61,7 +61,7 @@ export default [
   },
   {
     // Confirmation popup script
-    input: "./src/popups/confirmation/index.js",
+    input: "./src/frontend/popups/confirmation/index.js",
     output: {
       file: "./dist/confirmation_popup.js",
       format: "es",

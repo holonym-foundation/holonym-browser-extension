@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Register from "./Register";
-import PasswordLogin from "../../../shared/components/PasswordLogin";
+import PasswordLogin from "./PasswordLogin";
 import ChangePassword from "./ChangePassword";
-import { CryptoController } from "../../../shared/CryptoController";
+import { CryptoController } from "../../scripts/shared/CryptoController";
 
 const cryptoController = new CryptoController();
 
