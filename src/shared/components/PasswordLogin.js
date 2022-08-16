@@ -19,22 +19,24 @@ function PasswordLogin({ onLoginSuccess }) {
 
   return (
     <>
-      <form id="login-form" onSubmit={handleLogin}>
-        <div className="enter-password-label">
-          <label>Enter Password</label>
-        </div>
-        <div>
-          <input
-            type="text"
-            name="password"
-            defaultValue="test"
-            className="password-input center-block"
-          />
-        </div>
-        <button type="submit" className="submit-password center-block">
-          Submit
-        </button>
-      </form>
+      <div style={{ textAlign: "center" }}>
+        <form id="login-form" onSubmit={handleLogin}>
+          <div className="enter-password-label">
+            <label>Enter Password</label>
+          </div>
+          <div>
+            <input
+              type="text"
+              name="password"
+              defaultValue="test"
+              className="password-input"
+            />
+          </div>
+          <button type="submit" className="submit-password">
+            Submit
+          </button>
+        </form>
+      </div>
     </>
   );
 }

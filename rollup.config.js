@@ -43,6 +43,7 @@ export default [
       format: "es",
     },
     plugins: [
+      image(),
       resolve({
         browser: true,
         preferBuiltins: false,
