@@ -1,5 +1,5 @@
 import React from "react";
-import Credentials from "./Credentials";
+import Credentials from "../atoms/Credentials";
 
 function ConfirmCredentials({ credentials, onConfirmation }) {
   return (

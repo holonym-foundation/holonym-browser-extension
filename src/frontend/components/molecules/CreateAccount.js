@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import InitializeAccount from "./InitializeAccount";
-import Success from "./Success";
+import InitializeAccount from "../atoms/InitializeAccount";
+import Success from "../atoms/Success";
 
 function CreateAccount({ onAccountCreated }) {
   const [success, setSuccess] = useState(false);

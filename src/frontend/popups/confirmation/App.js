@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import HoloLogo from "../../img/Holo-Logo.png";
-import PasswordLogin from "../../components/PasswordLogin";
-import ConfirmCredentials from "../../components/ConfirmCredentials";
-import Success from "../../components/Success";
+import PasswordLogin from "../../components/atoms/PasswordLogin";
+import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
+import Success from "../../components/atoms/Success";
 
 const successMessage =
   "Your credentials have been encrypted and stored. " +
