@@ -2,17 +2,22 @@ import React, { useState, useEffect } from "react";
 import Register from "./Register";
 import PasswordLogin from "./PasswordLogin";
 import ChangePassword from "./ChangePassword";
-import { CryptoController } from "../../scripts/shared/CryptoController";
-
-const cryptoController = new CryptoController();
 
 function LandingPage({ onLoginSuccess }) {
   const [registered, setRegistered] = useState(false);
   const [changePwIsVisible, setChangePwIsVisible] = useState(false);
 
   useEffect(() => {
-    // TODO: Uncomment
-    // cryptoController.getIsRegistered().then((val) => setRegistered(val));
+    function getIsRegistered() {
+      return new Promise((resolve) => {
+        const message = {
+          message: "holoGetIsRegistered",
+        };
+        const callback = (resp) => resolve(resp.isRegistered);
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+    getIsRegistered().then((val) => setRegistered(val));
   }, []);
 
   function handleChangePwVisibility() {

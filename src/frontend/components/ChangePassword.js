@@ -18,7 +18,6 @@ function ChangePassword({ onPasswordChange }) {
         chrome.runtime.sendMessage(message, callback);
       });
     }
-
     const changePwSuccess = await changePassword();
     if (changePwSuccess && onPasswordChange) onPasswordChange();
   }

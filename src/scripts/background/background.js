@@ -19,6 +19,7 @@ const allowedPopupMessages = [
   "denyCredentials",
   "holoChangePassword",
   "holoInitializeAccount",
+  "holoGetIsRegistered",
 ];
 
 function popupListener(request, sender, sendResponse) {
@@ -69,8 +70,13 @@ function popupListener(request, sender, sendResponse) {
   } else if (message == "holoInitializeAccount") {
     const password = request.password;
     cryptoController
-      .initialize(password)
+      .initialize(password) // TODO: initialize() doesn't return anything
       .then((success) => sendResponse({ success: success }));
+    return true;
+  } else if (message == "holoGetIsRegistered") {
+    cryptoController
+      .getIsRegistered()
+      .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
     return true;
   }
 }
