@@ -4,6 +4,10 @@ import PasswordLogin from "../../components/PasswordLogin";
 import ConfirmCredentials from "../../components/ConfirmCredentials";
 import Success from "../../components/Success";
 
+const successMessage =
+  "Your credentials have been encrypted and stored. " +
+  "You can now generate zero knowledge proofs of identity.";
+
 function App() {
   const [loginIsVisible, setLoginIsVisible] = useState(true);
   const [credsContainerIsVisible, setCredsContainerIsVisible] = useState(false);
@@ -48,7 +52,11 @@ function App() {
         )}
         {credsConfirmed && (
           <div style={{ marginTop: "150px" }}>
-            <Success />
+            <Success
+              message={successMessage}
+              onExit={window.close}
+              exitButtonText="Close"
+            />
           </div>
         )}
       </div>
