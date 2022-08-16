@@ -1,7 +1,4 @@
 import React from "react";
-import { CryptoController } from "../../scripts/shared/CryptoController";
-
-const cryptoController = new CryptoController();
 
 // NOTE: Use with care.
 // This component can be used for (a) first-time account setup and (b) account resets.
@@ -9,10 +6,21 @@ const cryptoController = new CryptoController();
 function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
   async function handleInitialize(event) {
     event.preventDefault();
-    const password = event.target.password.value;
-    await cryptoController.initialize(password);
-    event.target.password.value = "";
-    onInitializeSuccess();
+    function initializeAccount() {
+      return new Promise((resolve) => {
+        const password = event.target.password.value;
+        event.target.password.value = "";
+        const message = {
+          message: "holoInitializeAccount",
+          password: password,
+        };
+        // const callback = (resp) => resolve(resp.success);
+        const callback = (resp) => resolve();
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+    await initializeAccount();
+    if (onInitializeSuccess) onInitializeSuccess();
   }
 
   return (

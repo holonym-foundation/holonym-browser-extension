@@ -1,7 +1,4 @@
 import React from "react";
-import { CryptoController } from "../../scripts/shared/CryptoController";
-
-const cryptoController = new CryptoController();
 
 function ChangePassword({ onPasswordChange }) {
   async function handleChangePassword(event) {

@@ -18,6 +18,7 @@ const allowedPopupMessages = [
   "confirmCredentials",
   "denyCredentials",
   "holoChangePassword",
+  "holoInitializeAccount",
 ];
 
 function popupListener(request, sender, sendResponse) {
@@ -64,6 +65,12 @@ function popupListener(request, sender, sendResponse) {
     cryptoController
       .changePassword(oldPassword, newPassword)
       .then((changePwSuccess) => sendResponse({ success: changePwSuccess }));
+    return true;
+  } else if (message == "holoInitializeAccount") {
+    const password = request.password;
+    cryptoController
+      .initialize(password)
+      .then((success) => sendResponse({ success: success }));
     return true;
   }
 }
