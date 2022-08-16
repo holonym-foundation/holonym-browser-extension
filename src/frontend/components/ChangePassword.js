@@ -3,18 +3,27 @@ import { CryptoController } from "../../scripts/shared/CryptoController";
 
 const cryptoController = new CryptoController();
 
-function ChangePassword() {
+function ChangePassword({ onPasswordChange }) {
   async function handleChangePassword(event) {
     event.preventDefault();
-    const oldPassword = event.target["old-password"].value;
-    const newPassword = event.target["new-password"].value;
-    const changePwSuccess = await cryptoController.changePassword(
-      oldPassword,
-      newPassword
-    );
-    console.log(`changePwSuccess: ${changePwSuccess}`);
-    event.target["old-password"].value = "";
-    event.target["new-password"].value = "";
+    function changePassword() {
+      return new Promise((resolve) => {
+        const oldPassword = event.target["old-password"].value;
+        const newPassword = event.target["new-password"].value;
+        event.target["old-password"].value = "";
+        event.target["new-password"].value = "";
+        const message = {
+          message: "holoChangePassword",
+          oldPassword: oldPassword,
+          newPassword: newPassword,
+        };
+        const callback = (resp) => resolve(resp.success);
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+
+    const changePwSuccess = await changePassword();
+    if (changePwSuccess && onPasswordChange) onPasswordChange();
   }
 
   return (

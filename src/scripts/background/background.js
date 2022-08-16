@@ -17,6 +17,7 @@ const allowedPopupMessages = [
   "getHoloCredentials",
   "confirmCredentials",
   "denyCredentials",
+  "holoChangePassword",
 ];
 
 function popupListener(request, sender, sendResponse) {
@@ -57,6 +58,13 @@ function popupListener(request, sender, sendResponse) {
     return true;
   } else if (message == "denyCredentials") {
     holoStore.setLatestMessage("");
+  } else if (message == "holoChangePassword") {
+    const oldPassword = request.oldPassword;
+    const newPassword = request.newPassword;
+    cryptoController
+      .changePassword(oldPassword, newPassword)
+      .then((changePwSuccess) => sendResponse({ success: changePwSuccess }));
+    return true;
   }
 }
 
