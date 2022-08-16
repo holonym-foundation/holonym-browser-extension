@@ -40,7 +40,8 @@ class CryptoController {
    * @param {string} password
    */
   async #createPassword(password) {
-    if (await this.#getPasswordHash()) return;
+    // Commenting out. User should be allowed to generate new account and erase old one.
+    // if (await this.#getPasswordHash()) return;
     this.#store.password = password;
     const salt = crypto.randomUUID();
     await this.#setPasswordSalt(salt);
@@ -53,7 +54,8 @@ class CryptoController {
    * This should be called only once, when the user creates their fist password.
    */
   async #generateKeyPair() {
-    if (await this.#getKeyPair()) return;
+    // Commenting out. User should be allowed to generate new account and erase old one.
+    // if (await this.#getKeyPair()) return;
     const algo = {
       name: "RSA-OAEP",
       modulusLength: 4096,
@@ -63,6 +65,7 @@ class CryptoController {
     const usage = ["encrypt", "decrypt"];
     const keyPair = await crypto.subtle.generateKey(algo, true, usage);
     const privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
+    this.#store.decryptedPrivateKey = privateKey;
     const publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const encryptedPrivateKey = await this.encryptWithPassword(privateKey);
     await this.#setKeyPair(encryptedPrivateKey, publicKey);
