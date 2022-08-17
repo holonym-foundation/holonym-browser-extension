@@ -6,6 +6,7 @@ content scripts--Doing so would overwrite the styles in the webpage.
 :root {
   --lobby3-lime: #e1eb81;
   --holo-light-blue: #6093e5;
+  --default-red: #601010;
   --holo-default-font: Montserrat, sans-serif;
 }
 
@@ -64,6 +65,16 @@ button:hover {
   width: 70vw;
 }
 
+.red-button {
+  border-color: var(--default-red);
+  background-color: var(--default-red);
+}
+
+.red-button:hover {
+  color: var(--default-red);
+  border-color: var(--default-red);
+}
+
 .password-input {
   margin: 10px auto;
 }
@@ -72,6 +83,10 @@ button:hover {
   text-align: center;
   font-weight: normal;
   font-size: 18px;
+}
+
+.small-paragraph {
+  font-size: 0.7rem;
 }
 
 .holo-credentials-container {

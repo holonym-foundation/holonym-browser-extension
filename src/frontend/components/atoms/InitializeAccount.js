@@ -23,17 +23,15 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
     if (onInitializeSuccess) onInitializeSuccess();
   }
 
+  // TODO: Add a loading icon while the message is being sent
+
   return (
     <>
       <div style={{ textAlign: "center" }}>
         <form onSubmit={handleInitialize}>
           <div className="header-base">
             <label>{inputLabel || "Enter Password"}</label>
-            {subLabel && <p>{subLabel}</p>}
-            {/* <p>
-                (WARNING: This will generate a new keypair, making your old credentials
-                inaccessible)
-              </p> */}
+            <div className="small-paragraph">{subLabel && <p>{subLabel}</p>}</div>
           </div>
           <div>
             <input
