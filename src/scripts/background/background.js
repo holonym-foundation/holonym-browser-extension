@@ -14,6 +14,7 @@ const holoStore = new HoloStore();
 const popupOrigin = "chrome-extension://jmaehplbldnmbeceocaopdolmgbnkoga";
 const allowedPopupMessages = [
   "holoPopupLogin",
+  "getHoloLatestMessage",
   "getHoloCredentials",
   "confirmCredentials",
   "denyCredentials",
@@ -34,11 +35,19 @@ function popupListener(request, sender, sendResponse) {
       sendResponse({ success: success });
     });
     return true; // <-- This is required in order to use sendResponse async
-  } else if (message == "getHoloCredentials") {
+  } else if (message == "getHoloLatestMessage") {
     holoStore
       .getLatestMessage()
       .then((encryptedMsg) => cryptoController.decryptWithPrivateKey(encryptedMsg))
       .then((decryptedMsg) => sendResponse({ credentials: JSON.parse(decryptedMsg) }));
+    return true;
+  } else if (message == "getHoloCredentials") {
+    holoStore
+      .getCredentials()
+      .then((encryptedCreds) => cryptoController.decryptWithPrivateKey(encryptedCreds))
+      .then((decryptedCreds) =>
+        sendResponse({ credentials: JSON.parse(decryptedCreds) })
+      );
     return true;
   } else if (message == "confirmCredentials") {
     let encryptedCreds = "";

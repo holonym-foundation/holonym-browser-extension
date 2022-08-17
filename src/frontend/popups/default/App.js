@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import HoloLogo from "../../img/Holo-Logo.png";
 import LandingPage from "../../components/LandingPage";
+import Credentials from "../../components/atoms/Credentials";
 
 function App() {
   const [landingPageIsVisible, setLandingPageIsVisible] = useState(true);
-  const [hasCredentials, setHasCredentials] = useState(false);
+  const [credentials, setCredentials] = useState();
 
   async function handleLoginSuccess() {
     setLandingPageIsVisible(false);
   }
 
   useEffect(() => {
+    if (landingPageIsVisible) return;
     function requestCredentials() {
       return new Promise((resolve) => {
         const message = { message: "getHoloCredentials" };
@@ -18,7 +20,7 @@ function App() {
         chrome.runtime.sendMessage(message, callback);
       });
     }
-    requestCredentials().then((credentials) => setHasCredentials(!!credentials));
+    requestCredentials().then((credentials) => setCredentials(credentials));
   }, [landingPageIsVisible]);
 
   return (
@@ -29,7 +31,10 @@ function App() {
         {landingPageIsVisible ? (
           <LandingPage onLoginSuccess={handleLoginSuccess} />
         ) : (
-          <p>Possess credentials: {hasCredentials.toString()}</p>
+          <div>
+            <h2 className="header-base">Credentials</h2>
+            <Credentials credentials={credentials} />
+          </div>
         )}
       </div>
     </>

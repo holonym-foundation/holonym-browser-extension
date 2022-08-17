@@ -23,7 +23,7 @@ function App() {
 
   function requestCredentials() {
     return new Promise((resolve) => {
-      const message = { message: "getHoloCredentials" };
+      const message = { message: "getHoloLatestMessage" };
       const callback = (resp) => resolve(resp.credentials);
       chrome.runtime.sendMessage(message, callback);
     });
