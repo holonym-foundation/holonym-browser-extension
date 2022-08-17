@@ -36,12 +36,16 @@ function popupListener(request, sender, sendResponse) {
     });
     return true; // <-- This is required in order to use sendResponse async
   } else if (message == "getHoloLatestMessage") {
+    const loggedIn = cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
     holoStore
       .getLatestMessage()
       .then((encryptedMsg) => cryptoController.decryptWithPrivateKey(encryptedMsg))
       .then((decryptedMsg) => sendResponse({ credentials: JSON.parse(decryptedMsg) }));
     return true;
   } else if (message == "getHoloCredentials") {
+    const loggedIn = cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
     holoStore
       .getCredentials()
       .then((encryptedCreds) => cryptoController.decryptWithPrivateKey(encryptedCreds))
@@ -50,6 +54,8 @@ function popupListener(request, sender, sendResponse) {
       );
     return true;
   } else if (message == "confirmCredentials") {
+    const loggedIn = cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
     let encryptedCreds = "";
     holoStore
       .getLatestMessage()
@@ -68,6 +74,8 @@ function popupListener(request, sender, sendResponse) {
       .then((setMsgSuccess) => sendResponse({}));
     return true;
   } else if (message == "denyCredentials") {
+    const loggedIn = cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
     holoStore.setLatestMessage("");
   } else if (message == "holoChangePassword") {
     const oldPassword = request.oldPassword;
