@@ -9,6 +9,8 @@ const resetNotice =
 function ResetAccount({ onAccountReset }) {
   const [success, setSuccess] = useState(false);
 
+  // TODO: Add "cancel" button
+
   return (
     <>
       <div style={{ textAlign: "center" }}>
