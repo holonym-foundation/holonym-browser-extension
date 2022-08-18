@@ -34,6 +34,12 @@ function AppRoutes() {
     chrome.runtime.sendMessage(message, callback);
   }
 
+  function onExit() {
+    const message = { command: "closingHoloConfirmationPopup" };
+    chrome.runtime.sendMessage(message);
+    window.close();
+  }
+
   return (
     <>
       <Routes>
@@ -56,7 +62,7 @@ function AppRoutes() {
             <div style={{ marginTop: "150px" }}>
               <Success
                 message={successMessage}
-                onExit={window.close}
+                onExit={onExit}
                 exitButtonText="Close"
               />
             </div>

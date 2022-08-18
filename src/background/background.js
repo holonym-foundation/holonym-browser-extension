@@ -9,6 +9,8 @@ import { HoloStore } from "./HoloStore";
 // Functions for listening to messages from popups
 // --------------------------------------------------------------
 
+let confirmationPopupIsOpen = false;
+
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 const popupOrigin = "chrome-extension://cilbidmppfndfhjafdlngkaabddoofea";
@@ -21,6 +23,7 @@ const allowedPopupCommands = [
   "holoChangePassword",
   "holoInitializeAccount",
   "holoGetIsRegistered",
+  "closingHoloConfirmationPopup",
 ];
 
 function popupListener(request, sender, sendResponse) {
@@ -95,10 +98,13 @@ function popupListener(request, sender, sendResponse) {
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
     return true;
+  } else if (command == "closingHoloConfirmationPopup") {
+    confirmationPopupIsOpen = false;
   }
 }
 
 function displayConfirmationPopup() {
+  if (confirmationPopupIsOpen) return;
   const config = {
     focused: true,
     height: 530,
@@ -108,7 +114,9 @@ function displayConfirmationPopup() {
     type: "popup",
     url: "confirmation_popup.html",
   };
-  chrome.windows.create(config, (window) => {});
+  chrome.windows.create(config, (window) => {
+    confirmationPopupIsOpen = true;
+  });
 }
 
 // --------------------------------------------------------------
