@@ -11,7 +11,7 @@ import { HoloStore } from "../shared/HoloStore";
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
-const popupOrigin = "chrome-extension://jmaehplbldnmbeceocaopdolmgbnkoga";
+const popupOrigin = "chrome-extension://cilbidmppfndfhjafdlngkaabddoofea";
 const allowedPopupMessages = [
   "holoPopupLogin",
   "getHoloLatestMessage",

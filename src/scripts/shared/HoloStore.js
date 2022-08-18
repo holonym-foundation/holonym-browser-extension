@@ -7,7 +7,7 @@ import { getStateAsBytes, getDateAsBytes } from "./utils";
 import { serverAddress, threeZeroedBytes } from "./constants";
 import { Buffer } from "buffer";
 
-const requiredCredsKeys = [
+const credentialNames = [
   "firstName",
   "lastName",
   "middleInitial",
@@ -19,9 +19,39 @@ const requiredCredsKeys = [
   "postalCode",
   "completedAt",
   "birthdate",
-  "serverSignature",
-  "secret",
 ];
+
+const secretNames = [
+  "bigCredsSecret",
+  "firstNameSecret",
+  "lastNameSecret",
+  "middleInitialSecret",
+  "countryCodeSecret",
+  "streetAddr1Secret",
+  "streetAddr2Secret",
+  "citySecret",
+  "subdivisionSecret",
+  "postalCodeSecret",
+  "completedAtSecret",
+  "birthdateSecret",
+];
+
+const signatureNames = [
+  "bigCredsSignature",
+  "firstNameSignature",
+  "lastNameSignature",
+  "middleInitialSignature",
+  "countryCodeSignature",
+  "streetAddr1Signature",
+  "streetAddr2Signature",
+  "citySignature",
+  "subdivisionSignature",
+  "postalCodeSignature",
+  "completedAtSignature",
+  "birthdateSignature",
+];
+
+const requiredCredsKeys = [...credentialNames, ...secretNames, ...signatureNames];
 
 /**
  * HoloStore has two stores:
@@ -102,47 +132,81 @@ class HoloStore {
 
     return true;
   }
-  async validateServerSignature(unencryptedCreds) {
+  async validateServerSignatures(unencryptedCreds) {
     try {
-      const arrayifiedAddr = ethers.utils.arrayify(serverAddress);
-      const arrayifiedSecret = ethers.utils.arrayify(unencryptedCreds.secret);
-      const credsArr = [
-        Buffer.concat([Buffer.from(unencryptedCreds.firstName || "")], 14),
-        Buffer.concat([Buffer.from(unencryptedCreds.lastName || "")], 14),
-        Buffer.concat([Buffer.from(unencryptedCreds.middleInitial || "")], 1),
-        Buffer.concat([Buffer.from(unencryptedCreds.countryCode || "")], 3),
-        Buffer.concat([Buffer.from(unencryptedCreds.streetAddr1 || "")], 16),
-        Buffer.concat([Buffer.from(unencryptedCreds.streetAddr2 || "")], 12),
-        Buffer.concat([Buffer.from(unencryptedCreds.city || "")], 16),
-        getStateAsBytes(unencryptedCreds.subdivision), // 2 bytes
-        Buffer.concat([Buffer.from(unencryptedCreds.postalCode || "")], 8),
-        unencryptedCreds.completedAt
-          ? getDateAsBytes(unencryptedCreds.completedAt)
-          : threeZeroedBytes,
-        unencryptedCreds.birthdate
-          ? getDateAsBytes(unencryptedCreds.birthdate)
-          : threeZeroedBytes,
-      ];
-      const arrayifiedCreds = ethers.utils.arrayify(Buffer.concat(credsArr));
-      const msg = Uint8Array.from([
+      const validSmallCredsSigs = await this.validateSmallCredsSigs(unencryptedCreds);
+      if (!validSmallCredsSigs) return false;
+      const validBigCredsSigs = await this.validateBigCredsSigs(unencryptedCreds);
+      if (!validBigCredsSigs) return false;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+    return true;
+  }
+  async validateSmallCredsSigs(unencryptedCreds) {
+    const arrayifiedAddr = ethers.utils.arrayify(serverAddress);
+    for (const credentialName of credentialNames) {
+      const secretKey = `${credentialName}Secret`;
+      const arrayifiedSecret = ethers.utils.arrayify(unencryptedCreds[secretKey]);
+      const credentialAsBuffer = Buffer.concat(
+        [Buffer.from(unencryptedCreds[credentialName] || "")],
+        28
+      );
+      const arrayifiedCredential = ethers.utils.arrayify(credentialAsBuffer);
+      const credentialMsg = Uint8Array.from([
         ...arrayifiedAddr,
+        ...arrayifiedCredential,
         ...arrayifiedSecret,
-        ...arrayifiedCreds,
       ]);
+      const signatureKey = `${credentialName}Signature`;
       const signer = await ethers.utils.verifyMessage(
-        msg,
-        unencryptedCreds.serverSignature
+        credentialMsg,
+        unencryptedCreds[signatureKey]
       );
       if (signer.toLowerCase() != serverAddress.toLowerCase()) {
         console.log("HoloStore: signer != serverAddress");
         return false;
       }
-      return true;
-    } catch (err) {
+    }
+    return true;
+  }
+  async validateBigCredsSigs(unencryptedCreds) {
+    const arrayifiedAddr = ethers.utils.arrayify(serverAddress);
+    const arrayifiedSecret = ethers.utils.arrayify(unencryptedCreds.bigCredsSecret);
+    const credsArr = [
+      Buffer.concat([Buffer.from(unencryptedCreds.firstName || "")], 14),
+      Buffer.concat([Buffer.from(unencryptedCreds.lastName || "")], 14),
+      Buffer.concat([Buffer.from(unencryptedCreds.middleInitial || "")], 1),
+      Buffer.concat([Buffer.from(unencryptedCreds.countryCode || "")], 3),
+      Buffer.concat([Buffer.from(unencryptedCreds.streetAddr1 || "")], 16),
+      Buffer.concat([Buffer.from(unencryptedCreds.streetAddr2 || "")], 12),
+      Buffer.concat([Buffer.from(unencryptedCreds.city || "")], 16),
+      getStateAsBytes(unencryptedCreds.subdivision), // 2 bytes
+      Buffer.concat([Buffer.from(unencryptedCreds.postalCode || "")], 8),
+      unencryptedCreds.completedAt
+        ? getDateAsBytes(unencryptedCreds.completedAt)
+        : threeZeroedBytes,
+      unencryptedCreds.birthdate
+        ? getDateAsBytes(unencryptedCreds.birthdate)
+        : threeZeroedBytes,
+    ];
+    const arrayifiedCreds = ethers.utils.arrayify(Buffer.concat(credsArr));
+    const msg = Uint8Array.from([
+      ...arrayifiedAddr,
+      ...arrayifiedSecret,
+      ...arrayifiedCreds,
+    ]);
+    const signer = await ethers.utils.verifyMessage(
+      msg,
+      unencryptedCreds.bigCredsSignature
+    );
+    if (signer.toLowerCase() != serverAddress.toLowerCase()) {
+      console.log("HoloStore: signer != serverAddress");
       return false;
     }
+    return true;
   }
-
   /**
    * @returns The last valid value that was supplied to setCredentials as credentials.encryptedCreds
    */
