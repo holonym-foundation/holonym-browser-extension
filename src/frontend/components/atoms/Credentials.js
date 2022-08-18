@@ -5,10 +5,12 @@ function Credentials({ credentials }) {
 
   useEffect(() => {
     if (!credentials) return;
-    const defaultCredsToIgnore = ["completedAt", "serverSignature", "secret"];
-    const allowedCredsNames = Object.keys(credentials).filter(
-      (name) => !defaultCredsToIgnore.includes(name)
-    );
+    const allowedCredsNames = Object.keys(credentials).filter((name) => {
+      if (name.toLowerCase().includes("signature")) return false;
+      if (name.toLowerCase().includes("secret")) return false;
+      if (name == "completedAt") return false;
+      return true;
+    });
     const credsToDisplayTemp = Object.fromEntries(
       allowedCredsNames.map((name) => [name, credentials[name]])
     );
