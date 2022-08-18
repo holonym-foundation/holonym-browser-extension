@@ -139,7 +139,7 @@ class CryptoController {
         encryptedPrivateKey: encryptedPrivateKey,
         publicKey: publicKey,
       };
-      chrome.storage.sync.set({ holoKeyPair: keyPair }, () => {
+      chrome.storage.local.set({ holoKeyPair: keyPair }, () => {
         resolve();
       });
     });
@@ -147,8 +147,8 @@ class CryptoController {
 
   #getKeyPair() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(["holoKeyPair"], (result) => {
-        resolve(result.holoKeyPair);
+      chrome.storage.local.get(["holoKeyPair"], (result) => {
+        resolve(result?.holoKeyPair);
       });
     });
   }
@@ -158,8 +158,8 @@ class CryptoController {
    */
   getPublicKey() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(["holoKeyPair"], (result) => {
-        resolve(result.holoKeyPair.publicKey);
+      chrome.storage.local.get(["holoKeyPair"], (result) => {
+        resolve(result?.holoKeyPair?.publicKey);
       });
     });
   }
@@ -235,7 +235,7 @@ class CryptoController {
    */
   #setPasswordHash(passwordHash) {
     return new Promise((resolve) => {
-      chrome.storage.sync.set({ holoPasswordHash: passwordHash }, () => {
+      chrome.storage.local.set({ holoPasswordHash: passwordHash }, () => {
         resolve();
       });
     });
@@ -243,15 +243,15 @@ class CryptoController {
 
   #getPasswordHash() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(["holoPasswordHash"], (result) => {
-        resolve(result.holoPasswordHash);
+      chrome.storage.local.get(["holoPasswordHash"], (result) => {
+        resolve(result?.holoPasswordHash);
       });
     });
   }
 
   #setPasswordSalt(salt) {
     return new Promise((resolve) => {
-      chrome.storage.sync.set({ holoPasswordSalt: salt }, () => {
+      chrome.storage.local.set({ holoPasswordSalt: salt }, () => {
         resolve();
       });
     });
@@ -259,8 +259,8 @@ class CryptoController {
 
   #getPasswordSalt() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(["holoPasswordSalt"], (result) => {
-        resolve(result.holoPasswordSalt);
+      chrome.storage.local.get(["holoPasswordSalt"], (result) => {
+        resolve(result?.holoPasswordSalt);
       });
     });
   }

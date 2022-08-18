@@ -120,8 +120,8 @@ function displayConfirmationPopup() {
  */
 function getPublicKey() {
   return new Promise((resolve) => {
-    chrome.storage.sync.get(["holoKeyPair"], (result) => {
-      resolve(result.holoKeyPair.publicKey);
+    chrome.storage.local.get(["holoKeyPair"], (result) => {
+      resolve(result?.holoKeyPair?.publicKey);
     });
   });
 }

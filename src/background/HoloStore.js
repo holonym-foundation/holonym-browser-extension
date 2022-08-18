@@ -93,13 +93,13 @@ class HoloStore {
    */
   setLatestMessage(message) {
     return new Promise((resolve) => {
-      chrome.storage.sync.set({ latestHoloMessage: message }, () => resolve(true));
+      chrome.storage.local.set({ latestHoloMessage: message }, () => resolve(true));
     });
   }
 
   getLatestMessage() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(["latestHoloMessage"], (result) => {
+      chrome.storage.local.get(["latestHoloMessage"], (result) => {
         resolve(result?.latestHoloMessage);
       });
     });
@@ -119,7 +119,7 @@ class HoloStore {
         resolve(false);
       }
       const encryptedCreds = credentials.encryptedCreds;
-      chrome.storage.sync.set({ holoCredentials: encryptedCreds }, () => {
+      chrome.storage.local.set({ holoCredentials: encryptedCreds }, () => {
         // TODO: Display success message to user
         console.log(`HoloStore: Storing credentials`);
         resolve(true);
@@ -235,7 +235,7 @@ class HoloStore {
    */
   getCredentials() {
     return new Promise((resolve, reject) => {
-      chrome.storage.sync.get(["holoCredentials"], (creds) => {
+      chrome.storage.local.get(["holoCredentials"], (creds) => {
         resolve(creds?.holoCredentials);
       });
     });
