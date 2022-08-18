@@ -4,7 +4,7 @@ import App from "./App";
 
 // On close, tell background script to clear latestHoloMessage
 window.addEventListener("beforeunload", (event) => {
-  const message = { message: "denyCredentials" };
+  const message = { command: "denyCredentials" };
   chrome.runtime.sendMessage(message);
 });
 

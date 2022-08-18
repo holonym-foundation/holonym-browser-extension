@@ -11,7 +11,7 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
         const password = event.target.password.value;
         event.target.password.value = "";
         const message = {
-          message: "holoInitializeAccount",
+          command: "holoInitializeAccount",
           password: password,
         };
         // const callback = (resp) => resolve(resp.success);

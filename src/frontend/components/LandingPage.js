@@ -10,7 +10,7 @@ function LandingPage({ onLoginSuccess }) {
     function getIsRegistered() {
       return new Promise((resolve) => {
         const message = {
-          message: "holoGetIsRegistered",
+          command: "holoGetIsRegistered",
         };
         const callback = (resp) => resolve(resp.isRegistered);
         chrome.runtime.sendMessage(message, callback);

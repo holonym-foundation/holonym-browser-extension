@@ -7,7 +7,7 @@ function PasswordLogin({ onLoginSuccess }) {
         event.preventDefault();
         const password = event.target.password.value;
         event.target.password.value = "";
-        const message = { message: "holoPopupLogin", password: password };
+        const message = { command: "holoPopupLogin", password: password };
         const callback = (resp) => resolve(resp.success);
         chrome.runtime.sendMessage(message, callback);
       });

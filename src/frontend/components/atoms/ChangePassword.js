@@ -10,7 +10,7 @@ function ChangePassword({ onPasswordChange }) {
         event.target["old-password"].value = "";
         event.target["new-password"].value = "";
         const message = {
-          message: "holoChangePassword",
+          command: "holoChangePassword",
           oldPassword: oldPassword,
           newPassword: newPassword,
         };

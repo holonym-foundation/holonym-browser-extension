@@ -20,14 +20,14 @@ function AppRoutes() {
 
   function requestCredentials() {
     return new Promise((resolve) => {
-      const message = { message: "getHoloLatestMessage" };
+      const message = { command: "getHoloLatestMessage" };
       const callback = (resp) => resolve(resp.credentials);
       chrome.runtime.sendMessage(message, callback);
     });
   }
 
   function handleConfirmation() {
-    const message = { message: "confirmCredentials" };
+    const message = { command: "confirmCredentials" };
     const callback = (resp) => {
       navigate("/success", { replace: true });
     };

@@ -18,7 +18,7 @@ function AppRoutes() {
     if (loggedIn) return;
     function requestCredentials() {
       return new Promise((resolve) => {
-        const message = { message: "getHoloCredentials" };
+        const message = { command: "getHoloCredentials" };
         const callback = (resp) => resolve(resp.credentials);
         chrome.runtime.sendMessage(message, callback);
       });
