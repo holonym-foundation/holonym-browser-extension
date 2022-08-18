@@ -141,6 +141,7 @@ function webPageListener(request, sender, sendResponse) {
     throw new Error("Disallowed origin attempting to access or modify HoloStore.");
   }
   const command = request.command;
+  const credsAreSharded = request.sharded;
   const newCreds = request.credentials;
 
   if (!allowedWebPageCommands.includes(command)) {
@@ -151,7 +152,11 @@ function webPageListener(request, sender, sendResponse) {
     getPublicKey().then((publicKey) => sendResponse(publicKey));
     return true;
   } else if (command == "setHoloCredentials") {
-    holoStore.setLatestMessage(newCreds).then(() => displayConfirmationPopup());
+    const latestMessage = {
+      sharded: credsAreSharded,
+      credentials: newCreds,
+    };
+    holoStore.setLatestMessage(latestMessage).then(() => displayConfirmationPopup());
     return;
   } else if (command == "holoGetIsRegistered") {
     cryptoController

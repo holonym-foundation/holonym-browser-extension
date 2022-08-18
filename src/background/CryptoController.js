@@ -12,6 +12,19 @@
 
 import passworder from "browser-passworder";
 
+/**
+ * (Also defined in HoloStore.)
+ * An encrypted message sent to the extension and stored by HoloStore as
+ * 'latestHoloMessage'. The unencrypted message must be a string.
+ * @typedef {Object} EncryptedCredentials
+ * @property {boolean} sharded Whether message is represented as encrypted shards.
+ * @property {string|Array<string>} credentials If not sharded, this is a string
+ * representation of the encrypted message. If sharded, it is an array consisting
+ * of parts of the message that were individually encrypted; in this case, the
+ * decrypted message can be recovered by decrypting each shard and concatenating
+ * the result.
+ */
+
 class CryptoController {
   #store;
   #isLoggedIn;
@@ -151,7 +164,12 @@ class CryptoController {
     });
   }
 
-  async decryptWithPrivateKey(message) {
+  /**
+   * @param {EncryptedCredentials} encryptedCredentials
+   * @returns {string}
+   */
+  async decryptWithPrivateKey(encryptedCredentials) {
+    const { sharded, credentials } = encryptedCredentials;
     const algo = {
       name: "RSA-OAEP",
       modulusLength: 4096,
@@ -165,14 +183,21 @@ class CryptoController {
       false,
       ["decrypt"]
     );
-    const encodedMessage = new Uint8Array(JSON.parse(message)).buffer;
-    const decryptedMessage = await crypto.subtle.decrypt(
-      { name: "RSA-OAEP" },
-      privateKeyAsCryptoKey,
-      encodedMessage
-    );
-    const decoder = new TextDecoder("utf-8");
-    return decoder.decode(decryptedMessage);
+
+    const credentialsShards = sharded ? credentials : [credentials];
+    const decryptedDecodedShards = [];
+    for (const shard of credentialsShards) {
+      const encodedShard = new Uint8Array(JSON.parse(shard)).buffer;
+      const decryptedShard = await crypto.subtle.decrypt(
+        { name: "RSA-OAEP" },
+        privateKeyAsCryptoKey,
+        encodedShard
+      );
+      const decoder = new TextDecoder("utf-8");
+      const decodedShard = decoder.decode(decryptedShard);
+      decryptedDecodedShards.push(decodedShard);
+    }
+    return decryptedDecodedShards.join("");
   }
 
   /**

@@ -7,6 +7,30 @@ import { getStateAsBytes, getDateAsBytes } from "./utils";
 import { serverAddress, threeZeroedBytes } from "./constants";
 import { Buffer } from "buffer";
 
+/**
+ * @typedef {Object} DecryptedCredentials
+ * (See credentialNames, secretNames, and signatureNames for properties.)
+ */
+
+/**
+ * (Also defined in CryptoController.)
+ * An encrypted message sent to the extension and stored by HoloStore as
+ * 'latestHoloMessage'. The unencrypted message must be a string.
+ * @typedef {Object} EncryptedCredentials
+ * @property {boolean} sharded Whether message is represented as encrypted shards.
+ * @property {string|Array<string>} credentials If not sharded, this is a string
+ * representation of the encrypted message. If sharded, it is an array consisting
+ * of parts of the message that were individually encrypted; in this case, the
+ * decrypted message can be recovered by decrypting each shard and concatenating
+ * the result.
+ */
+
+/**
+ * @typedef {Object} FullCredentials
+ * @property {DecryptedCredentials}
+ * @property {EncryptedCredentials}
+ */
+
 const credentialNames = [
   "firstName",
   "lastName",
@@ -84,8 +108,7 @@ class HoloStore {
   /**
    * Validates unencrypted unencryptedCreds. If unencryptedCreds are valid,
    * encryptedCreds are stored.
-   * @param {object} credentials Object containing: unencryptedCreds (obj)
-   *                             & encryptedCreds (str)
+   * @param {FullCredentials} credentials (See typedef)
    * @returns True if the given credentials get stored, false otherwise.
    */
   setCredentials(credentials) {
