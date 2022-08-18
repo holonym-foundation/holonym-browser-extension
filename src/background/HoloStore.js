@@ -147,7 +147,7 @@ class HoloStore {
       return false;
     }
 
-    const validSignature = this.validateServerSignature(credentials.unencryptedCreds);
+    const validSignature = this.validateServerSignatures(credentials.unencryptedCreds);
     if (!validSignature) {
       console.log("HoloStore: Invalid server signature");
       return false;
