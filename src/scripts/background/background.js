@@ -131,10 +131,11 @@ const allowedWebPageMessages = [
   "getHoloPublicKey",
   // "getHoloCredentials",
   "setHoloCredentials",
+  "holoGetIsRegistered",
 ];
 
 // Listener function for messages from webpage
-async function webPageListener(request, sender, sendResponse) {
+function webPageListener(request, sender, sendResponse) {
   const potentialOrigin = sender.origin || sender.url;
   if (!allowedOrigins.includes(potentialOrigin)) {
     throw new Error("Disallowed origin attempting to access or modify HoloStore.");
@@ -147,12 +148,16 @@ async function webPageListener(request, sender, sendResponse) {
   }
 
   if (message == "getHoloPublicKey") {
-    const publicKey = await getPublicKey();
-    sendResponse(publicKey);
-    return;
+    getPublicKey().then((publicKey) => sendResponse(publicKey));
+    return true;
   } else if (message == "setHoloCredentials") {
-    await holoStore.setLatestMessage(newCreds);
-    displayConfirmationPopup();
+    holoStore.setLatestMessage(newCreds).then(() => displayConfirmationPopup());
+    return;
+  } else if (message == "holoGetIsRegistered") {
+    cryptoController
+      .getIsRegistered()
+      .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
+    return true;
   }
 }
 
