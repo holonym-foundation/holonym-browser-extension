@@ -242,24 +242,4 @@ class HoloStore {
   }
 }
 
-/**
- * @param {string} credentials An encrypted string.
- */
-function injectCredentials(credentials) {
-  if (!credentials) {
-    return;
-  }
-  const credsEl = document.getElementById("injected-holonym-creds");
-  if (credsEl) {
-    credsEl.textContent = credentials;
-  } else {
-    const credsEl = document.createElement("div");
-    credsEl.textContent = credentials;
-    credsEl.style.visibility = "hidden";
-    credsEl.style.bottom = "-10px";
-    credsEl.id = "injected-holonym-creds";
-    document.body.appendChild(credsEl);
-  }
-}
-
-export { HoloStore, injectCredentials };
+export { HoloStore };
