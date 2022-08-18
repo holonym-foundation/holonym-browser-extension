@@ -12,7 +12,7 @@ import { HoloStore } from "./HoloStore";
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 const popupOrigin = "chrome-extension://cilbidmppfndfhjafdlngkaabddoofea";
-const allowedPopupMessages = [
+const allowedPopupCommands = [
   "holoPopupLogin",
   "getHoloLatestMessage",
   "getHoloCredentials",
@@ -26,16 +26,16 @@ const allowedPopupMessages = [
 function popupListener(request, sender, sendResponse) {
   if (sender.origin != popupOrigin) return;
   if (!sender.url.includes(popupOrigin)) return;
-  const message = request.message;
-  if (!allowedPopupMessages.includes(message)) return;
+  const command = request.command;
+  if (!allowedPopupCommands.includes(command)) return;
 
-  if (message == "holoPopupLogin") {
+  if (command == "holoPopupLogin") {
     const password = request.password;
     cryptoController.login(password).then((success) => {
       sendResponse({ success: success });
     });
     return true; // <-- This is required in order to use sendResponse async
-  } else if (message == "getHoloLatestMessage") {
+  } else if (command == "getHoloLatestMessage") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
     holoStore
@@ -43,7 +43,7 @@ function popupListener(request, sender, sendResponse) {
       .then((encryptedMsg) => cryptoController.decryptWithPrivateKey(encryptedMsg))
       .then((decryptedMsg) => sendResponse({ credentials: JSON.parse(decryptedMsg) }));
     return true;
-  } else if (message == "getHoloCredentials") {
+  } else if (command == "getHoloCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
     holoStore
@@ -53,7 +53,7 @@ function popupListener(request, sender, sendResponse) {
         sendResponse({ credentials: JSON.parse(decryptedCreds) })
       );
     return true;
-  } else if (message == "confirmCredentials") {
+  } else if (command == "confirmCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
     let encryptedCreds = "";
@@ -73,24 +73,24 @@ function popupListener(request, sender, sendResponse) {
       .then((setCredsSuccess) => holoStore.setLatestMessage(""))
       .then((setMsgSuccess) => sendResponse({}));
     return true;
-  } else if (message == "denyCredentials") {
+  } else if (command == "denyCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
     holoStore.setLatestMessage("");
-  } else if (message == "holoChangePassword") {
+  } else if (command == "holoChangePassword") {
     const oldPassword = request.oldPassword;
     const newPassword = request.newPassword;
     cryptoController
       .changePassword(oldPassword, newPassword)
       .then((changePwSuccess) => sendResponse({ success: changePwSuccess }));
     return true;
-  } else if (message == "holoInitializeAccount") {
+  } else if (command == "holoInitializeAccount") {
     const password = request.password;
     cryptoController
       .initialize(password) // TODO: initialize() doesn't return anything
       .then((success) => sendResponse({ success: success }));
     return true;
-  } else if (message == "holoGetIsRegistered") {
+  } else if (command == "holoGetIsRegistered") {
     cryptoController
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
