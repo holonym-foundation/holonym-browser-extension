@@ -127,7 +127,7 @@ function getPublicKey() {
 }
 
 const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
-const allowedWebPageMessages = [
+const allowedWebPageCommands = [
   "getHoloPublicKey",
   // "getHoloCredentials",
   "setHoloCredentials",
@@ -140,20 +140,20 @@ function webPageListener(request, sender, sendResponse) {
   if (!allowedOrigins.includes(potentialOrigin)) {
     throw new Error("Disallowed origin attempting to access or modify HoloStore.");
   }
-  const message = request.message;
+  const command = request.command;
   const newCreds = request.credentials;
 
-  if (!allowedWebPageMessages.includes(message)) {
+  if (!allowedWebPageCommands.includes(command)) {
     return;
   }
 
-  if (message == "getHoloPublicKey") {
+  if (command == "getHoloPublicKey") {
     getPublicKey().then((publicKey) => sendResponse(publicKey));
     return true;
-  } else if (message == "setHoloCredentials") {
+  } else if (command == "setHoloCredentials") {
     holoStore.setLatestMessage(newCreds).then(() => displayConfirmationPopup());
     return;
-  } else if (message == "holoGetIsRegistered") {
+  } else if (command == "holoGetIsRegistered") {
     cryptoController
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
