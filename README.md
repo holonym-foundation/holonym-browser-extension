@@ -1,5 +1,7 @@
 # Holonym
 
+---THIS README IS OUTDATED---
+
 This extension accomplishes two tasks:
 
 - Display a user's Holo when mouse hovers over their Twitter handle.
