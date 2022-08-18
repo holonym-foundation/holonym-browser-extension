@@ -2,8 +2,8 @@
  * This background script handles messages from both the webpage and
  * the confirmation popup.
  */
-import { CryptoController } from "../shared/CryptoController";
-import { HoloStore } from "../shared/HoloStore";
+import { CryptoController } from "./CryptoController";
+import { HoloStore } from "./HoloStore";
 
 // --------------------------------------------------------------
 // Functions for listening to messages from popups

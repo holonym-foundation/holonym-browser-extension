@@ -22,7 +22,7 @@ export default [
   },
   {
     // Background script
-    input: "./src/scripts/background/background.js",
+    input: "./src/background/background.js",
     output: {
       file: "./dist/background.js",
       format: "es",
