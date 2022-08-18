@@ -103,8 +103,9 @@ function popupListener(request, sender, sendResponse) {
   }
 }
 
-function displayConfirmationPopup() {
+async function displayConfirmationPopup() {
   if (confirmationPopupIsOpen) return;
+  confirmationPopupIsOpen = true;
   const config = {
     focused: true,
     height: 530,
@@ -114,9 +115,12 @@ function displayConfirmationPopup() {
     type: "popup",
     url: "confirmation_popup.html",
   };
-  chrome.windows.create(config, (window) => {
-    confirmationPopupIsOpen = true;
-  });
+  try {
+    const window = await chrome.windows.create(config);
+  } catch (err) {
+    console.log(err);
+    confirmationPopupIsOpen = false;
+  }
 }
 
 // --------------------------------------------------------------

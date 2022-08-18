@@ -2,10 +2,11 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 
-// On close, tell background script to clear latestHoloMessage
+// On close, tell background script to clear latestHoloMessage and to
+// release the confirmation popup lock
 window.addEventListener("beforeunload", (event) => {
-  const message = { command: "denyCredentials" };
-  chrome.runtime.sendMessage(message);
+  chrome.runtime.sendMessage({ command: "denyCredentials" });
+  chrome.runtime.sendMessage({ command: "closingHoloConfirmationPopup" });
 });
 
 const container = document.getElementById("root");
