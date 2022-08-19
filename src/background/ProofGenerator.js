@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { blake2s } from "blakejs";
 import { Buffer } from "buffer/";
 import { initialize as initializeZokrates } from "zokrates-js";
-import { generateSecret } from "./utils";
+import { generateSecret, toU32StringArray } from "./utils";
 import { serverAddress } from "./constants";
 
 /**
@@ -34,18 +34,19 @@ class ProofGenerator {
    */
   async generateUnitedStatesPoR(creds, nullifier) {
     // TODO: Check server signature of leaf. Don't submit tx unless you know it will succeed.
-    const signedLeaf = createSmallCredsLeaf(serverAddress, creds, nullifier);
+    const signedLeaf = Buffer.from(
+      createSmallCredsLeaf(serverAddress, creds, nullifier)
+    );
     const newNullifier = generateSecret();
-    const newLeaf = createSmallCredsLeaf(serverAddress, creds, newNullifier);
+    const newLeaf = Buffer.from(
+      createSmallCredsLeaf(serverAddress, creds, newNullifier)
+    );
 
-    const arrayifiedAddr = ethers.utils.arrayify(serverAddress);
-    const arrayifiedNullifier = ethers.utils.arrayify(Buffer.from(nullifier, "hex"));
-    const arrayifiedCreds = ethers.utils.arrayify(
-      Buffer.concat([Buffer.from(creds || "")], 28)
-    );
-    const arrayifiedNewNullifier = ethers.utils.arrayify(
-      Buffer.from(newNullifier, "hex")
-    );
+    const addrAsBuffer = Buffer.from(serverAddress.slice(2), "hex");
+    const nullifierAsBuffer = Buffer.from(nullifier, "hex");
+    const credsAsBuffer = Buffer.concat([Buffer.from(creds || "")], 28);
+
+    const newNullifierAsBuffer = Buffer.from(newNullifier, "hex");
 
     // Generate addLeafSmall proof
     const addSmallLeafCode = `import "hashes/blake2/blake2s" as leafHash;
@@ -56,31 +57,59 @@ class ProofGenerator {
         assert(leafHash(newPreimage) == newLeaf);
         return;
     }`;
-    const proofArgs = [
+    const aslArgs = [
       signedLeaf,
       newLeaf,
-      arrayifiedAddr,
-      arrayifiedCreds,
-      arrayifiedNullifier,
-      arrayifiedNewNullifier,
-    ];
-    const zokratesProvider = await initializeZokrates();
-    const artifacts = zokratesProvider.compile(addSmallLeafCode);
-    const { witness, output } = zokratesProvider.computeWitness(artifacts, proofArgs);
-    const keypair = zokratesProvider.setup(artifacts.program);
-    const proof = zokratesProvider.generateProof(
-      artifacts.program,
-      witness,
-      keypair.pk
+      addrAsBuffer,
+      credsAsBuffer,
+      nullifierAsBuffer,
+      newNullifierAsBuffer,
+    ].map((arg) => toU32StringArray(arg));
+    const aslZokratesProvider = await initializeZokrates();
+    const aslArtifacts = aslZokratesProvider.compile(addSmallLeafCode);
+    const { aslWitness, aslOutput } = aslZokratesProvider.computeWitness(
+      aslArtifacts,
+      aslArgs
     );
-    // const isVerified = zokratesProvider.verify(keypair.vk, proof);
+    const aslKeypair = aslZokratesProvider.setup(aslArtifacts.program);
+    const aslProof = aslZokratesProvider.generateProof(
+      aslArtifacts.program,
+      aslWitness,
+      aslKeypair.pk
+    );
+    // const isVerified = aslZokratesProvider.verify(aslKeypair.vk, aslProof);
     // TODO: Store proof
 
-    // TODO: Generate proof that creds=="US"
+    // Generate proof that creds == "US"
+    const proveResidenceCode = `import "hashes/blake2/blake2s" as leafHash;
+    def main(u32[8] leaf, u32[5] address, private u32[7] creds, private u32[4] nullifier) {
+        u32[1][16] preimage = [[...address, ...creds, ...nullifier]];
+        assert(leafHash(preimage) == leaf);
+        // assert creds == "US"
+        assert(creds[0] == 1431502848);
+        for u32 i in 1..6 {
+            assert(creds[i] == 0);
+        }
+        return;
+    }`;
+    const prArgs = [newLeaf, addrAsBuffer, credsAsBuffer, newNullifierAsBuffer].map(
+      (arg) => toU32StringArray(arg)
+    );
+    const prZokratesProvider = await initialize();
+    const prArtifacts = prZokratesProvider.compile(proveResidenceCode);
+    const { prWitness, prOutput } = prZokratesProvider.computeWitness(
+      prArtifacts,
+      prArgs
+    );
+    const prKeypair = prZokratesProvider.setup(prArtifacts.program);
+    const prProof = prZokratesProvider.generateProof(
+      prArtifacts.program,
+      prWitness,
+      prKeypair.pk
+    );
+    // const isVerified = prZokratesProvider.verify(prKeypair.vk, prProof);
+    // TODO: Store proof
 
-    // createLeaf(issuer, creds, secret)
-    // onAddCredentialSmall(signedLeaf, newLeaf, address, creds, oldSecret, newSecret)
-    // assertLeafContainsCreds(leaf, issuer, creds, msgSender, nullifier)
     // ---------------
     // Hub must be presented with:
     // - oldLeaf

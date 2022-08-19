@@ -5,6 +5,19 @@ export function generateSecret(numBytes = 16) {
   return "0x" + randomBytes(numBytes).toString("hex");
 }
 
+export function toU32StringArray(bytes) {
+  let u32s = chunk(bytes.toString("hex"), 8);
+  return u32s.map((x) => parseInt(x, 16).toString());
+}
+export function chunk(arr, chunkSize) {
+  let out = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    const chunk = arr.slice(i, i + chunkSize);
+    out.push(chunk);
+  }
+  return out;
+}
+
 export function getStateAsBytes(state) {
   if (!state) {
     return Buffer.concat([Buffer.from("")], 2);
