@@ -3,6 +3,7 @@
  */
 
 import { ethers } from "ethers";
+import blake from "blakejs";
 import { getStateAsBytes, getDateAsBytes } from "./utils";
 import { serverAddress, threeZeroedBytes } from "./constants";
 import { Buffer } from "buffer";
@@ -171,20 +172,23 @@ class HoloStore {
     const arrayifiedAddr = ethers.utils.arrayify(serverAddress);
     for (const credentialName of credentialNames) {
       const secretKey = `${credentialName}Secret`;
-      const arrayifiedSecret = ethers.utils.arrayify(unencryptedCreds[secretKey]);
-      const credentialAsBuffer = Buffer.concat(
+      const arrayifiedSmallCredsSecret = ethers.utils.arrayify(
+        Buffer.from(unencryptedCreds[secretKey])
+      );
+      const credentialsAsBuffer = Buffer.concat(
         [Buffer.from(unencryptedCreds[credentialName] || "")],
         28
       );
-      const arrayifiedCredential = ethers.utils.arrayify(credentialAsBuffer);
-      const credentialMsg = Uint8Array.from([
+      const arrayifiedCreds = ethers.utils.arrayify(credentialsAsBuffer);
+      const msg = Uint8Array.from([
         ...arrayifiedAddr,
-        ...arrayifiedCredential,
-        ...arrayifiedSecret,
+        ...arrayifiedCreds,
+        ...arrayifiedSmallCredsSecret,
       ]);
+      const smallCredsHash = blake.blake2s(msg);
       const signatureKey = `${credentialName}Signature`;
       const signer = await ethers.utils.verifyMessage(
-        credentialMsg,
+        smallCredsHash,
         unencryptedCreds[signatureKey]
       );
       if (signer.toLowerCase() != serverAddress.toLowerCase()) {
@@ -196,7 +200,9 @@ class HoloStore {
   }
   async validateBigCredsSigs(unencryptedCreds) {
     const arrayifiedAddr = ethers.utils.arrayify(serverAddress);
-    const arrayifiedSecret = ethers.utils.arrayify(unencryptedCreds.bigCredsSecret);
+    const arrayifiedBigCredsSecret = ethers.utils.arrayify(
+      unencryptedCreds.bigCredsSecret
+    );
     const credsArr = [
       Buffer.concat([Buffer.from(unencryptedCreds.firstName || "")], 14),
       Buffer.concat([Buffer.from(unencryptedCreds.lastName || "")], 14),
@@ -214,14 +220,15 @@ class HoloStore {
         ? getDateAsBytes(unencryptedCreds.birthdate)
         : threeZeroedBytes,
     ];
-    const arrayifiedCreds = ethers.utils.arrayify(Buffer.concat(credsArr));
+    const arrayifiedBigCreds = ethers.utils.arrayify(Buffer.concat(credsArr));
     const msg = Uint8Array.from([
       ...arrayifiedAddr,
-      ...arrayifiedSecret,
-      ...arrayifiedCreds,
+      ...arrayifiedBigCredsSecret,
+      ...arrayifiedBigCreds,
     ]);
+    const bigCredsHash = blake.blake2s(msg);
     const signer = await ethers.utils.verifyMessage(
-      msg,
+      bigCredsHash,
       unencryptedCreds.bigCredsSignature
     );
     if (signer.toLowerCase() != serverAddress.toLowerCase()) {
