@@ -3,10 +3,11 @@
  */
 
 import { ethers } from "ethers";
-import blake from "blakejs";
+import { blake2s } from "blakejs";
+import { Buffer } from "buffer/";
+import { generateSmallCredsLeaf } from "./ProofGenerator";
 import { getStateAsBytes, getDateAsBytes } from "./utils";
 import { serverAddress, threeZeroedBytes } from "./constants";
-import { Buffer } from "buffer";
 
 /**
  * @typedef {Object} DecryptedCredentials
@@ -169,26 +170,14 @@ class HoloStore {
     return true;
   }
   async validateSmallCredsSigs(unencryptedCreds) {
-    const arrayifiedAddr = ethers.utils.arrayify(serverAddress);
     for (const credentialName of credentialNames) {
+      const creds = unencryptedCreds[credentialName];
       const secretKey = `${credentialName}Secret`;
-      const arrayifiedSmallCredsSecret = ethers.utils.arrayify(
-        Buffer.from(unencryptedCreds[secretKey])
-      );
-      const credentialsAsBuffer = Buffer.concat(
-        [Buffer.from(unencryptedCreds[credentialName] || "")],
-        28
-      );
-      const arrayifiedCreds = ethers.utils.arrayify(credentialsAsBuffer);
-      const msg = Uint8Array.from([
-        ...arrayifiedAddr,
-        ...arrayifiedCreds,
-        ...arrayifiedSmallCredsSecret,
-      ]);
-      const smallCredsHash = blake.blake2s(msg);
+      const secret = unencryptedCreds[secretKey];
+      const smallCredsLeaf = generateSmallCredsLeaf(serverAddress, creds, secret);
       const signatureKey = `${credentialName}Signature`;
       const signer = await ethers.utils.verifyMessage(
-        smallCredsHash,
+        smallCredsLeaf,
         unencryptedCreds[signatureKey]
       );
       if (signer.toLowerCase() != serverAddress.toLowerCase()) {
@@ -226,7 +215,7 @@ class HoloStore {
       ...arrayifiedBigCredsSecret,
       ...arrayifiedBigCreds,
     ]);
-    const bigCredsHash = blake.blake2s(msg);
+    const bigCredsHash = blake2s(msg);
     const signer = await ethers.utils.verifyMessage(
       bigCredsHash,
       unencryptedCreds.bigCredsSignature
