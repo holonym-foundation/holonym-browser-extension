@@ -174,7 +174,7 @@ class HoloStore {
       const creds = unencryptedCreds[credentialName];
       const secretKey = `${credentialName}Secret`;
       const secret = unencryptedCreds[secretKey];
-      const smallCredsLeaf = generateSmallCredsLeaf(serverAddress, creds, secret);
+      const smallCredsLeaf = createSmallCredsLeaf(serverAddress, creds, secret);
       const signatureKey = `${credentialName}Signature`;
       const signer = await ethers.utils.verifyMessage(
         smallCredsLeaf,

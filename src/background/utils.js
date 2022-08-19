@@ -1,6 +1,10 @@
 import { Buffer } from "buffer/";
 import { stateAbbreviations } from "./constants";
 
+export function generateSecret(numBytes = 16) {
+  return "0x" + randomBytes(numBytes).toString("hex");
+}
+
 export function getStateAsBytes(state) {
   if (!state) {
     return Buffer.concat([Buffer.from("")], 2);
