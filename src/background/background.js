@@ -60,6 +60,7 @@ function popupListener(request, sender, sendResponse) {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
     let encryptedCreds = "";
+    let unencryptedCreds = "";
     holoStore
       .getLatestMessage()
       .then((encryptedMsg) => {
@@ -67,13 +68,18 @@ function popupListener(request, sender, sendResponse) {
         return cryptoController.decryptWithPrivateKey(encryptedMsg);
       })
       .then((decryptedCreds) => {
+        unencryptedCreds = JSON.parse(decryptedCreds);
         const credentials = {
-          unencryptedCreds: JSON.parse(decryptedCreds),
+          unencryptedCreds: unencryptedCreds,
           encryptedCreds: encryptedCreds,
         };
         return holoStore.setCredentials(credentials);
       })
-      .then((setCredsSuccess) => holoStore.setLatestMessage(""))
+      .then((setCredsSuccess) => {
+        // TODO: handle case where setCredsSuccess == false
+        // TODO: generateProofs(unencryptedCreds)
+        return holoStore.setLatestMessage("");
+      })
       .then((setMsgSuccess) => sendResponse({}));
     return true;
   } else if (command == "denyCredentials") {
