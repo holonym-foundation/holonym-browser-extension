@@ -37,7 +37,7 @@ export default [
       }),
       commonjs(),
       wasm({
-        targetEnv: 'browser'
+        targetEnv: "browser",
       }),
     ],
   },
@@ -61,9 +61,8 @@ export default [
       }),
       babel({
         presets: ["@babel/preset-react"],
-        babelHelpers: 'bundled',
-        babelHelpers: 'bundled',
-        exclude: 'node_modules/**'
+        babelHelpers: "bundled",
+        exclude: "node_modules/**",
       }),
       commonjs(),
     ],
@@ -88,8 +87,8 @@ export default [
       }),
       babel({
         presets: ["@babel/preset-react"],
-        babelHelpers: 'bundled',
-        exclude: 'node_modules/**'
+        babelHelpers: "bundled",
+        exclude: "node_modules/**",
       }),
       commonjs(),
     ],
