@@ -32,7 +32,7 @@ class ProofGenerator {
    * @param {string} creds
    * @param {string} nullifier 16-byte hex string
    */
-  async generateUnitedStatesPoR(creds, nullifier) {
+  static async generateUnitedStatesPoR(creds, nullifier) {
     // TODO: Check server signature of leaf. Don't submit tx unless you know it will succeed.
     const signedLeaf = Buffer.from(
       createSmallCredsLeaf(serverAddress, creds, nullifier)
