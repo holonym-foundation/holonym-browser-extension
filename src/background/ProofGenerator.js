@@ -14,7 +14,7 @@ import { serverAddress } from "./constants";
  */
 function createSmallCredsLeaf(issuer, creds, secret) {
   const arrayifiedAddr = ethers.utils.arrayify(issuer);
-  const arrayifiedSecret = ethers.utils.arrayify(Buffer.from(secret, "hex"));
+  const arrayifiedSecret = ethers.utils.arrayify(secret);
   const arrayifiedCreds = ethers.utils.arrayify(
     Buffer.concat([Buffer.from(creds || "")], 28)
   );
