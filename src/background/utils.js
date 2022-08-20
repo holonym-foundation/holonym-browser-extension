@@ -2,7 +2,8 @@ import { Buffer } from "buffer/";
 import { stateAbbreviations } from "./constants";
 
 export function generateSecret(numBytes = 16) {
-  return "0x" + randomBytes(numBytes).toString("hex");
+  const array = new Uint8Array(numBytes);
+  return "0x" + Buffer.from(crypto.getRandomValues(array)).toString("hex");
 }
 
 export function toU32StringArray(bytes) {
