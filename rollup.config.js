@@ -29,6 +29,7 @@ export default [
       // dir: "./dist",
       format: "es",
     },
+    shimMissingExports: true,
     inlineDynamicImports: true,
     plugins: [
       resolve({
