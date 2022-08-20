@@ -3,6 +3,7 @@
   "scripts": {
     "build": "bash build.sh"
   },
+  "license": "MIT",
   "dependencies": {
     "blakejs": "^1.2.1",
     "browser-passworder": "^2.0.3",
