@@ -26,15 +26,19 @@ export default [
     input: "./src/background/background.js",
     output: {
       file: "./dist/background.js",
+      // dir: "./dist",
       format: "es",
     },
+    inlineDynamicImports: true,
     plugins: [
-      wasm(),
       resolve({
         browser: true,
         preferBuiltins: false,
       }),
       commonjs(),
+      wasm({
+        targetEnv: 'browser'
+      }),
     ],
   },
   {
@@ -57,6 +61,9 @@ export default [
       }),
       babel({
         presets: ["@babel/preset-react"],
+        babelHelpers: 'bundled',
+        babelHelpers: 'bundled',
+        exclude: 'node_modules/**'
       }),
       commonjs(),
     ],
@@ -81,6 +88,8 @@ export default [
       }),
       babel({
         presets: ["@babel/preset-react"],
+        babelHelpers: 'bundled',
+        exclude: 'node_modules/**'
       }),
       commonjs(),
     ],
