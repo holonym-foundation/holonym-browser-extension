@@ -12,7 +12,7 @@ import { serverAddress } from "./constants";
  * @param {string} creds Credentials (e.g., "Alice" or "US")
  * @param {string} secret Hex string representation of 16 bytes
  */
-export function createSmallCredsLeaf(issuer, creds, secret) {
+function createSmallCredsLeaf(issuer, creds, secret) {
   const arrayifiedAddr = ethers.utils.arrayify(issuer);
   const arrayifiedSecret = ethers.utils.arrayify(Buffer.from(secret, "hex"));
   const arrayifiedCreds = ethers.utils.arrayify(
@@ -77,7 +77,8 @@ class ProofGenerator {
       aslWitness,
       aslKeypair.pk
     );
-    // const isVerified = aslZokratesProvider.verify(aslKeypair.vk, aslProof);
+    const aslIsVerified = aslZokratesProvider.verify(aslKeypair.vk, aslProof);
+    console.log(`aslIsVerified: ${aslIsVerified}`);
     // TODO: Store proof
 
     // Generate proof that creds == "US"
@@ -107,7 +108,8 @@ class ProofGenerator {
       prWitness,
       prKeypair.pk
     );
-    // const isVerified = prZokratesProvider.verify(prKeypair.vk, prProof);
+    const prIsVerified = prZokratesProvider.verify(prKeypair.vk, prProof);
+    console.log(`prIsVerified: ${prIsVerified}`);
     // TODO: Store proof
 
     // ---------------

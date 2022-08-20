@@ -3,6 +3,7 @@ import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
 import image from "@rollup/plugin-image";
+import { wasm } from "@rollup/plugin-wasm";
 
 export default [
   {
@@ -28,6 +29,7 @@ export default [
       format: "es",
     },
     plugins: [
+      wasm(),
       resolve({
         browser: true,
         preferBuiltins: false,
