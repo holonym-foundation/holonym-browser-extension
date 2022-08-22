@@ -4,7 +4,7 @@
  */
 import { CryptoController } from "./CryptoController";
 import { HoloStore } from "./HoloStore";
-import { ProofGenerator } from "./ProofGenerator";
+// import { ProofGenerator } from "./ProofGenerator";
 
 // --------------------------------------------------------------
 // Functions for listening to messages from popups
@@ -81,7 +81,7 @@ function popupListener(request, sender, sendResponse) {
         // TODO: generateProofs(unencryptedCreds)
         const countryCode = unencryptedCreds.countryCode;
         const nullifier = unencryptedCreds.countryCodeSecret;
-        ProofGenerator.generateUnitedStatesPoR(countryCode, nullifier);
+        // ProofGenerator.generateUnitedStatesPoR(countryCode, nullifier);
         return holoStore.setLatestMessage("");
       })
       .then((setMsgSuccess) => sendResponse({}));

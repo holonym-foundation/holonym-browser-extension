@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { blake2s } from "blakejs";
 import { Buffer } from "buffer/";
-import { initialize as initializeZokrates } from "zokrates-js";
+// import { initialize as initializeZokrates } from "zokrates-js";
 import { generateSecret, toU32StringArray } from "./utils";
 import { serverAddress } from "./constants";
 
