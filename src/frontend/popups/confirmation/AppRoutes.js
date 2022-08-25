@@ -2,11 +2,16 @@ import React, { useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import PasswordLogin from "../../components/atoms/PasswordLogin";
 import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
+import ConfirmSendToRelayer from "../../components/atoms/ConfirmSendToRelayer";
 import Success from "../../components/atoms/Success";
 
-const successMessage =
+const credsConfSuccessMessage =
   "Your credentials have been encrypted and stored. " +
-  "You can now generate zero knowledge proofs of identity.";
+  "You can now generate zero knowledge proofs of identity. " +
+  "Next step: Send your anonymous ZK proof of residence to a relayer to put on chain.";
+
+const sendToRelayerSuccessMessage =
+  "Your anonymous proof of residence has been sent to a relayer to put on chain.";
 
 function AppRoutes() {
   const [credentials, setCredentials] = useState();
@@ -15,7 +20,7 @@ function AppRoutes() {
   async function handleLoginSuccess() {
     const credentials = await requestCredentials();
     setCredentials(credentials);
-    navigate("/confirm", { replace: true });
+    navigate("/confirm-credentials", { replace: true });
   }
 
   function requestCredentials() {
@@ -26,12 +31,21 @@ function AppRoutes() {
     });
   }
 
-  function handleConfirmation() {
+  function handleCredsConfirmation() {
     const message = { command: "confirmCredentials" };
     const callback = (resp) => {
-      navigate("/success", { replace: true });
+      navigate("/creds-confirmation-success", { replace: true });
     };
     chrome.runtime.sendMessage(message, callback);
+  }
+
+  function onConfirmCredsContinue() {
+    navigate("/confirm-send-to-relayer");
+  }
+
+  function handleConfirmSendProof() {
+    // TODO: Actually send proof to relayer. Do this in background script.
+    navigate("/final-success");
   }
 
   function onExit() {
@@ -48,20 +62,40 @@ function AppRoutes() {
           element={<PasswordLogin onLoginSuccess={handleLoginSuccess} />}
         />
         <Route
-          path="/confirm"
+          path="/confirm-credentials"
           element={
             <ConfirmCredentials
               credentials={credentials}
-              onConfirmation={handleConfirmation}
+              onConfirmation={handleCredsConfirmation}
             />
           }
         />
         <Route
-          path="/success"
+          path="/creds-confirmation-success"
           element={
             <div style={{ marginTop: "150px" }}>
               <Success
-                message={successMessage}
+                message={credsConfSuccessMessage}
+                onExit={onConfirmCredsContinue}
+                exitButtonText="Continue"
+              />
+            </div>
+          }
+        />
+        <Route
+          path="/confirm-send-to-relayer"
+          element={
+            <div style={{ marginTop: "150px" }}>
+              <ConfirmSendToRelayer onConfirmation={handleConfirmSendProof} />
+            </div>
+          }
+        />
+        <Route
+          path="/final-success"
+          element={
+            <div style={{ marginTop: "150px" }}>
+              <Success
+                message={sendToRelayerSuccessMessage}
                 onExit={onExit}
                 exitButtonText="Close"
               />
