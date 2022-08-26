@@ -39,24 +39,24 @@ function AppRoutes() {
             <div>
               <h2 className="header-base">Credentials</h2>
               <Credentials credentials={credentials} />
-              <button
+              {/* <button
                 type="submit"
                 onClick={() => navigate("/reset-account", { replace: true })}
                 className="red-button"
               >
                 Reset Account
-              </button>
+              </button> */}
             </div>
           }
         />
-        <Route
+        {/* <Route
           path="/reset-account"
           element={
             <ResetAccount
               onAccountReset={() => navigate("/home", { replace: true })}
             />
           }
-        />
+        /> */}
       </Routes>
     </>
   );
