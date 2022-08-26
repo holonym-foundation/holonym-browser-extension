@@ -22,14 +22,6 @@
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [
-    {
-      "matches": ["file:///*", "http://*/*", "https://*/*"],
-      "js": ["content.js"],
-      "css": ["./HoverCard.css"],
-      "run_at": "document_idle"
-    }
-  ],
   "permissions": ["storage"],
   "externally_connectable": {
     "matches": ["http://localhost:3002/*", "https://app.holonym.id/*"]
