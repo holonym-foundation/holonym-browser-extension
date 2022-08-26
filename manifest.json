@@ -5,7 +5,19 @@
   "version": "1.0.0",
   "action": {
     "default_title": "Holonym",
-    "default_popup": "default_popup.html"
+    "default_popup": "default_popup.html",
+    "default_icon": {
+      "16": "./Holo-Logo-no-text-w-bg-16.png",
+      "32": "./Holo-Logo-no-text-w-bg-32.png",
+      "48": "./Holo-Logo-no-text-w-bg-48.png",
+      "128": "./Holo-Logo-no-text-w-bg-128.png"
+    }
+  },
+  "icons": {
+    "16": "./Holo-Logo-no-text-w-bg-16.png",
+    "32": "./Holo-Logo-no-text-w-bg-32.png",
+    "48": "./Holo-Logo-no-text-w-bg-48.png",
+    "128": "./Holo-Logo-no-text-w-bg-128.png"
   },
   "background": {
     "service_worker": "background.js"
