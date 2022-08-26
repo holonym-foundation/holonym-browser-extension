@@ -119,13 +119,14 @@ class HoloStore {
         // TODO: Display error message to user
         console.log(`HoloStore: Not storing credentials`);
         resolve(false);
+      } else {
+        const encryptedCreds = credentials.encryptedCreds;
+        chrome.storage.local.set({ holoCredentials: encryptedCreds }, () => {
+          // TODO: Display success message to user
+          console.log(`HoloStore: Storing credentials`);
+          resolve(true);
+        });
       }
-      const encryptedCreds = credentials.encryptedCreds;
-      chrome.storage.local.set({ holoCredentials: encryptedCreds }, () => {
-        // TODO: Display success message to user
-        console.log(`HoloStore: Storing credentials`);
-        resolve(true);
-      });
     });
   }
 
@@ -157,11 +158,11 @@ class HoloStore {
 
     return true;
   }
-  async validateServerSignatures(unencryptedCreds) {
+  validateServerSignatures(unencryptedCreds) {
     try {
-      const validSmallCredsSigs = await this.validateSmallCredsSigs(unencryptedCreds);
+      const validSmallCredsSigs = this.validateSmallCredsSigs(unencryptedCreds);
       if (!validSmallCredsSigs) return false;
-      const validBigCredsSigs = await this.validateBigCredsSigs(unencryptedCreds);
+      const validBigCredsSigs = this.validateBigCredsSigs(unencryptedCreds);
       if (!validBigCredsSigs) return false;
     } catch (err) {
       console.log(err);
@@ -169,14 +170,14 @@ class HoloStore {
     }
     return true;
   }
-  async validateSmallCredsSigs(unencryptedCreds) {
+  validateSmallCredsSigs(unencryptedCreds) {
     for (const credentialName of credentialNames) {
       const creds = unencryptedCreds[credentialName];
       const secretKey = `${credentialName}Secret`;
       const secret = unencryptedCreds[secretKey];
       const smallCredsLeaf = createSmallCredsLeaf(serverAddress, creds, secret);
       const signatureKey = `${credentialName}Signature`;
-      const signer = await ethers.utils.verifyMessage(
+      const signer = ethers.utils.verifyMessage(
         smallCredsLeaf,
         unencryptedCreds[signatureKey]
       );
@@ -187,7 +188,7 @@ class HoloStore {
     }
     return true;
   }
-  async validateBigCredsSigs(unencryptedCreds) {
+  validateBigCredsSigs(unencryptedCreds) {
     const arrayifiedAddr = ethers.utils.arrayify(serverAddress);
     const arrayifiedBigCredsSecret = ethers.utils.arrayify(
       unencryptedCreds.bigCredsSecret
@@ -216,7 +217,7 @@ class HoloStore {
       ...arrayifiedBigCreds,
     ]);
     const bigCredsHash = blake2s(msg);
-    const signer = await ethers.utils.verifyMessage(
+    const signer = ethers.utils.verifyMessage(
       bigCredsHash,
       unencryptedCreds.bigCredsSignature
     );
