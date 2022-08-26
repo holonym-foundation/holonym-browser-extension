@@ -11,6 +11,7 @@ import { HoloStore } from "./HoloStore";
 // --------------------------------------------------------------
 
 let confirmationPopupIsOpen = false;
+let sendResponseWebPage = (message) => {};
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
@@ -24,6 +25,7 @@ const allowedPopupCommands = [
   "holoChangePassword",
   "holoInitializeAccount",
   "holoGetIsRegistered",
+  "holoSignTx", // Triggers response to original setHoloCredentials message
   "closingHoloConfirmationPopup",
 ];
 
@@ -108,6 +110,15 @@ function popupListener(request, sender, sendResponse) {
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
     return true;
+  } else if (command == "holoSignTx") {
+    console.log("holoSignTx: entered");
+    // TODO: Send tx that includes proof(s)
+    const tx = {
+      to: "0x0000000000000000000000000000000000000000",
+      data: "0x1234",
+      value: 0,
+    };
+    sendResponseWebPage({ tx: tx });
   } else if (command == "closingHoloConfirmationPopup") {
     confirmationPopupIsOpen = false;
   }
@@ -179,7 +190,8 @@ function webPageListener(request, sender, sendResponse) {
       credentials: newCreds,
     };
     holoStore.setLatestMessage(latestMessage).then(() => displayConfirmationPopup());
-    return;
+    sendResponseWebPage = sendResponse;
+    return true;
   } else if (command == "holoGetIsRegistered") {
     cryptoController
       .getIsRegistered()
