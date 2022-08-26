@@ -30,7 +30,7 @@
       "run_at": "document_idle"
     }
   ],
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage"],
   "externally_connectable": {
     "matches": ["http://localhost:3002/*", "https://app.holonym.id/*"]
   }
