@@ -44,8 +44,8 @@ function AppRoutes() {
   }
 
   function handleConfirmSendProof() {
-    // TODO: Actually send proof to relayer. Do this in webpage frontend or in background script.
-    const message = { command: "holoSignTx" };
+    // TODO: Actually send proof to relayer. Do this in background script.
+    const message = { command: "holoSendProofsToRelayer" };
     chrome.runtime.sendMessage(message);
     navigate("/final-success");
   }
@@ -96,15 +96,11 @@ function AppRoutes() {
           path="/final-success"
           element={
             <div style={{ marginTop: "150px" }}>
-              <div style={{ marginTop: "20px" }}>
-                <button
-                  type="submit"
-                  onClick={onExit}
-                  className="wide-button center-block"
-                >
-                  Done
-                </button>
-              </div>
+              <Success
+                message={sendToRelayerSuccessMessage}
+                onExit={onExit}
+                exitButtonText="Exit"
+              />
             </div>
           }
         />
