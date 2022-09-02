@@ -2,12 +2,12 @@
  * API for storing Holo credentials.
  */
 
-import { ethers } from "ethers";
-import { blake2s } from "blakejs";
-import { Buffer } from "buffer/";
-import { createSmallCredsLeaf } from "./ProofGenerator";
-import { getStateAsBytes, getDateAsBytes } from "./utils";
-import { serverAddress, threeZeroedBytes } from "./constants";
+// import { ethers } from "ethers";
+// import { blake2s } from "blakejs";
+// import { Buffer } from "buffer/";
+// import { createSmallCredsLeaf } from "./ProofGenerator";
+// import { getStateAsBytes, getDateAsBytes } from "./utils";
+// import { serverAddress, threeZeroedBytes } from "./constants";
 
 /**
  * @typedef {Object} DecryptedCredentials
@@ -150,81 +150,6 @@ class HoloStore {
       return false;
     }
 
-    const validSignature = this.validateServerSignatures(credentials.unencryptedCreds);
-    if (!validSignature) {
-      console.log("HoloStore: Invalid server signature");
-      return false;
-    }
-
-    return true;
-  }
-  validateServerSignatures(unencryptedCreds) {
-    try {
-      const validSmallCredsSigs = this.validateSmallCredsSigs(unencryptedCreds);
-      if (!validSmallCredsSigs) return false;
-      const validBigCredsSigs = this.validateBigCredsSigs(unencryptedCreds);
-      if (!validBigCredsSigs) return false;
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
-    return true;
-  }
-  validateSmallCredsSigs(unencryptedCreds) {
-    for (const credentialName of credentialNames) {
-      const creds = unencryptedCreds[credentialName];
-      const secretKey = `${credentialName}Secret`;
-      const secret = unencryptedCreds[secretKey];
-      const smallCredsLeaf = createSmallCredsLeaf(serverAddress, creds, secret);
-      const signatureKey = `${credentialName}Signature`;
-      const signer = ethers.utils.verifyMessage(
-        smallCredsLeaf,
-        unencryptedCreds[signatureKey]
-      );
-      if (signer.toLowerCase() != serverAddress.toLowerCase()) {
-        console.log("HoloStore: signer != serverAddress");
-        return false;
-      }
-    }
-    return true;
-  }
-  validateBigCredsSigs(unencryptedCreds) {
-    const arrayifiedAddr = ethers.utils.arrayify(serverAddress);
-    const arrayifiedBigCredsSecret = ethers.utils.arrayify(
-      unencryptedCreds.bigCredsSecret
-    );
-    const credsArr = [
-      Buffer.concat([Buffer.from(unencryptedCreds.firstName || "")], 14),
-      Buffer.concat([Buffer.from(unencryptedCreds.lastName || "")], 14),
-      Buffer.concat([Buffer.from(unencryptedCreds.middleInitial || "")], 1),
-      Buffer.concat([Buffer.from(unencryptedCreds.countryCode || "")], 3),
-      Buffer.concat([Buffer.from(unencryptedCreds.streetAddr1 || "")], 16),
-      Buffer.concat([Buffer.from(unencryptedCreds.streetAddr2 || "")], 12),
-      Buffer.concat([Buffer.from(unencryptedCreds.city || "")], 16),
-      getStateAsBytes(unencryptedCreds.subdivision), // 2 bytes
-      Buffer.concat([Buffer.from(unencryptedCreds.postalCode || "")], 8),
-      unencryptedCreds.completedAt
-        ? getDateAsBytes(unencryptedCreds.completedAt)
-        : threeZeroedBytes,
-      unencryptedCreds.birthdate
-        ? getDateAsBytes(unencryptedCreds.birthdate)
-        : threeZeroedBytes,
-    ];
-    const arrayifiedBigCreds = ethers.utils.arrayify(Buffer.concat(credsArr));
-    const msg = Uint8Array.from([
-      ...arrayifiedAddr,
-      ...arrayifiedBigCredsSecret,
-      ...arrayifiedBigCreds,
-    ]);
-    const bigCredsHash = blake2s(msg);
-    const signer = ethers.utils.verifyMessage(
-      bigCredsHash,
-      unencryptedCreds.bigCredsSignature
-    );
-    if (signer.toLowerCase() != serverAddress.toLowerCase()) {
-      console.log("HoloStore: signer != serverAddress");
-      return false;
-    }
     return true;
   }
   /**
