@@ -17,7 +17,7 @@
     "16": "./Holo-Logo-no-text-w-bg-16.png",
     "32": "./Holo-Logo-no-text-w-bg-32.png",
     "48": "./Holo-Logo-no-text-w-bg-48.png",
-    "128": "./Holo-Logo-no-text-w-bg-128.png"
+    "128": "./Holo-Logo-new-no-text-128.png"
   },
   "background": {
     "service_worker": "background.js"
