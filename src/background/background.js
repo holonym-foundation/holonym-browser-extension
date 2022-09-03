@@ -13,7 +13,11 @@ let confirmationPopupIsOpen = false;
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
-const popupOrigin = "chrome-extension://oehcghhbelloglknnpdgoeammglelgna";
+const extensionId =
+  process.env.ENVIRONMENT == "dev"
+    ? "cilbidmppfndfhjafdlngkaabddoofea"
+    : "oehcghhbelloglknnpdgoeammglelgna";
+const popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
   "getHoloLatestMessage",

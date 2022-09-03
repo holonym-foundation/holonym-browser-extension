@@ -4,6 +4,11 @@ import commonjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
 import image from "@rollup/plugin-image";
 import { wasm } from "@rollup/plugin-wasm";
+import * as dotenv from "dotenv";
+dotenv.config();
+
+// TODO: Change 'dev' to 'prod' before bundling for production
+const ENVIRONMENT = JSON.stringify(process.env.ENVIRONMENT);
 
 export default [
   // {
@@ -56,8 +61,7 @@ export default [
         preferBuiltins: false,
       }),
       replace({
-        // TODO: Change 'development' to 'production' before bundling for production
-        "process.env.NODE_ENV": JSON.stringify("development"),
+        "process.env.ENVIRONMENT": ENVIRONMENT,
         preventAssignment: true,
       }),
       babel({
@@ -82,8 +86,7 @@ export default [
         preferBuiltins: false,
       }),
       replace({
-        // TODO: Change 'development' to 'production' before bundling for production
-        "process.env.NODE_ENV": JSON.stringify("development"),
+        "process.env.ENVIRONMENT": ENVIRONMENT,
         preventAssignment: true,
       }),
       babel({
