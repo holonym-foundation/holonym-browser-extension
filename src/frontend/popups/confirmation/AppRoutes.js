@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import PasswordLogin from "../../components/atoms/PasswordLogin";
+import LandingPage from "../../components/LandingPage";
 import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
 import ConfirmSendToRelayer from "../../components/atoms/ConfirmSendToRelayer";
 import Success from "../../components/atoms/Success";
@@ -61,7 +62,7 @@ function AppRoutes() {
       <Routes>
         <Route
           path="/"
-          element={<PasswordLogin onLoginSuccess={handleLoginSuccess} />}
+          element={<LandingPage onLoginSuccess={handleLoginSuccess} />}
         />
         <Route
           path="/confirm-credentials"
