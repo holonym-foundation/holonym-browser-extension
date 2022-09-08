@@ -8,8 +8,7 @@ import Success from "../../components/atoms/Success";
 
 const credsConfSuccessMessage =
   "Your credentials have been encrypted and stored. " +
-  "You can now generate zero knowledge proofs of identity. " +
-  "Next step: Send your anonymous ZK proof of residence to a relayer to put on chain.";
+  "You can now generate zero knowledge proofs of identity.";
 
 const sendToRelayerSuccessMessage =
   "Your anonymous proof of residence has been sent to a relayer to put on chain.";
