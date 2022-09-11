@@ -41,6 +41,10 @@ export default [
         browser: true,
         preferBuiltins: false,
       }),
+      replace({
+        "process.env.ENVIRONMENT": ENVIRONMENT,
+        preventAssignment: true,
+      }),
       commonjs(),
       wasm({
         targetEnv: "browser",
