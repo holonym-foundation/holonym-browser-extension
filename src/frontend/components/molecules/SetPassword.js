@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import InitializeAccount from "../atoms/InitializeAccount";
 import Success from "../atoms/Success";
 
-function CreateAccount({ onAccountCreated }) {
+function SetPassword({ onAccountCreated }) {
   const [success, setSuccess] = useState(false);
 
   function onInitializeSuccess() {
@@ -20,7 +20,7 @@ function CreateAccount({ onAccountCreated }) {
           />
         ) : (
           <InitializeAccount
-            inputLabel="Create Account"
+            inputLabel="Set Password"
             onInitializeSuccess={onInitializeSuccess}
           />
         )}
@@ -29,4 +29,4 @@ function CreateAccount({ onAccountCreated }) {
   );
 }
 
-export default CreateAccount;
+export default SetPassword;

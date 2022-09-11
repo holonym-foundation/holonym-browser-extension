@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import CreateAccount from "./molecules/CreateAccount";
+import SetPassword from "./molecules/SetPassword";
 import PasswordLogin from "./atoms/PasswordLogin";
 import ChangePassword from "./atoms/ChangePassword";
 
 function LandingPage({ onLoginSuccess }) {
   const [registered, setRegistered] = useState(false);
+
+  // TODO: Fix login! It's not working
 
   useEffect(() => {
     function getIsRegistered() {
@@ -22,7 +24,7 @@ function LandingPage({ onLoginSuccess }) {
   return (
     <>
       {!registered ? (
-        <CreateAccount onAccountCreated={() => setRegistered(true)} />
+        <SetPassword onAccountCreated={() => setRegistered(true)} />
       ) : (
         <PasswordLogin onLoginSuccess={onLoginSuccess} />
       )}

@@ -4,30 +4,38 @@ import PasswordLogin from "../../components/atoms/PasswordLogin";
 import LandingPage from "../../components/LandingPage";
 import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
 import ConfirmSendToRelayer from "../../components/atoms/ConfirmSendToRelayer";
+import ConfirmProof from "../../components/molecules/ConfirmProof";
 import Success from "../../components/atoms/Success";
 
 const credsConfSuccessMessage =
   "Your credentials have been encrypted and stored. " +
-  "You can now generate zero knowledge proofs of identity. " +
-  "Next step: Send your anonymous ZK proof of residence to a relayer to put on chain.";
+  "You can now generate zero knowledge proofs of identity.";
 
 const sendToRelayerSuccessMessage =
   "Your anonymous proof of residence has been sent to a relayer to put on chain.";
 
+const proofStorageSuccessMessage = "Your proof has been encrypted and stored.";
+
 function AppRoutes() {
   const [credentials, setCredentials] = useState();
+  const [proof, setProof] = useState();
   const navigate = useNavigate();
 
   async function handleLoginSuccess() {
-    const credentials = await requestCredentials();
-    setCredentials(credentials);
-    navigate("/confirm-credentials", { replace: true });
+    const latestMessage = await requestLatestMessage();
+    if (latestMessage.credentials) {
+      setCredentials(latestMessage.credentials);
+      navigate("/confirm-credentials", { replace: true });
+    } else if (latestMessage.proof) {
+      setProof(latestMessage.proof);
+      navigate("/confirm-proof", { replace: true });
+    }
   }
 
-  function requestCredentials() {
+  function requestLatestMessage() {
     return new Promise((resolve) => {
       const message = { command: "getHoloLatestMessage" };
-      const callback = (resp) => resolve(resp.credentials);
+      const callback = (resp) => resolve(resp.message);
       chrome.runtime.sendMessage(message, callback);
     });
   }
@@ -48,7 +56,13 @@ function AppRoutes() {
     // TODO: Actually send proof to relayer. Do this in background script.
     const message = { command: "holoSendProofsToRelayer" };
     chrome.runtime.sendMessage(message);
-    navigate("/final-success");
+    navigate("/final-creds-success");
+  }
+
+  function handleProofConfirmation() {
+    const message = { command: "confirmProof" };
+    const callback = (resp) => navigate("/final-proof-success", { replace: true });
+    chrome.runtime.sendMessage(message, callback);
   }
 
   function onExit() {
@@ -94,11 +108,30 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/final-success"
+          path="/final-creds-success"
           element={
             <div style={{ marginTop: "150px" }}>
               <Success
                 message={sendToRelayerSuccessMessage}
+                onExit={onExit}
+                exitButtonText="Exit"
+              />
+            </div>
+          }
+        />
+
+        <Route
+          path="/confirm-proof"
+          element={
+            <ConfirmProof proof={proof} onConfirmation={handleProofConfirmation} />
+          }
+        />
+        <Route
+          path="/final-proof-success"
+          element={
+            <div style={{ marginTop: "150px" }}>
+              <Success
+                message={proofStorageSuccessMessage}
                 onExit={onExit}
                 exitButtonText="Exit"
               />

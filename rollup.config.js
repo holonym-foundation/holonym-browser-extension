@@ -7,8 +7,8 @@ import { wasm } from "@rollup/plugin-wasm";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-// TODO: Change 'dev' to 'prod' before bundling for production
-const ENVIRONMENT = JSON.stringify(process.env.ENVIRONMENT);
+// TODO: Change 'dev' to 'production' before bundling for production
+const NODE_ENV = JSON.stringify(process.env.NODE_ENV);
 
 export default [
   // {
@@ -41,6 +41,10 @@ export default [
         browser: true,
         preferBuiltins: false,
       }),
+      replace({
+        "process.env.NODE_ENV": NODE_ENV,
+        preventAssignment: true,
+      }),
       commonjs(),
       wasm({
         targetEnv: "browser",
@@ -61,7 +65,7 @@ export default [
         preferBuiltins: false,
       }),
       replace({
-        "process.env.ENVIRONMENT": ENVIRONMENT,
+        "process.env.NODE_ENV": NODE_ENV,
         preventAssignment: true,
       }),
       babel({
@@ -86,7 +90,7 @@ export default [
         preferBuiltins: false,
       }),
       replace({
-        "process.env.ENVIRONMENT": ENVIRONMENT,
+        "process.env.NODE_ENV": NODE_ENV,
         preventAssignment: true,
       }),
       babel({

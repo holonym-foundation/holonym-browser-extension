@@ -14,7 +14,7 @@ let confirmationPopupIsOpen = false;
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 const extensionId =
-  process.env.ENVIRONMENT == "dev"
+  process.env.NODE_ENV == "dev"
     ? "cilbidmppfndfhjafdlngkaabddoofea"
     : "oehcghhbelloglknnpdgoeammglelgna";
 const popupOrigin = `chrome-extension://${extensionId}`;
@@ -29,6 +29,7 @@ const allowedPopupCommands = [
   "holoGetIsRegistered",
   "holoSendProofsToRelayer", // Triggers response to original setHoloCredentials message
   "closingHoloConfirmationPopup",
+  "confirmProof",
 ];
 
 function popupListener(request, sender, sendResponse) {
@@ -46,17 +47,33 @@ function popupListener(request, sender, sendResponse) {
   } else if (command == "getHoloLatestMessage") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
+    let isStoringCreds = false;
     holoStore
       .getLatestMessage()
-      .then((encryptedMsg) => cryptoController.decryptWithPrivateKey(encryptedMsg))
-      .then((decryptedMsg) => sendResponse({ credentials: JSON.parse(decryptedMsg) }));
+      .then((encryptedMsg) => {
+        isStoringCreds = encryptedMsg?.credentials ? true : false;
+        const message = encryptedMsg.credentials || encryptedMsg.proof;
+        return cryptoController.decryptWithPrivateKey(message, encryptedMsg.sharded);
+      })
+      .then((decryptedMsg) => {
+        if (isStoringCreds) {
+          sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } });
+        } else {
+          sendResponse({ message: { proof: JSON.parse(decryptedMsg) } });
+        }
+      });
     return true;
   } else if (command == "getHoloCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
     holoStore
       .getCredentials()
-      .then((encryptedCreds) => cryptoController.decryptWithPrivateKey(encryptedCreds))
+      .then((encryptedCreds) =>
+        cryptoController.decryptWithPrivateKey(
+          encryptedCreds.credentials,
+          encryptedCreds.sharded
+        )
+      )
       .then((decryptedCreds) =>
         sendResponse({ credentials: JSON.parse(decryptedCreds) })
       );
@@ -70,7 +87,10 @@ function popupListener(request, sender, sendResponse) {
       .getLatestMessage()
       .then((encryptedMsg) => {
         encryptedCreds = encryptedMsg;
-        return cryptoController.decryptWithPrivateKey(encryptedMsg);
+        return cryptoController.decryptWithPrivateKey(
+          encryptedMsg.credentials,
+          encryptedMsg.sharded
+        );
       })
       .then((decryptedCreds) => {
         unencryptedCreds = JSON.parse(decryptedCreds);
@@ -90,6 +110,24 @@ function popupListener(request, sender, sendResponse) {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
     holoStore.setLatestMessage("");
+  } else if (command == "confirmProof") {
+    const loggedIn = cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
+    holoStore
+      .getLatestMessage()
+      .then((encryptedMsg) => {
+        return cryptoController.decryptWithPrivateKey(
+          encryptedMsg.proof,
+          encryptedMsg.sharded
+        );
+      })
+      .then((decryptedProof) => holoStore.setProof(JSON.parse(decryptedProof)))
+      .then((setProofSuccess) => {
+        // TODO: handle case where setProofSuccess == false
+        return holoStore.setLatestMessage("");
+      })
+      .then((setMsgSuccess) => sendResponse({}));
+    return true;
   } else if (command == "holoChangePassword") {
     const oldPassword = request.oldPassword;
     const newPassword = request.newPassword;
@@ -162,6 +200,7 @@ const allowedWebPageCommands = [
   // "getHoloCredentials",
   "setHoloCredentials",
   "holoGetIsRegistered",
+  "setProof",
 ];
 
 // Listener function for messages from webpage
@@ -171,8 +210,9 @@ function webPageListener(request, sender, sendResponse) {
     throw new Error("Disallowed origin attempting to access or modify HoloStore.");
   }
   const command = request.command;
-  const credsAreSharded = request.sharded;
+  const messageIsSharded = request.sharded;
   const newCreds = request.credentials;
+  const proof = request.proof;
 
   if (!allowedWebPageCommands.includes(command)) {
     return;
@@ -183,11 +223,27 @@ function webPageListener(request, sender, sendResponse) {
     return true;
   } else if (command == "setHoloCredentials") {
     const latestMessage = {
-      sharded: credsAreSharded,
+      sharded: messageIsSharded,
       credentials: newCreds,
     };
     holoStore.setLatestMessage(latestMessage).then(() => displayConfirmationPopup());
     return;
+  } else if (command == "setProof") {
+    // TODO: Data structure for proofs: Object with a few set proofs? A list of proofs?
+    /**
+     * NOTE: Potential proof storage structure. If proofs are too big, each proof
+     * should be stored with its own key in chrome storage.
+      [
+        {
+          smallLeafProof: { ... }
+        }
+      ]
+     */
+    const latestMessage = {
+      sharded: messageIsSharded,
+      proof: proof,
+    };
+    holoStore.setLatestMessage(latestMessage).then(() => displayConfirmationPopup());
   } else if (command == "holoGetIsRegistered") {
     cryptoController
       .getIsRegistered()
