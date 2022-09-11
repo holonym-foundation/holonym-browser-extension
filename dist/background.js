@@ -672,7 +672,7 @@ class HoloStore {
    */
   setProof(proof) {
     return new Promise(async (resolve) => {
-      const allProofs = await this.getProofs();
+      const allProofs = (await this.getProofs()) || [];
       if (allProofs.length > 10) {
         allProofs.shift();
         allProofs.push(proof);
@@ -709,7 +709,8 @@ let confirmationPopupIsOpen = false;
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 const extensionId =
-  "oehcghhbelloglknnpdgoeammglelgna";
+  "cilbidmppfndfhjafdlngkaabddoofea"
+    ;
 const popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
@@ -750,9 +751,9 @@ function popupListener(request, sender, sendResponse) {
       })
       .then((decryptedMsg) => {
         if (isStoringCreds) {
-          sendResponse({ credentials: JSON.parse(decryptedMsg) });
+          sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } });
         } else {
-          sendResponse({ proof: JSON.parse(decryptedMsg) });
+          sendResponse({ message: { proof: JSON.parse(decryptedMsg) } });
         }
       });
     return true;
