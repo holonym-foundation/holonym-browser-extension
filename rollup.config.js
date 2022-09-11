@@ -42,7 +42,7 @@ export default [
         preferBuiltins: false,
       }),
       replace({
-        "process.env.ENVIRONMENT": ENVIRONMENT,
+        "process.env.NODE_ENV": ENVIRONMENT,
         preventAssignment: true,
       }),
       commonjs(),
@@ -65,7 +65,7 @@ export default [
         preferBuiltins: false,
       }),
       replace({
-        "process.env.ENVIRONMENT": ENVIRONMENT,
+        "process.env.NODE_ENV": ENVIRONMENT,
         preventAssignment: true,
       }),
       babel({
@@ -90,7 +90,7 @@ export default [
         preferBuiltins: false,
       }),
       replace({
-        "process.env.ENVIRONMENT": ENVIRONMENT,
+        "process.env.NODE_ENV": ENVIRONMENT,
         preventAssignment: true,
       }),
       babel({
