@@ -61,9 +61,7 @@ function AppRoutes() {
 
   function handleProofConfirmation() {
     const message = { command: "confirmProof" };
-    const callback = (resp) => {
-      navigate("/proof-confirmation-success", { replace: true });
-    };
+    const callback = (resp) => navigate("/final-proof-success", { replace: true });
     chrome.runtime.sendMessage(message, callback);
   }
 

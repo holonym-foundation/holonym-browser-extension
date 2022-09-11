@@ -168,7 +168,7 @@ class HoloStore {
    */
   setProof(proof) {
     return new Promise(async (resolve) => {
-      const allProofs = await this.getProofs();
+      const allProofs = (await this.getProofs()) || [];
       if (allProofs.length > 10) {
         allProofs.shift();
         allProofs.push(proof);
