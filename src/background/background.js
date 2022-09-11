@@ -4,6 +4,7 @@
  */
 import { CryptoController } from "./CryptoController";
 import { HoloStore } from "./HoloStore";
+import ProofGenerator from "./ProofGenerator";
 
 // --------------------------------------------------------------
 // Functions for listening to messages from popups
@@ -27,7 +28,7 @@ const allowedPopupCommands = [
   "holoChangePassword",
   "holoInitializeAccount",
   "holoGetIsRegistered",
-  "holoSendProofsToRelayer", // Triggers response to original setHoloCredentials message
+  "holoSendProofToRelayer", // Triggers response to original setHoloCredentials message
   "closingHoloConfirmationPopup",
   "confirmProof",
 ];
@@ -146,14 +147,27 @@ function popupListener(request, sender, sendResponse) {
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
     return true;
-  } else if (command == "holoSendProofsToRelayer") {
-    // TODO: Send tx that includes proof(s)
-    // TODO: Actually send the tx
-    const tx = {
-      to: "0x0000000000000000000000000000000000000000",
-      data: "0x1234",
-      value: 0,
-    };
+  } else if (command == "holoSendProofToRelayer") {
+    const loggedIn = cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
+    const proofType = request.proofType; // e.g., addSmallLeaf
+    holoStore
+      .getCredentials()
+      .then((encryptedMsg) =>
+        cryptoController.decryptWithPrivateKey(
+          encryptedMsg.credentials,
+          encryptedMsg.sharded
+        )
+      )
+      .then((decryptedCreds) => {
+        ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType).then(
+          (proof) => {
+            // TODO: send proof to relayer
+            return true;
+          }
+        );
+      })
+      .then((sendProofSuccess) => sendResponse({ success: sendProofSuccess }));
   } else if (command == "closingHoloConfirmationPopup") {
     confirmationPopupIsOpen = false;
   }
@@ -197,7 +211,7 @@ function getPublicKey() {
 const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
 const allowedWebPageCommands = [
   "getHoloPublicKey",
-  // "getHoloCredentials",
+  // "getHoloCredentials", // TODO: Don't let frontend retrieve credentials. Call proofs endpoint from within extension
   "setHoloCredentials",
   "holoGetIsRegistered",
   "setProof",
@@ -229,16 +243,6 @@ function webPageListener(request, sender, sendResponse) {
     holoStore.setLatestMessage(latestMessage).then(() => displayConfirmationPopup());
     return;
   } else if (command == "setProof") {
-    // TODO: Data structure for proofs: Object with a few set proofs? A list of proofs?
-    /**
-     * NOTE: Potential proof storage structure. If proofs are too big, each proof
-     * should be stored with its own key in chrome storage.
-      [
-        {
-          smallLeafProof: { ... }
-        }
-      ]
-     */
     const latestMessage = {
       sharded: messageIsSharded,
       proof: proof,
