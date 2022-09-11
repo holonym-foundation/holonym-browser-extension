@@ -74,7 +74,7 @@ function AppRoutes() {
       });
     }
     const addSmallLeafSuccess = await addSmallLeaf();
-    // const PoKoPoMLSuccess = await PoKoPoML(); // TODO: Figure out how to use poseidon hash for this
+    const PoKoPoMLSuccess = await PoKoPoML();
     // TODO: Request user to sign a tx to submit these proofs to smart contract
     navigate("/final-creds-success");
   }

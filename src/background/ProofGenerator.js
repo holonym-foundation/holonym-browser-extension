@@ -1,6 +1,6 @@
 import { Buffer } from "buffer/";
 import { IncrementalMerkleTree } from "@zk-kit/incremental-merkle-tree";
-import { encryptForServer, createSmallLeaf, poseidonHash } from "./utils";
+import { encryptForServer, createSmallLeaf } from "./utils";
 import {
   zkIdVerifyEndpoint,
   serverAddress,
@@ -50,6 +50,8 @@ class ProofGenerator {
    * @param {string} secret Hexstring representing 16 bytes
    */
   static async getPoKoPoMLCountry(countryCode, secret) {
+    console.log("getPoKoPoMLCountry: entered");
+    console.log(`getPoKoPoMLCountry: countryCode: ${countryCode}. secret: ${secret}`);
     let countryCodeAsBuffer;
     if (countryCode == 2) {
       countryCodeAsBuffer = unitedStatesCredsBuffer;
@@ -59,22 +61,9 @@ class ProofGenerator {
         "Operation not supported. Trying to generate proof where countryCode != 2."
       );
     }
-    const issuer = Buffer.from(serverAddress.replace("0x", ""), "hex");
-    const secretAsBuffer = Buffer.from(secret.replace("0x", ""), "hex");
-    const leaf = await createSmallLeaf(issuer, countryCodeAsBuffer, secretAsBuffer);
-    // TODO: Figure out how to use poseidon hash for this, or require the server to provide these inputs
-    const tree = new IncrementalMerkleTree(poseidonHash, 32, "0", 2);
-    tree.insert(leaf);
-    const index = tree.indexOf(leaf);
-    const proof = tree.createProof(index);
-    const { root, siblings: path } = proof;
-    const directionSelector = proof.pathIndices.map((n) => !!n);
     const args = {
-      countryCode,
-      secret,
-      root,
-      directionSelector,
-      path,
+      creds: countryCode,
+      secret: secret,
     };
     const { encryptedMessage, sharded } = await encryptForServer(JSON.stringify(args));
     const encryptedArgs = Array.isArray(encryptedMessage)
@@ -86,6 +75,8 @@ class ProofGenerator {
     const data = await resp.json();
     // shape of response: { data: proofOfKnowledgeOfPreimage: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] } }
     // TODO: Send proof to relayer
+    console.log("getPoKoPoMLCountry: retrieved proof...");
+    console.log(data.data);
   }
 }
 
