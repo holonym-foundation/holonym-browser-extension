@@ -57,9 +57,9 @@ function popupListener(request, sender, sendResponse) {
       })
       .then((decryptedMsg) => {
         if (isStoringCreds) {
-          sendResponse({ credentials: JSON.parse(decryptedMsg) });
+          sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } });
         } else {
-          sendResponse({ proof: JSON.parse(decryptedMsg) });
+          sendResponse({ message: { proof: JSON.parse(decryptedMsg) } });
         }
       });
     return true;
