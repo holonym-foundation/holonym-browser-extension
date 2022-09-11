@@ -165,11 +165,15 @@ class CryptoController {
   }
 
   /**
-   * @param {EncryptedCredentials} encryptedCredentials
+   * @param {boolean} sharded Whether message is represented as encrypted shards.
+   * @property {string|Array<string>} encryptedMessage If not sharded, this is a string
+   * representation of the encrypted message. If sharded, it is an array consisting
+   * of parts of the message that were individually encrypted; in this case, the
+   * decrypted message can be recovered by decrypting each shard and concatenating
+   * the result.
    * @returns {string}
    */
-  async decryptWithPrivateKey(encryptedCredentials) {
-    const { sharded, credentials } = encryptedCredentials;
+  async decryptWithPrivateKey(encryptedMessage, sharded) {
     const algo = {
       name: "RSA-OAEP",
       modulusLength: 4096,
@@ -184,9 +188,9 @@ class CryptoController {
       ["decrypt"]
     );
 
-    const credentialsShards = sharded ? credentials : [credentials];
+    const shards = sharded ? encryptedMessage : [encryptedMessage];
     const decryptedDecodedShards = [];
-    for (const shard of credentialsShards) {
+    for (const shard of shards) {
       const encodedShard = new Uint8Array(JSON.parse(shard)).buffer;
       const decryptedShard = await crypto.subtle.decrypt(
         { name: "RSA-OAEP" },

@@ -161,6 +161,34 @@ class HoloStore {
       });
     });
   }
+
+  /**
+   * (The latest 10 proofs are stored.)
+   * @param proof
+   */
+  setProof(proof) {
+    return new Promise(async (resolve) => {
+      const allProofs = await this.getProofs();
+      if (allProofs.length > 10) {
+        allProofs.shift();
+        allProofs.push(proof);
+      } else {
+        allProofs.push(proof);
+      }
+      chrome.storage.local.set({ holoProofs: allProofs }, () => {
+        console.log(`HoloStore: Storing proof`);
+        resolve(true);
+      });
+    });
+  }
+
+  getProofs() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(["holoProofs"], (result) => {
+        resolve(result?.holoProofs);
+      });
+    });
+  }
 }
 
 export { HoloStore };
