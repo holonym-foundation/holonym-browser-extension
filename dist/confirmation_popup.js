@@ -34886,12 +34886,23 @@ function AppRoutes() {
     navigate("/confirm-send-to-relayer");
   }
 
-  function handleConfirmSendProof() {
-    // TODO: Actually send proof to relayer. Do this in background script.
-    const message = {
-      command: "holoSendProofsToRelayer"
-    };
-    chrome.runtime.sendMessage(message);
+  async function handleConfirmSendProof() {
+    function addSmallLeaf() {
+      return new Promise((resolve, reject) => {
+        const message = {
+          command: "holoSendProofToRelayer",
+          proofType: "addSmallLeaf-country"
+        };
+
+        const callback = resp => resolve(resp);
+
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+
+    await addSmallLeaf(); // const PoKoPoMLSuccess = await PoKoPoML(); // TODO: Figure out how to use poseidon hash for this
+    // TODO: Request user to sign a tx to submit these proofs to smart contract
+
     navigate("/final-creds-success");
   }
 
