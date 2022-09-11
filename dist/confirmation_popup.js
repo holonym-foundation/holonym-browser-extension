@@ -34900,8 +34900,21 @@ function AppRoutes() {
       });
     }
 
-    await addSmallLeaf(); // const PoKoPoMLSuccess = await PoKoPoML(); // TODO: Figure out how to use poseidon hash for this
-    // TODO: Request user to sign a tx to submit these proofs to smart contract
+    function PoKoPoML() {
+      return new Promise((resolve, reject) => {
+        const message = {
+          command: "holoSendProofToRelayer",
+          proofType: "PoKoPoML-country"
+        };
+
+        const callback = resp => resolve(resp);
+
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+
+    await addSmallLeaf();
+    await PoKoPoML(); // TODO: Request user to sign a tx to submit these proofs to smart contract
 
     navigate("/final-creds-success");
   }

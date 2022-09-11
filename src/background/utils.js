@@ -179,20 +179,3 @@ export async function createSmallLeaf(issuer, creds, secret) {
     console.log(err);
   }
 }
-
-/**
- * @param {Array<string>} input 2-item array
- */
-export async function poseidonHash(input) {
-  const [leftInput, rightInput] = input;
-  const zokProvider = await initialize();
-  const source = `import "hashes/poseidon/poseidon" as poseidon;
-  def main(field[2] input) -> field {
-    return poseidon(input);
-  }`;
-  const poseidonHashArtifacts = zokProvider.compile(source);
-  const { witness, output } = zokProvider.computeWitness(poseidonHashArtifacts, [
-    [leftInput, rightInput],
-  ]);
-  return output.replaceAll('"', "");
-}
