@@ -160,14 +160,14 @@ function popupListener(request, sender, sendResponse) {
         )
       )
       .then((decryptedCreds) => {
-        ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType).then(
-          (proof) => {
-            // TODO: send proof to relayer
-            return true;
-          }
-        );
+        return ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType);
+      })
+      .then((proof) => {
+        // TODO: send proof to relayer
+        return true;
       })
       .then((sendProofSuccess) => sendResponse({ success: sendProofSuccess }));
+    return true;
   } else if (command == "closingHoloConfirmationPopup") {
     confirmationPopupIsOpen = false;
   }

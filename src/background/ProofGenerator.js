@@ -76,7 +76,6 @@ class ProofGenerator {
     // shape of response: { data: proofOfKnowledgeOfPreimage: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] } }
     // TODO: Send proof to relayer
     console.log("getPoKoPoMLCountry: retrieved proof...");
-    console.log(data.data);
   }
 }
 

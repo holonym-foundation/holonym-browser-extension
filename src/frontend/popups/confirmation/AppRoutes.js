@@ -6,6 +6,7 @@ import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
 import ConfirmSendToRelayer from "../../components/atoms/ConfirmSendToRelayer";
 import ConfirmProof from "../../components/molecules/ConfirmProof";
 import Success from "../../components/atoms/Success";
+import Loading from "../../components/atoms/Loading";
 
 const credsConfSuccessMessage =
   "Your credentials have been encrypted and stored. " +
@@ -19,6 +20,7 @@ const proofStorageSuccessMessage = "Your proof has been encrypted and stored.";
 function AppRoutes() {
   const [credentials, setCredentials] = useState();
   const [proof, setProof] = useState();
+  const [loading, setLoading] = useState();
   const navigate = useNavigate();
 
   async function handleLoginSuccess() {
@@ -49,7 +51,7 @@ function AppRoutes() {
   }
 
   function onConfirmCredsContinue() {
-    navigate("/confirm-send-to-relayer");
+    navigate("/confirm-send-to-relayer", { replace: true });
   }
 
   async function handleConfirmSendProof() {
@@ -73,10 +75,13 @@ function AppRoutes() {
         chrome.runtime.sendMessage(message, callback);
       });
     }
+    setLoading(true);
+    navigate("/loading-proofs", { replace: true });
     const addSmallLeafSuccess = await addSmallLeaf();
     const PoKoPoMLSuccess = await PoKoPoML();
+    setLoading(false);
     // TODO: Request user to sign a tx to submit these proofs to smart contract
-    navigate("/final-creds-success");
+    navigate("/final-creds-success", { replace: true });
   }
 
   function handleProofConfirmation() {
@@ -144,6 +149,14 @@ function AppRoutes() {
           path="/confirm-proof"
           element={
             <ConfirmProof proof={proof} onConfirmation={handleProofConfirmation} />
+          }
+        />
+        <Route
+          path="/loading-proofs"
+          element={
+            <div style={{ marginTop: "150px" }}>
+              <Loading loadingMessage={"Loading proofs..."} />
+            </div>
           }
         />
         <Route
