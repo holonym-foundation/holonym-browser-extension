@@ -279,16 +279,16 @@ function generateSalt (byteCount = 32) {
  */
 
 class CryptoController {
-  #store;
-  #isLoggedIn;
+  store;
+  isLoggedIn;
 
   constructor() {
-    this.#store = {
+    this.store = {
       password: undefined, // string
       decryptedPrivateKey: undefined, // SubtleCrypto.JWK
       // publicKey: undefined, // SubtleCrypto.JWK
     };
-    this.#isLoggedIn = false;
+    this.isLoggedIn = false;
   }
 
   /**
@@ -296,32 +296,32 @@ class CryptoController {
    * Should be called only once ever.
    */
   async initialize(password) {
-    await this.#createPassword(password);
-    await this.#generateKeyPair();
-    this.#isLoggedIn = true;
+    await this.createPassword(password);
+    await this.generateKeyPair();
+    this.isLoggedIn = true;
   }
 
   /**
    * Call when user sets password for first time.
    * @param {string} password
    */
-  async #createPassword(password) {
+  async createPassword(password) {
     // Commenting out. User should be allowed to generate new account and erase old one.
-    // if (await this.#getPasswordHash()) return;
-    this.#store.password = password;
+    // if (await this.getPasswordHash()) return;
+    this.store.password = password;
     const salt = crypto.randomUUID();
-    await this.#setPasswordSalt(salt);
+    await this.setPasswordSalt(salt);
     const passwordHash = await this.hashPassword(password, salt);
-    await this.#setPasswordHash(passwordHash);
+    await this.setPasswordHash(passwordHash);
   }
 
   /**
    * Generate, encrypt, and store in browser storage a new key pair.
    * This should be called only once, when the user creates their fist password.
    */
-  async #generateKeyPair() {
+  async generateKeyPair() {
     // Commenting out. User should be allowed to generate new account and erase old one.
-    // if (await this.#getKeyPair()) return;
+    // if (await this.getKeyPair()) return;
     const algo = {
       name: "RSA-OAEP",
       modulusLength: 4096,
@@ -331,10 +331,10 @@ class CryptoController {
     const usage = ["encrypt", "decrypt"];
     const keyPair = await crypto.subtle.generateKey(algo, true, usage);
     const privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
-    this.#store.decryptedPrivateKey = privateKey;
+    this.store.decryptedPrivateKey = privateKey;
     const publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const encryptedPrivateKey = await this.encryptWithPassword(privateKey);
-    await this.#setKeyPair(encryptedPrivateKey, publicKey);
+    await this.setKeyPair(encryptedPrivateKey, publicKey);
   }
 
   /**
@@ -342,29 +342,29 @@ class CryptoController {
    * @returns {Promise<boolean>} True if successful, false otherwise.
    */
   async login(password) {
-    const salt = await this.#getPasswordSalt();
+    const salt = await this.getPasswordSalt();
     const passwordHash = await this.hashPassword(password, salt);
-    const storedPasswordHash = await this.#getPasswordHash();
+    const storedPasswordHash = await this.getPasswordHash();
     if (passwordHash != storedPasswordHash) return false;
-    this.#store.password = password;
-    const keyPair = await this.#getKeyPair();
-    this.#store.decryptedPrivateKey = await this.decryptWithPassword(
+    this.store.password = password;
+    const keyPair = await this.getKeyPair();
+    this.store.decryptedPrivateKey = await this.decryptWithPassword(
       keyPair.encryptedPrivateKey
     );
-    this.#isLoggedIn = true;
+    this.isLoggedIn = true;
     return true;
   }
 
   logout() {
-    this.#store = {
+    this.store = {
       password: undefined,
       decryptedPrivateKey: undefined,
     };
-    this.#isLoggedIn = false;
+    this.isLoggedIn = false;
   }
 
   getIsLoggedIn() {
-    return this.#isLoggedIn;
+    return this.isLoggedIn;
   }
 
   async getIsRegistered() {
@@ -373,12 +373,12 @@ class CryptoController {
   }
 
   async changePassword(oldPassword, newPassword) {
-    const salt = await this.#getPasswordSalt();
+    const salt = await this.getPasswordSalt();
     const oldPasswordHash = await this.hashPassword(oldPassword, salt);
-    const storedPasswordHash = await this.#getPasswordHash();
+    const storedPasswordHash = await this.getPasswordHash();
     if (oldPasswordHash != storedPasswordHash) return false;
     const newPasswordHash = await this.hashPassword(newPassword, salt);
-    await this.#setPasswordHash(newPasswordHash);
+    await this.setPasswordHash(newPasswordHash);
     return true;
   }
 
@@ -386,7 +386,7 @@ class CryptoController {
    * @param {string} encryptedPrivateKey Encrypted private key
    * @param {SubtleCrypto.JWK} publicKey Plaintext public key
    */
-  #setKeyPair(encryptedPrivateKey, publicKey) {
+  setKeyPair(encryptedPrivateKey, publicKey) {
     return new Promise((resolve) => {
       const keyPair = {
         encryptedPrivateKey: encryptedPrivateKey,
@@ -398,7 +398,7 @@ class CryptoController {
     });
   }
 
-  #getKeyPair() {
+  getKeyPair() {
     return new Promise((resolve) => {
       chrome.storage.local.get(["holoKeyPair"], (result) => {
         resolve(result?.holoKeyPair);
@@ -435,7 +435,7 @@ class CryptoController {
     };
     const privateKeyAsCryptoKey = await crypto.subtle.importKey(
       "jwk",
-      this.#store.decryptedPrivateKey,
+      this.store.decryptedPrivateKey,
       algo,
       false,
       ["decrypt"]
@@ -461,14 +461,14 @@ class CryptoController {
    * @param {object} data
    */
   async encryptWithPassword(data) {
-    return await browserPassworder.encrypt(this.#store.password, data);
+    return await browserPassworder.encrypt(this.store.password, data);
   }
 
   /**
    * @param {string} data
    */
   async decryptWithPassword(data) {
-    return await browserPassworder.decrypt(this.#store.password, data);
+    return await browserPassworder.decrypt(this.store.password, data);
   }
 
   /**
@@ -490,7 +490,7 @@ class CryptoController {
   /**
    * @param {string} passwordHash Should be (password + salt)
    */
-  #setPasswordHash(passwordHash) {
+  setPasswordHash(passwordHash) {
     return new Promise((resolve) => {
       chrome.storage.local.set({ holoPasswordHash: passwordHash }, () => {
         resolve();
@@ -498,7 +498,7 @@ class CryptoController {
     });
   }
 
-  #getPasswordHash() {
+  getPasswordHash() {
     return new Promise((resolve) => {
       chrome.storage.local.get(["holoPasswordHash"], (result) => {
         resolve(result?.holoPasswordHash);
@@ -506,7 +506,7 @@ class CryptoController {
     });
   }
 
-  #setPasswordSalt(salt) {
+  setPasswordSalt(salt) {
     return new Promise((resolve) => {
       chrome.storage.local.set({ holoPasswordSalt: salt }, () => {
         resolve();
@@ -514,7 +514,7 @@ class CryptoController {
     });
   }
 
-  #getPasswordSalt() {
+  getPasswordSalt() {
     return new Promise((resolve) => {
       chrome.storage.local.get(["holoPasswordSalt"], (result) => {
         resolve(result?.holoPasswordSalt);
@@ -683,34 +683,6 @@ class HoloStore {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(["holoCredentials"], (creds) => {
         resolve(creds?.holoCredentials);
-      });
-    });
-  }
-
-  /**
-   * (The latest 10 proofs are stored.)
-   * @param proof
-   */
-  setProof(proof) {
-    return new Promise(async (resolve) => {
-      const allProofs = (await this.getProofs()) || [];
-      if (allProofs.length > 10) {
-        allProofs.shift();
-        allProofs.push(proof);
-      } else {
-        allProofs.push(proof);
-      }
-      chrome.storage.local.set({ holoProofs: allProofs }, () => {
-        console.log(`HoloStore: Storing proof`);
-        resolve(true);
-      });
-    });
-  }
-
-  getProofs() {
-    return new Promise((resolve, reject) => {
-      chrome.storage.local.get(["holoProofs"], (result) => {
-        resolve(result?.holoProofs);
       });
     });
   }
@@ -26676,11 +26648,10 @@ class ProofGenerator {
     const resp = await fetch(
       `${zkIdVerifyEndpoint}/proofs/proveKnowledgeOfPreimageOfMemberLeaf?args=${encryptedArgs}&sharded=${sharded}`
     );
-    const data = await resp.json();
+    await resp.json();
     // shape of response: { data: proofOfKnowledgeOfPreimage: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] } }
-    // TODO: Send proof to relayer
-    console.log("getPoKoPoMLCountry: retrieved proof...");
-    console.log(data.data);
+    // TODO: Call MetaMask
+    console.log("getPoKoPoMLCountry: retrieved proof");
   }
 }
 
@@ -26712,7 +26683,6 @@ const allowedPopupCommands = [
   "holoGetIsRegistered",
   "holoSendProofToRelayer", // Triggers response to original setHoloCredentials message
   "closingHoloConfirmationPopup",
-  "confirmProof",
 ];
 
 function popupListener(request, sender, sendResponse) {
@@ -26793,24 +26763,6 @@ function popupListener(request, sender, sendResponse) {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
     holoStore.setLatestMessage("");
-  } else if (command == "confirmProof") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    holoStore
-      .getLatestMessage()
-      .then((encryptedMsg) => {
-        return cryptoController.decryptWithPrivateKey(
-          encryptedMsg.proof,
-          encryptedMsg.sharded
-        );
-      })
-      .then((decryptedProof) => holoStore.setProof(JSON.parse(decryptedProof)))
-      .then((setProofSuccess) => {
-        // TODO: handle case where setProofSuccess == false
-        return holoStore.setLatestMessage("");
-      })
-      .then((setMsgSuccess) => sendResponse({}));
-    return true;
   } else if (command == "holoChangePassword") {
     const oldPassword = request.oldPassword;
     const newPassword = request.newPassword;
@@ -26842,14 +26794,14 @@ function popupListener(request, sender, sendResponse) {
         )
       )
       .then((decryptedCreds) => {
-        ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType).then(
-          (proof) => {
-            // TODO: send proof to relayer
-            return true;
-          }
-        );
+        return ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType);
+      })
+      .then((proof) => {
+        // TODO: send proof to relayer
+        return true;
       })
       .then((sendProofSuccess) => sendResponse({ success: sendProofSuccess }));
+    return true;
   } else if (command == "closingHoloConfirmationPopup") {
     confirmationPopupIsOpen = false;
   }
@@ -26896,7 +26848,6 @@ const allowedWebPageCommands = [
   // "getHoloCredentials", // TODO: Don't let frontend retrieve credentials. Call proofs endpoint from within extension
   "setHoloCredentials",
   "holoGetIsRegistered",
-  "setProof",
 ];
 
 // Listener function for messages from webpage
@@ -26908,7 +26859,7 @@ function webPageListener(request, sender, sendResponse) {
   const command = request.command;
   const messageIsSharded = request.sharded;
   const newCreds = request.credentials;
-  const proof = request.proof;
+  request.proof;
 
   if (!allowedWebPageCommands.includes(command)) {
     return;
@@ -26924,12 +26875,6 @@ function webPageListener(request, sender, sendResponse) {
     };
     holoStore.setLatestMessage(latestMessage).then(() => displayConfirmationPopup());
     return;
-  } else if (command == "setProof") {
-    const latestMessage = {
-      sharded: messageIsSharded,
-      proof: proof,
-    };
-    holoStore.setLatestMessage(latestMessage).then(() => displayConfirmationPopup());
   } else if (command == "holoGetIsRegistered") {
     cryptoController
       .getIsRegistered()
