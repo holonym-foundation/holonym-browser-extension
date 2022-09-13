@@ -31,8 +31,7 @@ export default [
     // Background script
     input: "./src/background/background.js",
     output: {
-      // Bundled into temp folder. Browserify is then used to bundle into dist folder.
-      file: "./rollup-temp/background.js",
+      file: "./dist/background.js",
       format: "es",
     },
     // shimMissingExports: true,
@@ -82,7 +81,8 @@ export default [
     // Confirmation popup script
     input: "./src/frontend/popups/confirmation/index.js",
     output: {
-      file: "./dist/confirmation_popup.js",
+      // Bundled into temp folder. Browserify is then used to bundle into dist folder.
+      file: "./rollup-temp/confirmation_popup.js",
       format: "es",
     },
     plugins: [
