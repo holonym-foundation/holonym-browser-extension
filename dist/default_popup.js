@@ -34715,7 +34715,7 @@ function LandingPage({
     getIsRegistered().then(val => setRegistered(val));
   }, []);
   return /*#__PURE__*/React.createElement(React.Fragment, null, !registered ? /*#__PURE__*/React.createElement(SetPassword, {
-    onAccountCreated: () => setRegistered(true)
+    onAccountCreated: onLoginSuccess
   }) : /*#__PURE__*/React.createElement(PasswordLogin, {
     onLoginSuccess: onLoginSuccess
   }));

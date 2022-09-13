@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import createMetaMaskProvider from "metamask-extension-provider";
 import PasswordLogin from "../../components/atoms/PasswordLogin";
 import LandingPage from "../../components/LandingPage";
 import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
 import ConfirmSendToRelayer from "../../components/atoms/ConfirmSendToRelayer";
-import ConfirmProof from "../../components/molecules/ConfirmProof";
 import Success from "../../components/atoms/Success";
+import Loading from "../../components/atoms/Loading";
 
 const credsConfSuccessMessage =
   "Your credentials have been encrypted and stored. " +
@@ -14,11 +15,8 @@ const credsConfSuccessMessage =
 const sendToRelayerSuccessMessage =
   "Your anonymous proof of residence has been sent to a relayer to put on chain.";
 
-const proofStorageSuccessMessage = "Your proof has been encrypted and stored.";
-
 function AppRoutes() {
   const [credentials, setCredentials] = useState();
-  const [proof, setProof] = useState();
   const navigate = useNavigate();
 
   async function handleLoginSuccess() {
@@ -26,9 +24,6 @@ function AppRoutes() {
     if (latestMessage.credentials) {
       setCredentials(latestMessage.credentials);
       navigate("/confirm-credentials", { replace: true });
-    } else if (latestMessage.proof) {
-      setProof(latestMessage.proof);
-      navigate("/confirm-proof", { replace: true });
     }
   }
 
@@ -49,7 +44,7 @@ function AppRoutes() {
   }
 
   function onConfirmCredsContinue() {
-    navigate("/confirm-send-to-relayer");
+    navigate("/confirm-send-to-relayer", { replace: true });
   }
 
   async function handleConfirmSendProof() {
@@ -73,16 +68,38 @@ function AppRoutes() {
         chrome.runtime.sendMessage(message, callback);
       });
     }
-    const addSmallLeafSuccess = await addSmallLeaf();
-    const PoKoPoMLSuccess = await PoKoPoML();
-    // TODO: Request user to sign a tx to submit these proofs to smart contract
-    navigate("/final-creds-success");
-  }
+    navigate("/loading-proofs", { replace: true });
+    // const addSmallLeafSuccess = await addSmallLeaf();
+    // const PoKoPoMLSuccess = await PoKoPoML();
 
-  function handleProofConfirmation() {
-    const message = { command: "confirmProof" };
-    const callback = (resp) => navigate("/final-proof-success", { replace: true });
-    chrome.runtime.sendMessage(message, callback);
+    let currentAccount;
+
+    // MetaMask stuff...
+    // TODO: Maybe move MetaMask stuff to App.js
+    const provider = createMetaMaskProvider();
+    function handleAccountsChanged(accounts) {
+      if (accounts.length === 0) {
+        // MetaMask is locked or the user has not connected any accounts
+        console.log("Please connect to MetaMask.");
+      } else if (accounts[0] !== currentAccount) {
+        currentAccount = accounts[0];
+        // Do any other work!
+      }
+      console.log("currentAccount...");
+      console.log(currentAccount);
+    }
+    provider
+      .request({ method: "eth_accounts" })
+      .then(handleAccountsChanged)
+      .catch((err) => {
+        // Some unexpected error.
+        // For backwards compatibility reasons, if no accounts are available,
+        // eth_accounts will return an empty array.
+        console.error(err);
+      });
+
+    // TODO: Submit these proofs to smart contract
+    navigate("/final-creds-success", { replace: true });
   }
 
   function onExit() {
@@ -139,24 +156,9 @@ function AppRoutes() {
             </div>
           }
         />
-
         <Route
-          path="/confirm-proof"
-          element={
-            <ConfirmProof proof={proof} onConfirmation={handleProofConfirmation} />
-          }
-        />
-        <Route
-          path="/final-proof-success"
-          element={
-            <div style={{ marginTop: "150px" }}>
-              <Success
-                message={proofStorageSuccessMessage}
-                onExit={onExit}
-                exitButtonText="Exit"
-              />
-            </div>
-          }
+          path="/loading-proofs"
+          element={<Loading loadingMessage="Loading proofs..." />}
         />
       </Routes>
     </>
