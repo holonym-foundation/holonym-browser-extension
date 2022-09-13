@@ -83,7 +83,7 @@ export default [
     output: {
       // Bundled into temp folder. Browserify is then used to bundle into dist folder.
       file: "./rollup-temp/confirmation_popup.js",
-      format: "es",
+      format: "cjs",
     },
     plugins: [
       json(), // needed for MetaMask
@@ -94,6 +94,7 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        'require("stream");': 'require("readable-stream");',
         preventAssignment: true,
       }),
       babel({
