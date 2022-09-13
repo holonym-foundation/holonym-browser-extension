@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import createMetaMaskProvider from "metamask-extension-provider";
 import PasswordLogin from "../../components/atoms/PasswordLogin";
 import LandingPage from "../../components/LandingPage";
 import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
@@ -68,8 +69,35 @@ function AppRoutes() {
       });
     }
     navigate("/loading-proofs", { replace: true });
-    const addSmallLeafSuccess = await addSmallLeaf();
-    const PoKoPoMLSuccess = await PoKoPoML();
+    // const addSmallLeafSuccess = await addSmallLeaf();
+    // const PoKoPoMLSuccess = await PoKoPoML();
+
+    let currentAccount;
+
+    // MetaMask stuff...
+    // TODO: Maybe move MetaMask stuff to App.js
+    const provider = createMetaMaskProvider();
+    function handleAccountsChanged(accounts) {
+      if (accounts.length === 0) {
+        // MetaMask is locked or the user has not connected any accounts
+        console.log("Please connect to MetaMask.");
+      } else if (accounts[0] !== currentAccount) {
+        currentAccount = accounts[0];
+        // Do any other work!
+      }
+      console.log("currentAccount...");
+      console.log(currentAccount);
+    }
+    provider
+      .request({ method: "eth_accounts" })
+      .then(handleAccountsChanged)
+      .catch((err) => {
+        // Some unexpected error.
+        // For backwards compatibility reasons, if no accounts are available,
+        // eth_accounts will return an empty array.
+        console.error(err);
+      });
+
     // TODO: Submit these proofs to smart contract
     navigate("/final-creds-success", { replace: true });
   }
@@ -127,6 +155,10 @@ function AppRoutes() {
               />
             </div>
           }
+        />
+        <Route
+          path="/loading-proofs"
+          element={<Loading loadingMessage="Loading proofs..." />}
         />
       </Routes>
     </>
