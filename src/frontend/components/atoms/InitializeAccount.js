@@ -35,10 +35,10 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
           </div>
           <div>
             <input
-              type="text"
+              type="password"
               name="password"
               defaultValue="test"
-              className="password-input"
+              className="password-input text-field"
             />
           </div>
           <button type="submit">Submit</button>

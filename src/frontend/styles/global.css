@@ -96,3 +96,52 @@ button:hover {
 .credential-name {
   color: #ddd;
 }
+
+.text-field {
+  padding: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #fff;
+  border-radius: 5px;
+  background-color: transparent;
+  font-family: 'Clover Regular', sans-serif;
+  color: #fff;
+  /* font-size: 20px; */
+  /* line-height: 1.2; */
+}
+
+.text-field:active {
+  border-color: var(--holo-light-blue);
+  
+}
+
+.text-field:focus {
+  border-color: var(--holo-light-blue);
+}
+
+.text-field:focus-visible {
+  border-color: var(--holo-light-blue);
+  outline: none;
+}
+
+@font-face {
+  font-family: 'Clover Semibold';
+  src: url('./fonts/CloverDisplay-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Clover Regular';
+  src: url('./fonts/CloverDisplay-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Clover Medium';
+  src: url('./fonts/CloverDisplay-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}

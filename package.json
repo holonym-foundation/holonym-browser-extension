@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "build": "bash build.sh"
+    "build": "bash build.sh",
+    "view-on-mac": "bash build.sh; open dist/default_popup.html"
   },
   "license": "MIT",
   "dependencies": {

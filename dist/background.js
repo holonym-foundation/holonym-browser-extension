@@ -26669,8 +26669,7 @@ let confirmationPopupIsOpen = false;
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 const extensionId =
-  "cilbidmppfndfhjafdlngkaabddoofea"
-    ;
+  "oehcghhbelloglknnpdgoeammglelgna";
 const popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
