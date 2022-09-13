@@ -6,3 +6,5 @@ prod-materials/
 
 .vscode/
 notes.txt
+
+.env
