@@ -6,4 +6,6 @@ prod-materials/
 .vscode/
 .env
 
+rollup-temp
+
 notes.txt

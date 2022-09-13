@@ -4,6 +4,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
 import image from "@rollup/plugin-image";
 import { wasm } from "@rollup/plugin-wasm";
+import json from "@rollup/plugin-json";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -30,8 +31,8 @@ export default [
     // Background script
     input: "./src/background/background.js",
     output: {
-      file: "./dist/background.js",
-      // dir: "./dist",
+      // Bundled into temp folder. Browserify is then used to bundle into dist folder.
+      file: "./rollup-temp/background.js",
       format: "es",
     },
     // shimMissingExports: true,
@@ -59,6 +60,7 @@ export default [
       format: "es",
     },
     plugins: [
+      json(), // needed for MetaMask
       image(),
       resolve({
         browser: true,
@@ -84,6 +86,7 @@ export default [
       format: "es",
     },
     plugins: [
+      json(), // needed for MetaMask
       image(),
       resolve({
         browser: true,

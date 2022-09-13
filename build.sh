@@ -11,6 +11,8 @@ cp ./src/frontend/img/*Holo-Logo-new* ./dist # copy icons
 # Bundle
 rollup --config rollup.config.js
 
+browserify ./rollup-temp/background.js > ./dist/background.js
+
 # zip for production
 printf "\nzipping ./dist\n"
 zip -r ./prod-materials/dist.zip ./dist
