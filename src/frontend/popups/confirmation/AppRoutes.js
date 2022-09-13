@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import PasswordLogin from "../../components/atoms/PasswordLogin";
 import LandingPage from "../../components/LandingPage";
 import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
 import ConfirmSendToRelayer from "../../components/atoms/ConfirmSendToRelayer";
-import ConfirmProof from "../../components/molecules/ConfirmProof";
 import Success from "../../components/atoms/Success";
 import Loading from "../../components/atoms/Loading";
 
@@ -15,12 +14,8 @@ const credsConfSuccessMessage =
 const sendToRelayerSuccessMessage =
   "Your anonymous proof of residence has been sent to a relayer to put on chain.";
 
-const proofStorageSuccessMessage = "Your proof has been encrypted and stored.";
-
 function AppRoutes() {
   const [credentials, setCredentials] = useState();
-  const [proof, setProof] = useState();
-  const [loading, setLoading] = useState();
   const navigate = useNavigate();
 
   async function handleLoginSuccess() {
@@ -28,9 +23,6 @@ function AppRoutes() {
     if (latestMessage.credentials) {
       setCredentials(latestMessage.credentials);
       navigate("/confirm-credentials", { replace: true });
-    } else if (latestMessage.proof) {
-      setProof(latestMessage.proof);
-      navigate("/confirm-proof", { replace: true });
     }
   }
 
@@ -75,19 +67,11 @@ function AppRoutes() {
         chrome.runtime.sendMessage(message, callback);
       });
     }
-    setLoading(true);
     navigate("/loading-proofs", { replace: true });
     const addSmallLeafSuccess = await addSmallLeaf();
     const PoKoPoMLSuccess = await PoKoPoML();
-    setLoading(false);
-    // TODO: Request user to sign a tx to submit these proofs to smart contract
+    // TODO: Submit these proofs to smart contract
     navigate("/final-creds-success", { replace: true });
-  }
-
-  function handleProofConfirmation() {
-    const message = { command: "confirmProof" };
-    const callback = (resp) => navigate("/final-proof-success", { replace: true });
-    chrome.runtime.sendMessage(message, callback);
   }
 
   function onExit() {
@@ -138,33 +122,6 @@ function AppRoutes() {
             <div style={{ marginTop: "150px" }}>
               <Success
                 message={sendToRelayerSuccessMessage}
-                onExit={onExit}
-                exitButtonText="Exit"
-              />
-            </div>
-          }
-        />
-
-        <Route
-          path="/confirm-proof"
-          element={
-            <ConfirmProof proof={proof} onConfirmation={handleProofConfirmation} />
-          }
-        />
-        <Route
-          path="/loading-proofs"
-          element={
-            <div style={{ marginTop: "150px" }}>
-              <Loading loadingMessage={"Loading proofs..."} />
-            </div>
-          }
-        />
-        <Route
-          path="/final-proof-success"
-          element={
-            <div style={{ marginTop: "150px" }}>
-              <Success
-                message={proofStorageSuccessMessage}
                 onExit={onExit}
                 exitButtonText="Exit"
               />

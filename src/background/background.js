@@ -30,7 +30,6 @@ const allowedPopupCommands = [
   "holoGetIsRegistered",
   "holoSendProofToRelayer", // Triggers response to original setHoloCredentials message
   "closingHoloConfirmationPopup",
-  "confirmProof",
 ];
 
 function popupListener(request, sender, sendResponse) {
@@ -111,24 +110,6 @@ function popupListener(request, sender, sendResponse) {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
     holoStore.setLatestMessage("");
-  } else if (command == "confirmProof") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    holoStore
-      .getLatestMessage()
-      .then((encryptedMsg) => {
-        return cryptoController.decryptWithPrivateKey(
-          encryptedMsg.proof,
-          encryptedMsg.sharded
-        );
-      })
-      .then((decryptedProof) => holoStore.setProof(JSON.parse(decryptedProof)))
-      .then((setProofSuccess) => {
-        // TODO: handle case where setProofSuccess == false
-        return holoStore.setLatestMessage("");
-      })
-      .then((setMsgSuccess) => sendResponse({}));
-    return true;
   } else if (command == "holoChangePassword") {
     const oldPassword = request.oldPassword;
     const newPassword = request.newPassword;
@@ -214,7 +195,6 @@ const allowedWebPageCommands = [
   // "getHoloCredentials", // TODO: Don't let frontend retrieve credentials. Call proofs endpoint from within extension
   "setHoloCredentials",
   "holoGetIsRegistered",
-  "setProof",
 ];
 
 // Listener function for messages from webpage
@@ -242,12 +222,6 @@ function webPageListener(request, sender, sendResponse) {
     };
     holoStore.setLatestMessage(latestMessage).then(() => displayConfirmationPopup());
     return;
-  } else if (command == "setProof") {
-    const latestMessage = {
-      sharded: messageIsSharded,
-      proof: proof,
-    };
-    holoStore.setLatestMessage(latestMessage).then(() => displayConfirmationPopup());
   } else if (command == "holoGetIsRegistered") {
     cryptoController
       .getIsRegistered()
