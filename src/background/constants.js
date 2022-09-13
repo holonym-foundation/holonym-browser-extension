@@ -1,5 +1,8 @@
 import { Buffer } from "buffer/";
 
+// export const zkIdVerifyEndpoint = 'https://zk.sciverse.id'
+export const zkIdVerifyEndpoint = "http://localhost:3000"; // For tests
+
 export const serverAddress = "0x8281316aC1D51c94f2DE77575301cEF615aDea84";
 export const threeZeroedBytes = Buffer.concat([Buffer.from("")], 3);
 
@@ -64,3 +67,9 @@ export const stateAbbreviations = {
   WISCONSIN: "WI",
   WYOMING: "WY",
 };
+
+export const unitedStatesCredsBuffer = Buffer.from("00".repeat(26) + "0002", "hex");
+
+// Max length of encrypt-able string using RSA-OAEP with SHA256 where
+// modulusLength == 4096: 446 characters.
+export const maxEncryptableLength = 446;

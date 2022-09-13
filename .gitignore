@@ -1,10 +1,11 @@
 node_modules/
-dist/
 prod-materials/
 .DS_Store/
 .parcel-cache/
 
 .vscode/
+.env
+
 notes.txt
 
 .env

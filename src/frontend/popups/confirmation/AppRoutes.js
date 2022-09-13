@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import PasswordLogin from "../../components/atoms/PasswordLogin";
+import LandingPage from "../../components/LandingPage";
 import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
 import ConfirmSendToRelayer from "../../components/atoms/ConfirmSendToRelayer";
 import Success from "../../components/atoms/Success";
+import Loading from "../../components/atoms/Loading";
 
 const credsConfSuccessMessage =
   "Your credentials have been encrypted and stored. " +
-  "You can now generate zero knowledge proofs of identity. " +
-  "Next step: Send your anonymous ZK proof of residence to a relayer to put on chain.";
+  "You can now generate zero knowledge proofs of identity.";
 
 const sendToRelayerSuccessMessage =
   "Your anonymous proof of residence has been sent to a relayer to put on chain.";
@@ -18,15 +19,17 @@ function AppRoutes() {
   const navigate = useNavigate();
 
   async function handleLoginSuccess() {
-    const credentials = await requestCredentials();
-    setCredentials(credentials);
-    navigate("/confirm-credentials", { replace: true });
+    const latestMessage = await requestLatestMessage();
+    if (latestMessage.credentials) {
+      setCredentials(latestMessage.credentials);
+      navigate("/confirm-credentials", { replace: true });
+    }
   }
 
-  function requestCredentials() {
+  function requestLatestMessage() {
     return new Promise((resolve) => {
       const message = { command: "getHoloLatestMessage" };
-      const callback = (resp) => resolve(resp.credentials);
+      const callback = (resp) => resolve(resp.message);
       chrome.runtime.sendMessage(message, callback);
     });
   }
@@ -40,14 +43,35 @@ function AppRoutes() {
   }
 
   function onConfirmCredsContinue() {
-    navigate("/confirm-send-to-relayer");
+    navigate("/confirm-send-to-relayer", { replace: true });
   }
 
-  function handleConfirmSendProof() {
-    // TODO: Actually send proof to relayer. Do this in background script.
-    const message = { command: "holoSendProofsToRelayer" };
-    chrome.runtime.sendMessage(message);
-    navigate("/final-success");
+  async function handleConfirmSendProof() {
+    function addSmallLeaf() {
+      return new Promise((resolve, reject) => {
+        const message = {
+          command: "holoSendProofToRelayer",
+          proofType: "addSmallLeaf-country",
+        };
+        const callback = (resp) => resolve(resp);
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+    function PoKoPoML() {
+      return new Promise((resolve, reject) => {
+        const message = {
+          command: "holoSendProofToRelayer",
+          proofType: "PoKoPoML-country",
+        };
+        const callback = (resp) => resolve(resp);
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+    navigate("/loading-proofs", { replace: true });
+    const addSmallLeafSuccess = await addSmallLeaf();
+    const PoKoPoMLSuccess = await PoKoPoML();
+    // TODO: Submit these proofs to smart contract
+    navigate("/final-creds-success", { replace: true });
   }
 
   function onExit() {
@@ -61,7 +85,7 @@ function AppRoutes() {
       <Routes>
         <Route
           path="/"
-          element={<PasswordLogin onLoginSuccess={handleLoginSuccess} />}
+          element={<LandingPage onLoginSuccess={handleLoginSuccess} />}
         />
         <Route
           path="/confirm-credentials"
@@ -93,7 +117,7 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/final-success"
+          path="/final-creds-success"
           element={
             <div style={{ marginTop: "150px" }}>
               <Success
