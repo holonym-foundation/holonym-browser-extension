@@ -168,7 +168,9 @@ async function displayConfirmationPopup(type) {
     credentialsConfirmationPopupIsOpen = true;
     url = "credentials_confirmation_popup.html";
   } else if (type == "proof") {
-    if (proofConfirmationPopupIsOpen) return;
+    // TODO: Figure out best way to handle case where user closes popup, and
+    // proofConfirmationPopupIsOpen does not get set to false. Timeouts? Event emitters?
+    // if (proofConfirmationPopupIsOpen) return;
     proofConfirmationPopupIsOpen = true;
     url = "proof_confirmation_popup.html";
   }
@@ -278,6 +280,8 @@ function webPageListener(request, sender, sendResponse) {
         return ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType);
       })
       .then((proof) => {
+        console.log("generated proof...");
+        console.log(proof);
         generatingProof = false;
         sendResponse(proof);
       });

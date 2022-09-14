@@ -23,11 +23,13 @@ function LandingPage({ onLoginSuccess }) {
 
   return (
     <>
-      {!registered ? (
-        <SetPassword onAccountCreated={onLoginSuccess} />
-      ) : (
-        <PasswordLogin onLoginSuccess={onLoginSuccess} />
-      )}
+      <div style={{ marginTop: "150px" }}>
+        {!registered ? (
+          <SetPassword onAccountCreated={onLoginSuccess} />
+        ) : (
+          <PasswordLogin onLoginSuccess={onLoginSuccess} />
+        )}
+      </div>
     </>
   );
 }
