@@ -77,10 +77,35 @@ export default [
     ],
   },
   {
-    // Confirmation popup script
-    input: "./src/frontend/popups/confirmation/index.js",
+    // Credentials confirmation popup script
+    input: "./src/frontend/popups/confirmation-credentials/index.js",
     output: {
-      file: "./dist/confirmation_popup.js",
+      file: "./dist/credentials_confirmation_popup.js",
+      format: "es",
+    },
+    plugins: [
+      image(),
+      resolve({
+        browser: true,
+        preferBuiltins: false,
+      }),
+      replace({
+        "process.env.NODE_ENV": NODE_ENV,
+        preventAssignment: true,
+      }),
+      babel({
+        presets: ["@babel/preset-react"],
+        babelHelpers: "bundled",
+        exclude: "node_modules/**",
+      }),
+      commonjs(),
+    ],
+  },
+  {
+    // Proof confirmation popup script
+    input: "./src/frontend/popups/confirmation-proof/index.js",
+    output: {
+      file: "./dist/proof_confirmation_popup.js",
       format: "es",
     },
     plugins: [
