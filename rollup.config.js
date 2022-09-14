@@ -14,6 +14,10 @@ const linkToStartVerification =
   process.env.NODE_ENV == "dev"
     ? "'http://localhost:3002/zk-id/verify'"
     : "'https://app.holonym.id/zk-id/verify'";
+const linkToProofPage =
+  process.env.NODE_ENV == "dev"
+    ? "'http://localhost:3002/zk-id/proofs'"
+    : "'https://app.holonym.id/zk-id/proofs'";
 
 export default [
   // {
@@ -72,6 +76,7 @@ export default [
       replace({
         "process.env.NODE_ENV": NODE_ENV,
         "process.env.LINK_TO_START_VERIFICATION": linkToStartVerification,
+        "process.env.LINK_TO_PROOF_PAGE": linkToProofPage,
         preventAssignment: true,
       }),
       babel({

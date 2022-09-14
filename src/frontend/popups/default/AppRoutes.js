@@ -6,8 +6,7 @@ import ResetAccount from "../../components/molecules/ResetAccount";
 import { sleep } from "../../../background/utils";
 
 const linkToStartVerification = process.env.LINK_TO_START_VERIFICATION;
-// const linkToProofPage = process.env.LINK_TO_PROOF_PAGE;
-const linkToProofPage = "google.com";
+const linkToProofPage = process.env.LINK_TO_PROOF_PAGE;
 
 function AppRoutes() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -104,9 +103,18 @@ function AppRoutes() {
               <a
                 href={linkToProofPage + "/addSmallLeaf"}
                 target="_blank"
+                style={{ marginTop: "10px" }}
                 className="link wide-button center-block"
               >
-                Generate addSmallLeaf Proof
+                Generate addSmallLeaf-country Proof
+              </a>
+              <a
+                href={linkToProofPage + "/PoKoPoML"}
+                target="_blank"
+                style={{ marginTop: "10px" }}
+                className="link wide-button center-block"
+              >
+                Generate PoKoPoML Proof
               </a>
               <div style={{ marginTop: "10px" }}>
                 <button
