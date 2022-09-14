@@ -99,7 +99,7 @@ function AppRoutes() {
         <Route
           path="/proof-menu"
           element={
-            <div style={{ margin: "15px" }}>
+            <div style={{ marginTop: "150px" }}>
               <a
                 href={linkToProofPage + "/addSmallLeaf-country"}
                 target="_blank"
