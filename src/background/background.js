@@ -34,7 +34,6 @@ const allowedPopupCommands = [
   "holoChangePassword",
   "holoInitializeAccount",
   "holoGetIsRegistered",
-  "holoSendProofToRelayer", // Triggers response to original setHoloCredentials message
   "confirmShareProof",
   "getTypeOfRequestedProof",
   "closingHoloCredentialsConfirmationPopup",
@@ -136,27 +135,6 @@ function popupListener(request, sender, sendResponse) {
     cryptoController
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
-    return true;
-  } else if (command == "holoSendProofToRelayer") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    const proofType = request.proofType; // e.g., addSmallLeaf
-    holoStore
-      .getCredentials()
-      .then((encryptedMsg) =>
-        cryptoController.decryptWithPrivateKey(
-          encryptedMsg.credentials,
-          encryptedMsg.sharded
-        )
-      )
-      .then((decryptedCreds) => {
-        return ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType);
-      })
-      .then((proof) => {
-        // TODO: send proof to relayer
-        return true;
-      })
-      .then((sendProofSuccess) => sendResponse({ success: sendProofSuccess }));
     return true;
   } else if (command == "confirmShareProof") {
     async function waitForProofToBeGenerated() {
