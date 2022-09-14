@@ -34586,10 +34586,10 @@ function PasswordLogin({
   }, /*#__PURE__*/React$1.createElement("div", {
     className: "header-base"
   }, /*#__PURE__*/React$1.createElement("label", null, "Enter Password")), /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("input", {
-    type: "text",
+    type: "password",
     name: "password",
     defaultValue: "test",
-    className: "password-input"
+    className: "text-field"
   })), /*#__PURE__*/React$1.createElement("button", {
     type: "submit"
   }, "Submit"))));
@@ -34656,7 +34656,7 @@ function InitializeAccount({
     onChange: e => setPassword(e.target.value),
     placeholder: "password",
     autoComplete: "current-password",
-    className: "password-input text-field"
+    className: "text-field"
   })), /*#__PURE__*/React$1.createElement("div", {
     style: {
       display: "flex",
