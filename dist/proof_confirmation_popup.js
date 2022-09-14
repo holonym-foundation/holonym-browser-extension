@@ -34854,9 +34854,13 @@ function AppRoutes() {
     })
   }), /*#__PURE__*/React$1.createElement(Route, {
     path: "/loading-share-proof",
-    element: /*#__PURE__*/React$1.createElement(Loading, {
+    element: /*#__PURE__*/React$1.createElement("div", {
+      style: {
+        marginTop: "150px"
+      }
+    }, /*#__PURE__*/React$1.createElement(Loading, {
       loadingMessage: "Loading proof..."
-    })
+    }))
   }), /*#__PURE__*/React$1.createElement(Route, {
     path: "/share-proof-success",
     element: /*#__PURE__*/React$1.createElement("div", {

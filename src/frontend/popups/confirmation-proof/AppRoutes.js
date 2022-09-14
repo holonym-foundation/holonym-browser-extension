@@ -58,7 +58,11 @@ function AppRoutes() {
         />
         <Route
           path="/loading-share-proof"
-          element={<Loading loadingMessage="Loading proof..." />}
+          element={
+            <div style={{ marginTop: "150px" }}>
+              <Loading loadingMessage="Loading proof..." />
+            </div>
+          }
         />
         <Route
           path="/share-proof-success"
