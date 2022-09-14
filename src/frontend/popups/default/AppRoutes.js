@@ -101,13 +101,21 @@ function AppRoutes() {
           element={
             <div style={{ marginTop: "150px" }}>
               <a
+                href={linkToProofPage + "/lobby3"}
+                target="_blank"
+                style={{ marginTop: "10px" }}
+                className="link wide-button center-block"
+              >
+                Generate Lobby3 Proofs
+              </a>
+              {/* <a
                 href={linkToProofPage + "/addSmallLeaf-country"}
                 target="_blank"
                 style={{ marginTop: "10px" }}
                 className="link wide-button center-block"
               >
                 Generate addSmallLeaf-country Proof
-              </a>
+              </a> */}
               {/* <a
                 href={linkToProofPage + "/PoKoPoML-country"}
                 target="_blank"
