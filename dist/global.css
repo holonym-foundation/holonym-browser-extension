@@ -273,3 +273,10 @@ button:hover {
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./fonts/Montserrat/static/Montserrat-Regular.ttf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
