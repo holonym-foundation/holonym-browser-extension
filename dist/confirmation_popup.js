@@ -52009,11 +52009,16 @@ function PasswordLogin({
   }, /*#__PURE__*/React$1.createElement("div", {
     className: "header-base"
   }, /*#__PURE__*/React$1.createElement("label", null, "Enter Password")), /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("input", {
-    type: "text",
+    type: "password",
     name: "password",
-    defaultValue: "test",
-    className: "password-input"
+    placeholder: "password",
+    autoComplete: "current-password",
+    className: "password-input text-field"
   })), /*#__PURE__*/React$1.createElement("button", {
+    className: "x-button",
+    style: {
+      margin: "10px"
+    },
     type: "submit"
   }, "Submit"))));
 }
@@ -52156,19 +52161,29 @@ function LandingPage({
   const [registered, setRegistered] = react.exports.useState(false); // TODO: Fix login! It's not working
 
   react.exports.useEffect(() => {
-    function getIsRegistered() {
-      return new Promise(resolve => {
-        const message = {
-          command: "holoGetIsRegistered"
-        };
+    async function getIsRegistered() {
+      let numAttempts = 0; // try 50 times in case of port closed error
 
-        const callback = resp => resolve(resp.isRegistered);
+      while (numAttempts < 50) {
+        console.log("attempt ", numAttempts);
 
-        chrome.runtime.sendMessage(message, callback);
-      });
+        try {
+          const callback = resp => console.log("response was ", resp);
+
+          chrome.runtime.sendMessage({
+            command: "holoGetIsRegistered"
+          }, callback);
+        } catch (err) {}
+
+        await sleep(50);
+        numAttempts += 1;
+      }
     }
 
-    getIsRegistered().then(val => setRegistered(val));
+    getIsRegistered().then(val => {
+      console.log(val);
+      setRegistered(val);
+    });
   }, []);
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
     onAccountCreated: onLoginSuccess
