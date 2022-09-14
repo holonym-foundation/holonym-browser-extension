@@ -101,21 +101,21 @@ function AppRoutes() {
           element={
             <div style={{ margin: "15px" }}>
               <a
-                href={linkToProofPage + "/addSmallLeaf"}
+                href={linkToProofPage + "/addSmallLeaf-country"}
                 target="_blank"
                 style={{ marginTop: "10px" }}
                 className="link wide-button center-block"
               >
                 Generate addSmallLeaf-country Proof
               </a>
-              <a
-                href={linkToProofPage + "/PoKoPoML"}
+              {/* <a
+                href={linkToProofPage + "/PoKoPoML-country"}
                 target="_blank"
                 style={{ marginTop: "10px" }}
                 className="link wide-button center-block"
               >
                 Generate PoKoPoML Proof
-              </a>
+              </a> */}
               <div style={{ marginTop: "10px" }}>
                 <button
                   type="submit"
