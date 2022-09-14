@@ -34715,229 +34715,98 @@ function LandingPage({
     getIsRegistered().then(val => setRegistered(val));
   }, []);
   return /*#__PURE__*/React.createElement(React.Fragment, null, !registered ? /*#__PURE__*/React.createElement(SetPassword, {
-    onAccountCreated: () => setRegistered(true)
+    onAccountCreated: onLoginSuccess
   }) : /*#__PURE__*/React.createElement(PasswordLogin, {
     onLoginSuccess: onLoginSuccess
   }));
 }
 
-function Credentials({
-  credentials
+function ConfirmShareProof({
+  proofType,
+  onConfirmation
 }) {
-  const [credsToDisplay, setCredsToDisplay] = react.exports.useState();
-  react.exports.useEffect(() => {
-    if (!credentials) return;
-    const allowedCredsNames = Object.keys(credentials).filter(name => {
-      if (name.toLowerCase().includes("signature")) return false;
-      if (name.toLowerCase().includes("secret")) return false;
-      if (name == "completedAt") return false;
-      return true;
-    });
-    const credsToDisplayTemp = Object.fromEntries(allowedCredsNames.map(name => [name, credentials[name]]));
-    setCredsToDisplay(credsToDisplayTemp);
-  }, [credentials]);
-  return /*#__PURE__*/React.createElement(React.Fragment, null, credsToDisplay && Object.keys(credsToDisplay).length > 0 && /*#__PURE__*/React.createElement("div", {
-    className: "holo-credentials-container"
-  }, Object.keys(credsToDisplay).map((credentialName, index) => /*#__PURE__*/React.createElement("div", {
-    key: index,
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     style: {
-      display: "flex",
-      margin: "1.05rem"
+      textAlign: "center"
     }
-  }, /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "header-base"
+  }, "Share Proof"), /*#__PURE__*/React.createElement("p", {
+    className: "small-paragraph"
+  }, "Confirm that you would like to share the following proof with this website.")), /*#__PURE__*/React.createElement("p", {
     style: {
-      flex: "30%"
+      fontSize: "14px"
+    }
+  }, proofType), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "10px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "submit",
+    onClick: onConfirmation,
+    className: "wide-button center-block"
+  }, "Confirm")));
+}
+
+function Loading({
+  loadingMessage
+}) {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      margin: "0px"
     },
-    className: "credential-name"
-  }, credentialName), /*#__PURE__*/React.createElement("span", {
-    style: {
-      flex: "70%"
-    }
-  }, credsToDisplay[credentialName])))));
-}
-
-function ConfirmCredentials({
-  credentials,
-  onConfirmation
-}) {
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "center"
-    }
-  }, /*#__PURE__*/React.createElement("h2", {
     className: "header-base"
-  }, "Confirm Credentials"), /*#__PURE__*/React.createElement("p", {
-    className: "small-paragraph"
-  }, "Confirm that the following info is accurate. Clicking \"confirm\" will encrypt this info and store it in your browser. This will allow you to generate zero knowledge proofs about aspects of your identity.")), /*#__PURE__*/React.createElement(Credentials, {
-    credentials: credentials
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: "10px"
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    type: "submit",
-    onClick: onConfirmation,
-    className: "wide-button center-block"
-  }, "Confirm")));
+  }, loadingMessage || "Loading...")));
 }
-
-function ConfirmSendToRelayer({
-  onConfirmation
-}) {
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "center"
-    }
-  }, /*#__PURE__*/React.createElement("h2", {
-    className: "header-base"
-  }, "Confirm"), /*#__PURE__*/React.createElement("p", null, "Confirm that you would like to send your ZK proof of residence to a relayer.")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: "10px"
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    type: "submit",
-    onClick: onConfirmation,
-    className: "wide-button center-block"
-  }, "Confirm")));
-}
-
-function ConfirmProof({
-  proof,
-  onConfirmation
-}) {
-  const [proofItems, setProofItems] = react.exports.useState();
-  react.exports.useEffect(() => {
-    if (!proof || typeof proof != "object") return;
-    setProofItems(Object.keys(proof));
-  }, []);
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "center"
-    }
-  }, /*#__PURE__*/React.createElement("h2", {
-    className: "header-base"
-  }, "Confirm Proof"), /*#__PURE__*/React.createElement("p", {
-    className: "small-paragraph"
-  }, "Confirm storage of these proof items.")), proofItems && proofItems.length > 0 && proofItems.map((item, index) => /*#__PURE__*/React.createElement("p", {
-    key: index
-  }, item)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: "10px"
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    type: "submit",
-    onClick: onConfirmation,
-    className: "wide-button center-block"
-  }, "Confirm")));
-}
-
-const credsConfSuccessMessage = "Your credentials have been encrypted and stored. " + "You can now generate zero knowledge proofs of identity.";
-const sendToRelayerSuccessMessage = "Your anonymous proof of residence has been sent to a relayer to put on chain.";
-const proofStorageSuccessMessage = "Your proof has been encrypted and stored.";
 
 function AppRoutes() {
-  const [credentials, setCredentials] = react.exports.useState();
-  const [proof, setProof] = react.exports.useState();
   const navigate = useNavigate();
+  const [proofType, setProofType] = react.exports.useState();
 
   async function handleLoginSuccess() {
-    const latestMessage = await requestLatestMessage();
-
-    if (latestMessage.credentials) {
-      setCredentials(latestMessage.credentials);
-      navigate("/confirm-credentials", {
-        replace: true
-      });
-    } else if (latestMessage.proof) {
-      setProof(latestMessage.proof);
-      navigate("/confirm-proof", {
-        replace: true
-      });
-    }
-  }
-
-  function requestLatestMessage() {
-    return new Promise(resolve => {
-      const message = {
-        command: "getHoloLatestMessage"
-      };
-
-      const callback = resp => resolve(resp.message);
-
-      chrome.runtime.sendMessage(message, callback);
+    navigate("/confirm-share-proof", {
+      replace: true
     });
   }
 
-  function handleCredsConfirmation() {
+  function handleConfirmation() {
     const message = {
-      command: "confirmCredentials"
+      command: "confirmShareProof"
     };
 
     const callback = resp => {
-      navigate("/creds-confirmation-success", {
-        replace: true
-      });
+      navigate("/share-proof-success");
     };
 
+    navigate("/loading-share-proof");
     chrome.runtime.sendMessage(message, callback);
   }
 
-  function onConfirmCredsContinue() {
-    navigate("/confirm-send-to-relayer");
-  }
-
-  async function handleConfirmSendProof() {
-    function addSmallLeaf() {
-      return new Promise((resolve, reject) => {
-        const message = {
-          command: "holoSendProofToRelayer",
-          proofType: "addSmallLeaf-country"
-        };
-
-        const callback = resp => resolve(resp);
-
-        chrome.runtime.sendMessage(message, callback);
-      });
-    }
-
-    function PoKoPoML() {
-      return new Promise((resolve, reject) => {
-        const message = {
-          command: "holoSendProofToRelayer",
-          proofType: "PoKoPoML-country"
-        };
-
-        const callback = resp => resolve(resp);
-
-        chrome.runtime.sendMessage(message, callback);
-      });
-    }
-
-    await addSmallLeaf();
-    await PoKoPoML(); // TODO: Request user to sign a tx to submit these proofs to smart contract
-
-    navigate("/final-creds-success");
-  }
-
-  function handleProofConfirmation() {
+  react.exports.useEffect(() => {
+    // TODO: Impelement this command in background.js
     const message = {
-      command: "confirmProof"
+      command: "getTypeOfRequestedProof"
     };
 
-    const callback = resp => navigate("/final-proof-success", {
-      replace: true
-    });
+    const callback = resp => {
+      setProofType(resp.proofType);
+    };
 
     chrome.runtime.sendMessage(message, callback);
-  }
+  }, []);
 
   function onExit() {
     const message = {
-      command: "closingHoloConfirmationPopup"
+      command: "closingHoloProofConfirmationPopup"
     };
     chrome.runtime.sendMessage(message);
     window.close();
-  }
+  } // TODO: Maybe a loading page while proof is being generated?
+
 
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Routes, null, /*#__PURE__*/React.createElement(Route, {
     path: "/",
@@ -34945,58 +34814,26 @@ function AppRoutes() {
       onLoginSuccess: handleLoginSuccess
     })
   }), /*#__PURE__*/React.createElement(Route, {
-    path: "/confirm-credentials",
-    element: /*#__PURE__*/React.createElement(ConfirmCredentials, {
-      credentials: credentials,
-      onConfirmation: handleCredsConfirmation
+    path: "/confirm-share-proof",
+    element: /*#__PURE__*/React.createElement(ConfirmShareProof, {
+      proofType: proofType,
+      onConfirmation: handleConfirmation
     })
   }), /*#__PURE__*/React.createElement(Route, {
-    path: "/creds-confirmation-success",
-    element: /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: "150px"
-      }
-    }, /*#__PURE__*/React.createElement(Success, {
-      message: credsConfSuccessMessage,
-      onExit: onConfirmCredsContinue,
-      exitButtonText: "Continue"
-    }))
-  }), /*#__PURE__*/React.createElement(Route, {
-    path: "/confirm-send-to-relayer",
-    element: /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: "150px"
-      }
-    }, /*#__PURE__*/React.createElement(ConfirmSendToRelayer, {
-      onConfirmation: handleConfirmSendProof
-    }))
-  }), /*#__PURE__*/React.createElement(Route, {
-    path: "/final-creds-success",
-    element: /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: "150px"
-      }
-    }, /*#__PURE__*/React.createElement(Success, {
-      message: sendToRelayerSuccessMessage,
-      onExit: onExit,
-      exitButtonText: "Exit"
-    }))
-  }), /*#__PURE__*/React.createElement(Route, {
-    path: "/confirm-proof",
-    element: /*#__PURE__*/React.createElement(ConfirmProof, {
-      proof: proof,
-      onConfirmation: handleProofConfirmation
+    path: "/loading-share-proof",
+    element: /*#__PURE__*/React.createElement(Loading, {
+      loadingMessage: "Loading proof..."
     })
   }), /*#__PURE__*/React.createElement(Route, {
-    path: "/final-proof-success",
+    path: "/share-proof-success",
     element: /*#__PURE__*/React.createElement("div", {
       style: {
         marginTop: "150px"
       }
     }, /*#__PURE__*/React.createElement(Success, {
-      message: proofStorageSuccessMessage,
+      message: "Successfully shared proof",
       onExit: onExit,
-      exitButtonText: "Exit"
+      exitButtonText: "Close"
     }))
   })));
 }
@@ -35021,7 +34858,7 @@ window.addEventListener("beforeunload", event => {
     command: "denyCredentials"
   });
   chrome.runtime.sendMessage({
-    command: "closingHoloConfirmationPopup"
+    command: "closingHoloProofConfirmationPopup"
   });
 });
 const container = document.getElementById("root");
