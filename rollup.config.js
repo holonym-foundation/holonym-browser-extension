@@ -10,6 +10,10 @@ dotenv.config();
 
 // TODO: Change 'dev' to 'production' before bundling for production
 const NODE_ENV = JSON.stringify(process.env.NODE_ENV);
+const linkToStartVerification =
+  process.env.NODE_ENV == "dev"
+    ? "'http://localhost:3002/zk-id/verify'"
+    : "'https://app.holonym.id/zk-id/verify'";
 
 export default [
   // {
@@ -67,6 +71,7 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        "process.env.LINK_TO_START_VERIFICATION": linkToStartVerification,
         preventAssignment: true,
       }),
       babel({

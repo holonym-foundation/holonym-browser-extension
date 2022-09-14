@@ -5,6 +5,8 @@ import Credentials from "../../components/atoms/Credentials";
 import ResetAccount from "../../components/molecules/ResetAccount";
 import { sleep } from "../../../background/utils";
 
+const linkToStartVerification = process.env.LINK_TO_START_VERIFICATION;
+
 function AppRoutes() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [credentials, setCredentials] = useState();
@@ -55,6 +57,17 @@ function AppRoutes() {
           path="/home"
           element={
             <div>
+              <div style={{ margin: "15px" }}>
+                {!credentials && (
+                  <a
+                    href={linkToStartVerification}
+                    target="_blank"
+                    className="link wide-button center-block"
+                  >
+                    Get your credentials
+                  </a>
+                )}
+              </div>
               <h2 className="header-base">Credentials</h2>
               <Credentials credentials={credentials} />
               {/* <button
