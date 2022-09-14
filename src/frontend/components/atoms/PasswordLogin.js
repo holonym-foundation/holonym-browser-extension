@@ -25,13 +25,14 @@ function PasswordLogin({ onLoginSuccess }) {
           </div>
           <div>
             <input
-              type="text"
+              type="password"
               name="password"
-              defaultValue="test"
-              className="password-input"
+              placeholder="password"
+              autoComplete="current-password"
+              className="password-input text-field"
             />
           </div>
-          <button type="submit">Submit</button>
+          <button className="x-button" style={{ margin:"10px" }} type="submit">Submit</button>
         </form>
       </div>
     </>
