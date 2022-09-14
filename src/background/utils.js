@@ -104,6 +104,8 @@ function isLeapYear(year) {
   return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
 }
 
+export const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 const serverPublicKey = {
   key_ops: ["encrypt"],
   ext: true,
