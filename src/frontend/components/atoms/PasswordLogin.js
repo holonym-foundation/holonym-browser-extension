@@ -25,10 +25,10 @@ function PasswordLogin({ onLoginSuccess }) {
           </div>
           <div>
             <input
-              type="text"
+              type="password"
               name="password"
               defaultValue="test"
-              className="password-input"
+              className="text-field"
             />
           </div>
           <button type="submit">Submit</button>

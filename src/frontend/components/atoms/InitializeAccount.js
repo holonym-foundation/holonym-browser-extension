@@ -48,7 +48,7 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
               autoComplete="current-password"
-              className="password-input text-field"
+              className="text-field"
             />
           </div>
           <div style={{ display: "flex", justifyContent: "center" }}>
