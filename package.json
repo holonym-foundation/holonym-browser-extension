@@ -1,19 +1,25 @@
 {
   "type": "module",
   "scripts": {
-    "build": "bash build.sh"
+    "build": "bash build.sh",
+    "view-on-mac": "bash build.sh; open dist/default_popup.html"
   },
   "license": "MIT",
   "dependencies": {
+    "@rollup/plugin-json": "^4.1.0",
     "@zk-kit/incremental-merkle-tree": "^1.0.0",
     "blakejs": "^1.2.1",
     "browser-passworder": "^2.0.3",
     "buffer": "^6.0.3",
     "dotenv": "^16.0.2",
     "ethers": "^5.6.9",
+    "events": "^3.3.0",
+    "metamask-extension-provider": "^3.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.3.0"
+    "react-password-strength-bar": "^0.4.1",
+    "react-router-dom": "^6.3.0",
+    "readable-stream": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",

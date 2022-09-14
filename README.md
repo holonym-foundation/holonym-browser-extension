@@ -2,12 +2,15 @@
 
 ---THIS README IS OUTDATED---
 
-This extension accomplishes two tasks:
-
-- Display a user's Holo when mouse hovers over their Twitter handle.
-- Store credentials that can be used to generate zk proofs of identity.
+This extension store credentials that can be used to generate zk proofs about aspects of one's identity.
 
 Holonym website: https://holonym.id/
+
+## Requirements
+
+- Node ^16.14.2
+- Rollup (used for general bundling)
+- Browserify (used to handle the use of `process` in metamask extension package)
 
 ## Storage scheme
 
