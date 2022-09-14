@@ -3,7 +3,6 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import PasswordLogin from "../../components/atoms/PasswordLogin";
 import LandingPage from "../../components/LandingPage";
 import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
-import ConfirmSendToRelayer from "../../components/atoms/ConfirmSendToRelayer";
 import Success from "../../components/atoms/Success";
 import Loading from "../../components/atoms/Loading";
 
@@ -42,65 +41,6 @@ function AppRoutes() {
     chrome.runtime.sendMessage(message, callback);
   }
 
-  function onConfirmCredsContinue() {
-    navigate("/confirm-send-to-relayer", { replace: true });
-  }
-
-  async function handleconfirmShareProof() {
-    function addSmallLeaf() {
-      return new Promise((resolve, reject) => {
-        const message = {
-          command: "holoSendProofToRelayer",
-          proofType: "addSmallLeaf-country",
-        };
-        const callback = (resp) => resolve(resp);
-        chrome.runtime.sendMessage(message, callback);
-      });
-    }
-    function PoKoPoML() {
-      return new Promise((resolve, reject) => {
-        const message = {
-          command: "holoSendProofToRelayer",
-          proofType: "PoKoPoML-country",
-        };
-        const callback = (resp) => resolve(resp);
-        chrome.runtime.sendMessage(message, callback);
-      });
-    }
-    navigate("/loading-proofs", { replace: true });
-    // const addSmallLeafSuccess = await addSmallLeaf();
-    // const PoKoPoMLSuccess = await PoKoPoML();
-
-    let currentAccount;
-
-    // MetaMask stuff...
-    // TODO: Maybe move MetaMask stuff to App.js
-    const provider = createMetaMaskProvider();
-    function handleAccountsChanged(accounts) {
-      if (accounts.length === 0) {
-        // MetaMask is locked or the user has not connected any accounts
-        console.log("Please connect to MetaMask.");
-      } else if (accounts[0] !== currentAccount) {
-        currentAccount = accounts[0];
-        // Do any other work!
-      }
-      console.log("currentAccount...");
-      console.log(currentAccount);
-    }
-    provider
-      .request({ method: "eth_accounts" })
-      .then(handleAccountsChanged)
-      .catch((err) => {
-        // Some unexpected error.
-        // For backwards compatibility reasons, if no accounts are available,
-        // eth_accounts will return an empty array.
-        console.error(err);
-      });
-
-    // TODO: Submit these proofs to smart contract
-    navigate("/final-creds-success", { replace: true });
-  }
-
   function onExit() {
     const message = { command: "closingHoloCredentialsConfirmationPopup" };
     chrome.runtime.sendMessage(message);
@@ -129,35 +69,11 @@ function AppRoutes() {
             <div style={{ marginTop: "150px" }}>
               <Success
                 message={credsConfSuccessMessage}
-                onExit={onConfirmCredsContinue}
-                exitButtonText="Continue"
-              />
-            </div>
-          }
-        />
-        <Route
-          path="/confirm-send-to-relayer"
-          element={
-            <div style={{ marginTop: "150px" }}>
-              <ConfirmSendToRelayer onConfirmation={handleconfirmShareProof} />
-            </div>
-          }
-        />
-        <Route
-          path="/final-creds-success"
-          element={
-            <div style={{ marginTop: "150px" }}>
-              <Success
-                message={sendToRelayerSuccessMessage}
                 onExit={onExit}
                 exitButtonText="Close"
               />
             </div>
           }
-        />
-        <Route
-          path="/loading-proofs"
-          element={<Loading loadingMessage="Loading proofs..." />}
         />
       </Routes>
     </>
