@@ -6,6 +6,8 @@ import ResetAccount from "../../components/molecules/ResetAccount";
 import { sleep } from "../../../background/utils";
 
 const linkToStartVerification = process.env.LINK_TO_START_VERIFICATION;
+// const linkToProofPage = process.env.LINK_TO_PROOF_PAGE;
+const linkToProofPage = "google.com";
 
 function AppRoutes() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -77,6 +79,13 @@ function AppRoutes() {
               >
                 Reset Account
               </button> */}
+              <button
+                type="submit"
+                onClick={() => navigate("/proof-menu", { replace: true })}
+                className="wide-button center-block"
+              >
+                View Proof Menu
+              </button>
             </div>
           }
         />
@@ -88,6 +97,29 @@ function AppRoutes() {
             />
           }
         /> */}
+        <Route
+          path="/proof-menu"
+          element={
+            <div style={{ margin: "15px" }}>
+              <a
+                href={linkToProofPage + "/addSmallLeaf"}
+                target="_blank"
+                className="link wide-button center-block"
+              >
+                Generate addSmallLeaf Proof
+              </a>
+              <div style={{ marginTop: "10px" }}>
+                <button
+                  type="submit"
+                  onClick={() => navigate("/home", { replace: true })}
+                  className="wide-button center-block"
+                >
+                  Return To Credentials
+                </button>
+              </div>
+            </div>
+          }
+        />
       </Routes>
     </>
   );
