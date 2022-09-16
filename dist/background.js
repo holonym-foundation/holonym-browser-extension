@@ -26676,7 +26676,7 @@ const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 
 let extensionId = "oehcghhbelloglknnpdgoeammglelgna";
-switch("dev") {
+switch("production") {
   case "dev":
     extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
     break;
