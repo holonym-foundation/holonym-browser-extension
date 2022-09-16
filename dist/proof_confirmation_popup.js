@@ -34588,9 +34588,14 @@ function PasswordLogin({
   }, /*#__PURE__*/React$1.createElement("label", null, "Enter Password")), /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("input", {
     type: "password",
     name: "password",
-    defaultValue: "test",
-    className: "text-field"
+    placeholder: "password",
+    autoComplete: "current-password",
+    className: "password-input text-field"
   })), /*#__PURE__*/React$1.createElement("button", {
+    className: "x-button",
+    style: {
+      margin: "10px"
+    },
     type: "submit"
   }, "Submit"))));
 }
@@ -34688,19 +34693,14 @@ function Success({
     style: {
       textAlign: "center"
     }
-  }, /*#__PURE__*/React$1.createElement("h2", {
-    style: {
-      margin: "0px"
-    },
-    className: "header-base"
-  }, "Success!"), /*#__PURE__*/React$1.createElement("p", null, message)), /*#__PURE__*/React$1.createElement("div", {
+  }, /*#__PURE__*/React$1.createElement("h1", null, "Success!")), /*#__PURE__*/React$1.createElement("div", {
     style: {
       marginTop: "20px"
     }
   }, /*#__PURE__*/React$1.createElement("button", {
     type: "submit",
     onClick: onExit,
-    className: "wide-button center-block"
+    className: "x-button wide-button center-block"
   }, exitButtonText || "Close")));
 }
 

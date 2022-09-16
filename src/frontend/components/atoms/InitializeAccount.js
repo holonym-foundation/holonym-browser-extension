@@ -63,6 +63,7 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
             Submit
           </button>
         </form>
+        
       </div>
     </>
   );

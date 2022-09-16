@@ -117,7 +117,7 @@ button:hover {
 }
 
 .credential-name {
-  color: #ddd;
+  color: #fdc094;
 }
 
 .text-field {
@@ -274,10 +274,21 @@ button:hover {
 .x-button.small {
   padding: 15px 25px;
 }
+.h1 {
+  font-size: 67px;
+  color: #fff;
+}
 
+.h1.small {
+  width: 50%;
+}
+
+.h3 {
+  color: #fff;
+}
 @font-face {
-  font-family: "Clover Semibold";
-  src: url("./fonts/CloverDisplay-SemiBold.otf") format("opentype");
+  font-family: 'Clover Semibold';
+  src: url('./fonts/CloverDisplay-SemiBold.otf') format('opentype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -292,6 +303,13 @@ button:hover {
 @font-face {
   font-family: "Clover Medium";
   src: url("./fonts/CloverDisplay-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url("./fonts/Montserrat/static/Montserrat-Regular.ttf") format("opentype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;

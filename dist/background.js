@@ -26674,9 +26674,21 @@ let typeOfRequestedProof;
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
-const extensionId =
-  "cilbidmppfndfhjafdlngkaabddoofea"
-    ;
+
+let extensionId = "oehcghhbelloglknnpdgoeammglelgna";
+switch("dev") {
+  case "dev":
+    extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
+    break;
+  case "caleb":
+      extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
+      break;
+  case "nanak":
+    extensionId = "lgmhnpjmdlgddnjchckodphblmacnhdo";
+    break;
+}
+  
+console.log("extension ID should be ", extensionId);
 const popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",

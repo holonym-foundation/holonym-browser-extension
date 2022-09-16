@@ -95,6 +95,7 @@ export default [
       format: "es",
     },
     plugins: [
+      json(), // needed for MetaMask
       image(),
       resolve({
         browser: true,
@@ -102,6 +103,7 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        'require("stream");': 'require("readable-stream");',
         preventAssignment: true,
       }),
       babel({
