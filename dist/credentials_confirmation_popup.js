@@ -34747,11 +34747,15 @@ function LandingPage({
 
     getIsRegistered().then(val => setRegistered(val));
   }, []);
-  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
+  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+    style: {
+      marginTop: "150px"
+    }
+  }, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
     onAccountCreated: onLoginSuccess
   }) : /*#__PURE__*/React$1.createElement(PasswordLogin, {
     onLoginSuccess: onLoginSuccess
-  }));
+  })));
 }
 
 function Credentials({
@@ -34814,43 +34818,7 @@ function ConfirmCredentials({
   }, "Confirm")));
 }
 
-function ConfirmSendToRelayer({
-  onConfirmation
-}) {
-  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
-    style: {
-      textAlign: "center"
-    }
-  }, /*#__PURE__*/React$1.createElement("h2", {
-    className: "header-base"
-  }, "Confirm"), /*#__PURE__*/React$1.createElement("p", null, "Confirm that you would like to send your ZK proof of residence to a relayer.")), /*#__PURE__*/React$1.createElement("div", {
-    style: {
-      marginTop: "10px"
-    }
-  }, /*#__PURE__*/React$1.createElement("button", {
-    type: "submit",
-    onClick: onConfirmation,
-    className: "wide-button center-block"
-  }, "Confirm")));
-}
-
-function Loading({
-  loadingMessage
-}) {
-  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
-    style: {
-      textAlign: "center"
-    }
-  }, /*#__PURE__*/React$1.createElement("h2", {
-    style: {
-      margin: "0px"
-    },
-    className: "header-base"
-  }, loadingMessage || "Loading...")));
-}
-
 const credsConfSuccessMessage = "Your credentials have been encrypted and stored. " + "You can now generate zero knowledge proofs of identity.";
-const sendToRelayerSuccessMessage = "Your anonymous proof of residence has been sent to a relayer to put on chain.";
 
 function AppRoutes() {
   const [credentials, setCredentials] = react.exports.useState();
@@ -34893,50 +34861,6 @@ function AppRoutes() {
     chrome.runtime.sendMessage(message, callback);
   }
 
-  function onConfirmCredsContinue() {
-    navigate("/confirm-send-to-relayer", {
-      replace: true
-    });
-  }
-
-  async function handleconfirmShareProof() {
-
-    navigate("/loading-proofs", {
-      replace: true
-    }); // const addSmallLeafSuccess = await addSmallLeaf();
-    // const PoKoPoMLSuccess = await PoKoPoML();
-
-    let currentAccount; // MetaMask stuff...
-    // TODO: Maybe move MetaMask stuff to App.js
-
-    const provider = createMetaMaskProvider();
-
-    function handleAccountsChanged(accounts) {
-      if (accounts.length === 0) {
-        // MetaMask is locked or the user has not connected any accounts
-        console.log("Please connect to MetaMask.");
-      } else if (accounts[0] !== currentAccount) {
-        currentAccount = accounts[0]; // Do any other work!
-      }
-
-      console.log("currentAccount...");
-      console.log(currentAccount);
-    }
-
-    provider.request({
-      method: "eth_accounts"
-    }).then(handleAccountsChanged).catch(err => {
-      // Some unexpected error.
-      // For backwards compatibility reasons, if no accounts are available,
-      // eth_accounts will return an empty array.
-      console.error(err);
-    }); // TODO: Submit these proofs to smart contract
-
-    navigate("/final-creds-success", {
-      replace: true
-    });
-  }
-
   function onExit() {
     const message = {
       command: "closingHoloCredentialsConfirmationPopup"
@@ -34964,34 +34888,9 @@ function AppRoutes() {
       }
     }, /*#__PURE__*/React$1.createElement(Success, {
       message: credsConfSuccessMessage,
-      onExit: onConfirmCredsContinue,
-      exitButtonText: "Continue"
-    }))
-  }), /*#__PURE__*/React$1.createElement(Route, {
-    path: "/confirm-send-to-relayer",
-    element: /*#__PURE__*/React$1.createElement("div", {
-      style: {
-        marginTop: "150px"
-      }
-    }, /*#__PURE__*/React$1.createElement(ConfirmSendToRelayer, {
-      onConfirmation: handleconfirmShareProof
-    }))
-  }), /*#__PURE__*/React$1.createElement(Route, {
-    path: "/final-creds-success",
-    element: /*#__PURE__*/React$1.createElement("div", {
-      style: {
-        marginTop: "150px"
-      }
-    }, /*#__PURE__*/React$1.createElement(Success, {
-      message: sendToRelayerSuccessMessage,
       onExit: onExit,
       exitButtonText: "Close"
     }))
-  }), /*#__PURE__*/React$1.createElement(Route, {
-    path: "/loading-proofs",
-    element: /*#__PURE__*/React$1.createElement(Loading, {
-      loadingMessage: "Loading proofs..."
-    })
   })));
 }
 

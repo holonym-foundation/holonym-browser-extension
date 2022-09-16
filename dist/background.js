@@ -26668,7 +26668,6 @@ class ProofGenerator {
 
 // TODO: Use an event emitter in place of some of these global variables
 let credentialsConfirmationPopupIsOpen = false;
-let proofConfirmationPopupIsOpen = false;
 let confirmShareProof = false;
 let generatingProof = false;
 let typeOfRequestedProof;
@@ -26688,7 +26687,6 @@ const allowedPopupCommands = [
   "holoChangePassword",
   "holoInitializeAccount",
   "holoGetIsRegistered",
-  "holoSendProofToRelayer", // Triggers response to original setHoloCredentials message
   "confirmShareProof",
   "getTypeOfRequestedProof",
   "closingHoloCredentialsConfirmationPopup",
@@ -26791,27 +26789,6 @@ function popupListener(request, sender, sendResponse) {
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
     return true;
-  } else if (command == "holoSendProofToRelayer") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    const proofType = request.proofType; // e.g., addSmallLeaf
-    holoStore
-      .getCredentials()
-      .then((encryptedMsg) =>
-        cryptoController.decryptWithPrivateKey(
-          encryptedMsg.credentials,
-          encryptedMsg.sharded
-        )
-      )
-      .then((decryptedCreds) => {
-        return ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType);
-      })
-      .then((proof) => {
-        // TODO: send proof to relayer
-        return true;
-      })
-      .then((sendProofSuccess) => sendResponse({ success: sendProofSuccess }));
-    return true;
   } else if (command == "confirmShareProof") {
     async function waitForProofToBeGenerated() {
       const timeout = new Date().getTime() + 180 * 1000;
@@ -26829,9 +26806,7 @@ function popupListener(request, sender, sendResponse) {
     sendResponse({ proofType: typeOfRequestedProof });
   } else if (command == "closingHoloCredentialsConfirmationPopup") {
     credentialsConfirmationPopupIsOpen = false;
-  } else if (command == "closingHoloProofConfirmationPopup") {
-    proofConfirmationPopupIsOpen = false;
-  }
+  } else ;
 }
 
 /**
@@ -26844,8 +26819,6 @@ async function displayConfirmationPopup(type) {
     credentialsConfirmationPopupIsOpen = true;
     url = "credentials_confirmation_popup.html";
   } else if (type == "proof") {
-    if (proofConfirmationPopupIsOpen) return;
-    proofConfirmationPopupIsOpen = true;
     url = "proof_confirmation_popup.html";
   }
   const config = {
@@ -26862,7 +26835,6 @@ async function displayConfirmationPopup(type) {
   } catch (err) {
     console.log(err);
     credentialsConfirmationPopupIsOpen = false;
-    proofConfirmationPopupIsOpen = false;
   }
 }
 
@@ -26954,6 +26926,8 @@ function webPageListener(request, sender, sendResponse) {
         return ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType);
       })
       .then((proof) => {
+        console.log("generated proof...");
+        console.log(proof);
         generatingProof = false;
         sendResponse(proof);
       });

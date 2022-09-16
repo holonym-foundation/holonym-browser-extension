@@ -34770,11 +34770,15 @@ function LandingPage({
 
     getIsRegistered().then(val => setRegistered(val));
   }, []);
-  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
+  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+    style: {
+      marginTop: "150px"
+    }
+  }, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
     onAccountCreated: onLoginSuccess
   }) : /*#__PURE__*/React$1.createElement(PasswordLogin, {
     onLoginSuccess: onLoginSuccess
-  }));
+  })));
 }
 
 function Credentials({
@@ -60393,6 +60397,9 @@ buffer.Buffer.from("00".repeat(26) + "0002", "hex"); // Max length of encrypt-ab
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+const linkToStartVerification = 'http://localhost:3002/zk-id/verify';
+const linkToProofPage = 'http://localhost:3002/zk-id/proofs';
+
 function AppRoutes() {
   const [loggedIn, setLoggedIn] = react.exports.useState(false);
   const [credentials, setCredentials] = react.exports.useState();
@@ -60448,11 +60455,49 @@ function AppRoutes() {
     })
   }), /*#__PURE__*/React$1.createElement(Route, {
     path: "/home",
-    element: /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("h2", {
+    element: /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("div", {
+      style: {
+        margin: "15px"
+      }
+    }, !credentials && /*#__PURE__*/React$1.createElement("a", {
+      href: linkToStartVerification,
+      target: "_blank",
+      className: "link wide-button center-block"
+    }, "Get your credentials")), /*#__PURE__*/React$1.createElement("h2", {
       className: "header-base"
     }, "Credentials"), /*#__PURE__*/React$1.createElement(Credentials, {
       credentials: credentials
-    }))
+    }), /*#__PURE__*/React$1.createElement("button", {
+      type: "submit",
+      onClick: () => navigate("/proof-menu", {
+        replace: true
+      }),
+      className: "wide-button center-block"
+    }, "View Proof Menu"))
+  }), /*#__PURE__*/React$1.createElement(Route, {
+    path: "/proof-menu",
+    element: /*#__PURE__*/React$1.createElement("div", {
+      style: {
+        marginTop: "150px"
+      }
+    }, /*#__PURE__*/React$1.createElement("a", {
+      href: linkToProofPage + "/lobby3",
+      target: "_blank",
+      style: {
+        marginTop: "10px"
+      },
+      className: "link wide-button center-block"
+    }, "Generate Lobby3 Proofs"), /*#__PURE__*/React$1.createElement("div", {
+      style: {
+        marginTop: "10px"
+      }
+    }, /*#__PURE__*/React$1.createElement("button", {
+      type: "submit",
+      onClick: () => navigate("/home", {
+        replace: true
+      }),
+      className: "wide-button center-block"
+    }, "Return To Credentials")))
   })));
 }
 
