@@ -33,45 +33,27 @@
  */
 
 const credentialNames = [
-  "firstName",
-  "lastName",
-  "middleInitial",
   "countryCode",
-  "streetAddr1",
-  "streetAddr2",
   "city",
   "subdivision",
-  "postalCode",
   "completedAt",
   "birthdate",
 ];
 
 const secretNames = [
   "bigCredsSecret",
-  "firstNameSecret",
-  "lastNameSecret",
-  "middleInitialSecret",
   "countryCodeSecret",
-  "streetAddr1Secret",
-  "streetAddr2Secret",
   "citySecret",
   "subdivisionSecret",
-  "postalCodeSecret",
   "completedAtSecret",
   "birthdateSecret",
 ];
 
 const signatureNames = [
   "bigCredsSignature",
-  "firstNameSignature",
-  "lastNameSignature",
-  "middleInitialSignature",
   "countryCodeSignature",
-  "streetAddr1Signature",
-  "streetAddr2Signature",
   "citySignature",
   "subdivisionSignature",
-  "postalCodeSignature",
   "completedAtSignature",
   "birthdateSignature",
 ];
