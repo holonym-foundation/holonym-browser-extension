@@ -1,6 +1,7 @@
 node_modules/
 prod-materials/
-.DS_Store/
+.DS_Store
+*/.DS_Store
 .parcel-cache/
 
 .vscode/

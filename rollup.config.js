@@ -10,6 +10,14 @@ dotenv.config();
 
 // TODO: Change 'dev' to 'production' before bundling for production
 const NODE_ENV = JSON.stringify(process.env.NODE_ENV);
+const linkToStartVerification =
+  process.env.NODE_ENV == "dev"
+    ? "'http://localhost:3002/zk-id/verify'"
+    : "'https://app.holonym.id/zk-id/verify'";
+const linkToProofPage =
+  process.env.NODE_ENV == "dev"
+    ? "'http://localhost:3002/zk-id/proofs'"
+    : "'https://app.holonym.id/zk-id/proofs'";
 
 export default [
   // {
@@ -67,6 +75,8 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        "process.env.LINK_TO_START_VERIFICATION": linkToStartVerification,
+        "process.env.LINK_TO_PROOF_PAGE": linkToProofPage,
         preventAssignment: true,
       }),
       babel({
@@ -78,12 +88,38 @@ export default [
     ],
   },
   {
-    // Confirmation popup script
-    input: "./src/frontend/popups/confirmation/index.js",
+    // Credentials confirmation popup script
+    input: "./src/frontend/popups/confirmation-credentials/index.js",
     output: {
-      // Bundled into temp folder. Browserify is then used to bundle into dist folder.
-      file: "./rollup-temp/confirmation_popup.js",
-      format: "cjs",
+      file: "./dist/credentials_confirmation_popup.js",
+      format: "es",
+    },
+    plugins: [
+      json(), // needed for MetaMask
+      image(),
+      resolve({
+        browser: true,
+        preferBuiltins: false,
+      }),
+      replace({
+        "process.env.NODE_ENV": NODE_ENV,
+        'require("stream");': 'require("readable-stream");',
+        preventAssignment: true,
+      }),
+      babel({
+        presets: ["@babel/preset-react"],
+        babelHelpers: "bundled",
+        exclude: "node_modules/**",
+      }),
+      commonjs(),
+    ],
+  },
+  {
+    // Proof confirmation popup script
+    input: "./src/frontend/popups/confirmation-proof/index.js",
+    output: {
+      file: "./dist/proof_confirmation_popup.js",
+      format: "es",
     },
     plugins: [
       json(), // needed for MetaMask

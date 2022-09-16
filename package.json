@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "build": "bash build.sh"
+    "build": "bash build.sh",
+    "view-on-mac": "bash build.sh; open dist/default_popup.html"
   },
   "license": "MIT",
   "dependencies": {
@@ -16,6 +17,7 @@
     "metamask-extension-provider": "^3.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-password-strength-bar": "^0.4.1",
     "react-router-dom": "^6.3.0",
     "readable-stream": "^4.1.0"
   },
