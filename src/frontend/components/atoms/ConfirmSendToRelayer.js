@@ -4,7 +4,7 @@ function ConfirmSendToRelayer({ onConfirmation }) {
   return (
     <>
       <div style={{ textAlign: "center" }}>
-        <h2 className="header-base">Confirm</h2>
+        <h1>Confirm</h1>
         <p>
           Confirm that you would like to send your ZK proof of residence to a relayer.
         </p>
@@ -13,7 +13,7 @@ function ConfirmSendToRelayer({ onConfirmation }) {
         <button
           type="submit"
           onClick={onConfirmation}
-          className="wide-button center-block"
+          className="wide-button center-block x-button"
         >
           Confirm
         </button>
