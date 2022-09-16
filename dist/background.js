@@ -26546,6 +26546,8 @@ buffer.Buffer.from("00".repeat(26) + "0002", "hex");
 // modulusLength == 4096: 446 characters.
 const maxEncryptableLength = 446;
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 const serverPublicKey = {
   key_ops: ["encrypt"],
   ext: true,
@@ -26664,12 +26666,30 @@ class ProofGenerator {
 // Functions for listening to messages from popups
 // --------------------------------------------------------------
 
-let confirmationPopupIsOpen = false;
+// TODO: Use an event emitter in place of some of these global variables
+let credentialsConfirmationPopupIsOpen = false;
+let proofConfirmationPopupIsOpen = false;
+let confirmShareProof = false;
+let generatingProof = false;
+let typeOfRequestedProof;
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
-const extensionId =
-  "oehcghhbelloglknnpdgoeammglelgna";
+
+let extensionId = "oehcghhbelloglknnpdgoeammglelgna";
+switch(undefined) {
+  case "dev":
+    extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
+    break;
+  case "caleb":
+      extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
+      break;
+  case "nanak":
+    extensionId = "lgmhnpjmdlgddnjchckodphblmacnhdo";
+    break;
+}
+  
+console.log("extension ID should be ", extensionId);
 const popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
@@ -26681,7 +26701,10 @@ const allowedPopupCommands = [
   "holoInitializeAccount",
   "holoGetIsRegistered",
   "holoSendProofToRelayer", // Triggers response to original setHoloCredentials message
-  "closingHoloConfirmationPopup",
+  "confirmShareProof",
+  "getTypeOfRequestedProof",
+  "closingHoloCredentialsConfirmationPopup",
+  "closingHoloProofConfirmationPopup",
 ];
 
 function popupListener(request, sender, sendResponse) {
@@ -26801,14 +26824,42 @@ function popupListener(request, sender, sendResponse) {
       })
       .then((sendProofSuccess) => sendResponse({ success: sendProofSuccess }));
     return true;
-  } else if (command == "closingHoloConfirmationPopup") {
-    confirmationPopupIsOpen = false;
+  } else if (command == "confirmShareProof") {
+    async function waitForProofToBeGenerated() {
+      const timeout = new Date().getTime() + 180 * 1000;
+      while (new Date().getTime() <= timeout && generatingProof) {
+        await sleep(50);
+      }
+    }
+    confirmShareProof = true;
+    generatingProof = true;
+    waitForProofToBeGenerated().then(() => {
+      sendResponse({ finished: true });
+    });
+    return true;
+  } else if (command == "getTypeOfRequestedProof") {
+    sendResponse({ proofType: typeOfRequestedProof });
+  } else if (command == "closingHoloCredentialsConfirmationPopup") {
+    credentialsConfirmationPopupIsOpen = false;
+  } else if (command == "closingHoloProofConfirmationPopup") {
+    proofConfirmationPopupIsOpen = false;
   }
 }
 
-async function displayConfirmationPopup() {
-  if (confirmationPopupIsOpen) return;
-  confirmationPopupIsOpen = true;
+/**
+ * @param {string} type Either "credentials" or "proof"; the desired popup type
+ */
+async function displayConfirmationPopup(type) {
+  let url = "";
+  if (type == "credentials") {
+    if (credentialsConfirmationPopupIsOpen) return;
+    credentialsConfirmationPopupIsOpen = true;
+    url = "credentials_confirmation_popup.html";
+  } else if (type == "proof") {
+    if (proofConfirmationPopupIsOpen) return;
+    proofConfirmationPopupIsOpen = true;
+    url = "proof_confirmation_popup.html";
+  }
   const config = {
     focused: true,
     height: 530,
@@ -26816,13 +26867,14 @@ async function displayConfirmationPopup() {
     incognito: false,
     setSelfAsOpener: false,
     type: "popup",
-    url: "confirmation_popup.html",
+    url: url,
   };
   try {
     const window = await chrome.windows.create(config);
   } catch (err) {
     console.log(err);
-    confirmationPopupIsOpen = false;
+    credentialsConfirmationPopupIsOpen = false;
+    proofConfirmationPopupIsOpen = false;
   }
 }
 
@@ -26844,9 +26896,9 @@ function getPublicKey() {
 const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
 const allowedWebPageCommands = [
   "getHoloPublicKey",
-  // "getHoloCredentials", // TODO: Don't let frontend retrieve credentials. Call proofs endpoint from within extension
   "setHoloCredentials",
   "holoGetIsRegistered",
+  "holoGenerateProof",
 ];
 
 // Listener function for messages from webpage
@@ -26858,7 +26910,7 @@ function webPageListener(request, sender, sendResponse) {
   const command = request.command;
   const messageIsSharded = request.sharded;
   const newCreds = request.credentials;
-  request.proof;
+  const proofType = request.proofType;
 
   if (!allowedWebPageCommands.includes(command)) {
     return;
@@ -26872,12 +26924,51 @@ function webPageListener(request, sender, sendResponse) {
       sharded: messageIsSharded,
       credentials: newCreds,
     };
-    holoStore.setLatestMessage(latestMessage).then(() => displayConfirmationPopup());
+    holoStore
+      .setLatestMessage(latestMessage)
+      .then(() => displayConfirmationPopup("credentials"));
     return;
   } else if (command == "holoGetIsRegistered") {
     cryptoController
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
+    return true;
+  } else if (command == "holoGenerateProof") {
+    async function waitForConfirmation() {
+      typeOfRequestedProof = proofType;
+      const timeout = new Date().getTime() + 180 * 1000;
+      while (new Date().getTime() <= timeout && !confirmShareProof) {
+        await sleep(50);
+      }
+      typeOfRequestedProof = ""; // reset
+      return confirmShareProof;
+    }
+    // TODO: Delete this log
+    console.log(`holoGenerateProof: received request for proof: ${proofType}`);
+    displayConfirmationPopup("proof");
+    waitForConfirmation()
+      .then((confirmShare) => {
+        console.log(`confirmShare: ${confirmShare}`);
+        if (!confirmShare) return;
+        confirmShareProof = false; // reset
+        const loggedIn = cryptoController.getIsLoggedIn();
+        if (!loggedIn) return;
+        return holoStore.getCredentials();
+      })
+      .then((encryptedMsg) =>
+        cryptoController.decryptWithPrivateKey(
+          encryptedMsg.credentials,
+          encryptedMsg.sharded
+        )
+      )
+      .then((decryptedCreds) => {
+        console.log("generating proof...");
+        return ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType);
+      })
+      .then((proof) => {
+        generatingProof = false;
+        sendResponse(proof);
+      });
     return true;
   }
 }

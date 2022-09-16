@@ -35,7 +35,7 @@ function ChangePassword({ onPasswordChange }) {
               type="text"
               name="old-password"
               defaultValue="test"
-              className="password-input"
+              className="text-field"
             />
           </div>
           <div>
@@ -43,10 +43,10 @@ function ChangePassword({ onPasswordChange }) {
               <label>New Password</label>
             </div>
             <input
-              type="text"
+              type="password"
               name="new-password"
               defaultValue="test"
-              className="password-input"
+              className="text-field"
             />
           </div>
           <button type="submit">Submit</button>

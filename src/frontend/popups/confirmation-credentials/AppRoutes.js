@@ -47,7 +47,7 @@ function AppRoutes() {
     navigate("/confirm-send-to-relayer", { replace: true });
   }
 
-  async function handleConfirmSendProof() {
+  async function handleconfirmShareProof() {
     function addSmallLeaf() {
       return new Promise((resolve, reject) => {
         const message = {
@@ -103,7 +103,7 @@ function AppRoutes() {
   }
 
   function onExit() {
-    const message = { command: "closingHoloConfirmationPopup" };
+    const message = { command: "closingHoloCredentialsConfirmationPopup" };
     chrome.runtime.sendMessage(message);
     window.close();
   }
@@ -168,7 +168,7 @@ function AppRoutes() {
           path="/confirm-send-to-relayer"
           element={
             <div style={{ marginTop: "150px" }}>
-              <ConfirmSendToRelayer onConfirmation={handleConfirmSendProof} />
+              <ConfirmSendToRelayer onConfirmation={handleconfirmShareProof} />
             </div>
           }
         />
@@ -179,7 +179,7 @@ function AppRoutes() {
               <Success
                 message={sendToRelayerSuccessMessage}
                 onExit={onExit}
-                exitButtonText="Exit"
+                exitButtonText="Close"
               />
             </div>
           }

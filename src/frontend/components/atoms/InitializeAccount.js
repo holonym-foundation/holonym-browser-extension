@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PasswordStrengthBar from 'react-password-strength-bar';
+import PasswordStrengthBar from "react-password-strength-bar";
 
 // NOTE: Use with care.
 // This component can be used for (a) first-time account setup and (b) account resets.
@@ -9,9 +9,9 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
   const [passwordScore, setPasswordScore] = useState(0);
   async function handleInitialize(event) {
     event.preventDefault();
-    if(passwordScore < 4){
+    if (passwordScore < 4) {
       alert("Please choose a stronger password");
-      return
+      return;
     }
     function initializeAccount() {
       return new Promise((resolve) => {
@@ -45,18 +45,23 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
               type="password"
               name="password"
               value={password}
-              onChange={(e)=>setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
               autoComplete="current-password"
-              className="password-input text-field"
+              className="text-field"
             />
           </div>
-          <div style={{ display: "flex", justifyContent: "center" }} >
-            <div style={{ width:"35%", margin: "8px" }}>
-              <PasswordStrengthBar password={password} onChangeScore={(score, feedback) => setPasswordScore(score)} />
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{ width: "35%", margin: "8px" }}>
+              <PasswordStrengthBar
+                password={password}
+                onChangeScore={(score, feedback) => setPasswordScore(score)}
+              />
             </div>
           </div>
-          <button className="x-button" style={{ margin:"10px" }} type="submit">Submit</button>
+          <button className="x-button" style={{ margin: "10px" }} type="submit">
+            Submit
+          </button>
         </form>
         
       </div>
