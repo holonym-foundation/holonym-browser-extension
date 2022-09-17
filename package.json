@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "build": "bash build.sh",
+    "build:dev": "NODE_ENV=dev && bash build.sh",
+    "build:prod": "NODE_ENV=production && bash build.sh",
     "view-on-mac": "bash build.sh; open dist/default_popup.html"
   },
   "license": "MIT",
@@ -11,7 +12,6 @@
     "blakejs": "^1.2.1",
     "browser-passworder": "^2.0.3",
     "buffer": "^6.0.3",
-    "dotenv": "^16.0.2",
     "ethers": "^5.6.9",
     "events": "^3.3.0",
     "react": "^18.2.0",
