@@ -558,45 +558,27 @@ class CryptoController {
  */
 
 const credentialNames = [
-  "firstName",
-  "lastName",
-  "middleInitial",
   "countryCode",
-  "streetAddr1",
-  "streetAddr2",
   "city",
   "subdivision",
-  "postalCode",
   "completedAt",
   "birthdate",
 ];
 
 const secretNames = [
   "bigCredsSecret",
-  "firstNameSecret",
-  "lastNameSecret",
-  "middleInitialSecret",
   "countryCodeSecret",
-  "streetAddr1Secret",
-  "streetAddr2Secret",
   "citySecret",
   "subdivisionSecret",
-  "postalCodeSecret",
   "completedAtSecret",
   "birthdateSecret",
 ];
 
 const signatureNames = [
   "bigCredsSignature",
-  "firstNameSignature",
-  "lastNameSignature",
-  "middleInitialSignature",
   "countryCodeSignature",
-  "streetAddr1Signature",
-  "streetAddr2Signature",
   "citySignature",
   "subdivisionSignature",
-  "postalCodeSignature",
   "completedAtSignature",
   "birthdateSignature",
 ];
@@ -26536,8 +26518,6 @@ try {
 }
 catch (error) { }
 
-// export const zkIdVerifyEndpoint = 'https://zk.sciverse.id'
-const zkIdVerifyEndpoint = "http://localhost:3000"; // For tests
 buffer.Buffer.concat([buffer.Buffer.from("")], 3);
 
 buffer.Buffer.from("00".repeat(26) + "0002", "hex");
@@ -26614,7 +26594,7 @@ class ProofGenerator {
       JSON.stringify(args)
     );
     const resp = await fetch(
-      `${zkIdVerifyEndpoint}/proofs/addSmallLeaf?args=${encryptedArgs}`
+      `${process.env.LINK_TO_PROOF_PAGE}/addSmallLeaf?args=${encryptedArgs}`
     );
     const data = await resp.json();
     // shape of response: { data: smallLeafProof: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] },  newSecret: newSecretAsBuffer.toString("hex") }
@@ -26648,7 +26628,7 @@ class ProofGenerator {
       ? JSON.stringify(encryptedMessage)
       : encryptedMessage;
     const resp = await fetch(
-      `${zkIdVerifyEndpoint}/proofs/proveKnowledgeOfPreimageOfMemberLeaf?args=${encryptedArgs}&sharded=${sharded}`
+      `${process.env.LINK_TO_PROOF_PAGE}/proveKnowledgeOfPreimageOfMemberLeaf?args=${encryptedArgs}&sharded=${sharded}`
     );
     await resp.json();
     // shape of response: { data: proofOfKnowledgeOfPreimage: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] } }
@@ -26676,7 +26656,7 @@ const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 
 let extensionId = "oehcghhbelloglknnpdgoeammglelgna";
-switch("production") {
+switch(undefined) {
   case "dev":
     extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
     break;
