@@ -50,10 +50,12 @@ function AppRoutes() {
         <Route
           path="/confirm-share-proof"
           element={
-            <ConfirmShareProof
-              proofType={proofType}
-              onConfirmation={handleConfirmation}
-            />
+            <div style={{ marginTop: "150px" }}>
+              <ConfirmShareProof
+                proofType={proofType}
+                onConfirmation={handleConfirmation}
+              />
+            </div>
           }
         />
         <Route

@@ -34776,11 +34776,15 @@ function LandingPage({
 
     getIsRegistered().then(val => setRegistered(val));
   }, []);
-  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
+  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+    style: {
+      marginTop: "150px"
+    }
+  }, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
     onAccountCreated: onLoginSuccess
   }) : /*#__PURE__*/React$1.createElement(PasswordLogin, {
     onLoginSuccess: onLoginSuccess
-  }));
+  })));
 }
 
 function ConfirmShareProof({
@@ -34877,10 +34881,14 @@ function AppRoutes() {
     })
   }), /*#__PURE__*/React$1.createElement(Route, {
     path: "/confirm-share-proof",
-    element: /*#__PURE__*/React$1.createElement(ConfirmShareProof, {
+    element: /*#__PURE__*/React$1.createElement("div", {
+      style: {
+        marginTop: "150px"
+      }
+    }, /*#__PURE__*/React$1.createElement(ConfirmShareProof, {
       proofType: proofType,
       onConfirmation: handleConfirmation
-    })
+    }))
   }), /*#__PURE__*/React$1.createElement(Route, {
     path: "/loading-share-proof",
     element: /*#__PURE__*/React$1.createElement("div", {

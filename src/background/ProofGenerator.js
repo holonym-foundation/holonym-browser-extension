@@ -1,11 +1,7 @@
 import { Buffer } from "buffer/";
 import { IncrementalMerkleTree } from "@zk-kit/incremental-merkle-tree";
 import { encryptForServer, createSmallLeaf } from "./utils";
-import {
-  zkIdVerifyEndpoint,
-  serverAddress,
-  unitedStatesCredsBuffer,
-} from "./constants";
+import { serverAddress, unitedStatesCredsBuffer } from "./constants";
 
 class ProofGenerator {
   static async generateProof(credentials, proofType) {
@@ -33,7 +29,7 @@ class ProofGenerator {
       JSON.stringify(args)
     );
     const resp = await fetch(
-      `${zkIdVerifyEndpoint}/proofs/addSmallLeaf?args=${encryptedArgs}`
+      `${process.env.LINK_TO_PROOF_PAGE}/addSmallLeaf?args=${encryptedArgs}`
     );
     const data = await resp.json();
     // shape of response: { data: smallLeafProof: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] },  newSecret: newSecretAsBuffer.toString("hex") }
@@ -70,7 +66,7 @@ class ProofGenerator {
       ? JSON.stringify(encryptedMessage)
       : encryptedMessage;
     const resp = await fetch(
-      `${zkIdVerifyEndpoint}/proofs/proveKnowledgeOfPreimageOfMemberLeaf?args=${encryptedArgs}&sharded=${sharded}`
+      `${process.env.LINK_TO_PROOF_PAGE}/proveKnowledgeOfPreimageOfMemberLeaf?args=${encryptedArgs}&sharded=${sharded}`
     );
     const data = await resp.json();
     // shape of response: { data: proofOfKnowledgeOfPreimage: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] } }

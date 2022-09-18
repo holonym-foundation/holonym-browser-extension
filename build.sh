@@ -12,8 +12,6 @@ cp ./src/frontend/img/* ./dist # copy icons
 # Bundle
 rollup --config rollup.config.js
 
-browserify ./rollup-temp/confirmation_popup.js > ./dist/confirmation_popup.js
-
 # zip for production
 printf "\nzipping ./dist\n"
 zip -r ./prod-materials/dist.zip ./dist

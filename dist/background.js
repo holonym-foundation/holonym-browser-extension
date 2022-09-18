@@ -558,45 +558,27 @@ class CryptoController {
  */
 
 const credentialNames = [
-  "firstName",
-  "lastName",
-  "middleInitial",
   "countryCode",
-  "streetAddr1",
-  "streetAddr2",
   "city",
   "subdivision",
-  "postalCode",
   "completedAt",
   "birthdate",
 ];
 
 const secretNames = [
   "bigCredsSecret",
-  "firstNameSecret",
-  "lastNameSecret",
-  "middleInitialSecret",
   "countryCodeSecret",
-  "streetAddr1Secret",
-  "streetAddr2Secret",
   "citySecret",
   "subdivisionSecret",
-  "postalCodeSecret",
   "completedAtSecret",
   "birthdateSecret",
 ];
 
 const signatureNames = [
   "bigCredsSignature",
-  "firstNameSignature",
-  "lastNameSignature",
-  "middleInitialSignature",
   "countryCodeSignature",
-  "streetAddr1Signature",
-  "streetAddr2Signature",
   "citySignature",
   "subdivisionSignature",
-  "postalCodeSignature",
   "completedAtSignature",
   "birthdateSignature",
 ];
@@ -26536,8 +26518,6 @@ try {
 }
 catch (error) { }
 
-// export const zkIdVerifyEndpoint = 'https://zk.sciverse.id'
-const zkIdVerifyEndpoint = "http://localhost:3000"; // For tests
 buffer.Buffer.concat([buffer.Buffer.from("")], 3);
 
 buffer.Buffer.from("00".repeat(26) + "0002", "hex");
@@ -26614,7 +26594,7 @@ class ProofGenerator {
       JSON.stringify(args)
     );
     const resp = await fetch(
-      `${zkIdVerifyEndpoint}/proofs/addSmallLeaf?args=${encryptedArgs}`
+      `${process.env.LINK_TO_PROOF_PAGE}/addSmallLeaf?args=${encryptedArgs}`
     );
     const data = await resp.json();
     // shape of response: { data: smallLeafProof: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] },  newSecret: newSecretAsBuffer.toString("hex") }
@@ -26648,7 +26628,7 @@ class ProofGenerator {
       ? JSON.stringify(encryptedMessage)
       : encryptedMessage;
     const resp = await fetch(
-      `${zkIdVerifyEndpoint}/proofs/proveKnowledgeOfPreimageOfMemberLeaf?args=${encryptedArgs}&sharded=${sharded}`
+      `${process.env.LINK_TO_PROOF_PAGE}/proveKnowledgeOfPreimageOfMemberLeaf?args=${encryptedArgs}&sharded=${sharded}`
     );
     await resp.json();
     // shape of response: { data: proofOfKnowledgeOfPreimage: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] } }
@@ -26668,7 +26648,6 @@ class ProofGenerator {
 
 // TODO: Use an event emitter in place of some of these global variables
 let credentialsConfirmationPopupIsOpen = false;
-let proofConfirmationPopupIsOpen = false;
 let confirmShareProof = false;
 let generatingProof = false;
 let typeOfRequestedProof;
@@ -26700,7 +26679,6 @@ const allowedPopupCommands = [
   "holoChangePassword",
   "holoInitializeAccount",
   "holoGetIsRegistered",
-  "holoSendProofToRelayer", // Triggers response to original setHoloCredentials message
   "confirmShareProof",
   "getTypeOfRequestedProof",
   "closingHoloCredentialsConfirmationPopup",
@@ -26803,27 +26781,6 @@ function popupListener(request, sender, sendResponse) {
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
     return true;
-  } else if (command == "holoSendProofToRelayer") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    const proofType = request.proofType; // e.g., addSmallLeaf
-    holoStore
-      .getCredentials()
-      .then((encryptedMsg) =>
-        cryptoController.decryptWithPrivateKey(
-          encryptedMsg.credentials,
-          encryptedMsg.sharded
-        )
-      )
-      .then((decryptedCreds) => {
-        return ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType);
-      })
-      .then((proof) => {
-        // TODO: send proof to relayer
-        return true;
-      })
-      .then((sendProofSuccess) => sendResponse({ success: sendProofSuccess }));
-    return true;
   } else if (command == "confirmShareProof") {
     async function waitForProofToBeGenerated() {
       const timeout = new Date().getTime() + 180 * 1000;
@@ -26841,9 +26798,7 @@ function popupListener(request, sender, sendResponse) {
     sendResponse({ proofType: typeOfRequestedProof });
   } else if (command == "closingHoloCredentialsConfirmationPopup") {
     credentialsConfirmationPopupIsOpen = false;
-  } else if (command == "closingHoloProofConfirmationPopup") {
-    proofConfirmationPopupIsOpen = false;
-  }
+  } else ;
 }
 
 /**
@@ -26856,8 +26811,6 @@ async function displayConfirmationPopup(type) {
     credentialsConfirmationPopupIsOpen = true;
     url = "credentials_confirmation_popup.html";
   } else if (type == "proof") {
-    if (proofConfirmationPopupIsOpen) return;
-    proofConfirmationPopupIsOpen = true;
     url = "proof_confirmation_popup.html";
   }
   const config = {
@@ -26874,7 +26827,6 @@ async function displayConfirmationPopup(type) {
   } catch (err) {
     console.log(err);
     credentialsConfirmationPopupIsOpen = false;
-    proofConfirmationPopupIsOpen = false;
   }
 }
 
@@ -26966,6 +26918,8 @@ function webPageListener(request, sender, sendResponse) {
         return ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType);
       })
       .then((proof) => {
+        console.log("generated proof...");
+        console.log(proof);
         generatingProof = false;
         sendResponse(proof);
       });

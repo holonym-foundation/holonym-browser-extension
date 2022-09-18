@@ -34813,11 +34813,15 @@ function LandingPage({
 
     getIsRegistered().then(val => setRegistered(val));
   }, []);
-  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
+  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+    style: {
+      marginTop: "150px"
+    }
+  }, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
     onAccountCreated: onLoginSuccess
   }) : /*#__PURE__*/React$1.createElement(PasswordLogin, {
     onLoginSuccess: onLoginSuccess
-  }));
+  })));
 }
 
 function Credentials({
@@ -60521,23 +60525,16 @@ function AppRoutes() {
     path: "/proof-menu",
     element: /*#__PURE__*/React$1.createElement("div", {
       style: {
-        margin: "15px"
+        marginTop: "150px"
       }
     }, /*#__PURE__*/React$1.createElement("a", {
-      href: linkToProofPage + "/addSmallLeaf",
+      href: linkToProofPage + "/lobby3",
       target: "_blank",
       style: {
         marginTop: "10px"
       },
       className: "link wide-button center-block"
-    }, "Generate addSmallLeaf-country Proof"), /*#__PURE__*/React$1.createElement("a", {
-      href: linkToProofPage + "/PoKoPoML",
-      target: "_blank",
-      style: {
-        marginTop: "10px"
-      },
-      className: "link wide-button center-block"
-    }, "Generate PoKoPoML Proof"), /*#__PURE__*/React$1.createElement("div", {
+    }, "Generate Lobby3 Proofs"), /*#__PURE__*/React$1.createElement("div", {
       style: {
         marginTop: "10px"
       }

@@ -99,23 +99,31 @@ function AppRoutes() {
         <Route
           path="/proof-menu"
           element={
-            <div style={{ margin: "15px" }}>
+            <div style={{ marginTop: "150px" }}>
               <a
-                href={linkToProofPage + "/addSmallLeaf"}
+                href={linkToProofPage + "/lobby3"}
+                target="_blank"
+                style={{ marginTop: "10px" }}
+                className="link wide-button center-block"
+              >
+                Generate Lobby3 Proofs
+              </a>
+              {/* <a
+                href={linkToProofPage + "/addSmallLeaf-country"}
                 target="_blank"
                 style={{ marginTop: "10px" }}
                 className="link wide-button center-block"
               >
                 Generate addSmallLeaf-country Proof
-              </a>
-              <a
-                href={linkToProofPage + "/PoKoPoML"}
+              </a> */}
+              {/* <a
+                href={linkToProofPage + "/PoKoPoML-country"}
                 target="_blank"
                 style={{ marginTop: "10px" }}
                 className="link wide-button center-block"
               >
                 Generate PoKoPoML Proof
-              </a>
+              </a> */}
               <div style={{ marginTop: "10px" }}>
                 <button
                   type="submit"
