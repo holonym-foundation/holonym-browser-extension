@@ -109,12 +109,12 @@ function AppRoutes() {
                 Generate Lobby3 Proofs
               </a>
               {/* <a
-                href={linkToProofPage + "/addSmallLeaf-country"}
+                href={linkToProofPage + "/addLeaf-country"}
                 target="_blank"
                 style={{ marginTop: "10px" }}
                 className="link wide-button center-block"
               >
-                Generate addSmallLeaf-country Proof
+                Generate addLeaf-country Proof
               </a> */}
               {/* <a
                 href={linkToProofPage + "/PoKoPoML-country"}

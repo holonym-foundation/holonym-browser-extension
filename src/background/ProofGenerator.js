@@ -5,8 +5,8 @@ import { serverAddress, unitedStatesCredsBuffer } from "./constants";
 
 class ProofGenerator {
   static async generateProof(credentials, proofType) {
-    if (proofType == "addSmallLeaf-country") {
-      return await this.getAddSmallLeafProofCountry(
+    if (proofType == "addLeaf-country") {
+      return await this.getAddLeafProofCountry(
         credentials.countryCode,
         credentials.countryCodeSecret
       );
@@ -19,7 +19,7 @@ class ProofGenerator {
     }
   }
 
-  static async getAddSmallLeafProofCountry(countryCode, countryCodeSecret) {
+  static async getAddLeafProofCountry(countryCode, countryCodeSecret) {
     const args = {
       creds: countryCode,
       secret: countryCodeSecret,
@@ -29,12 +29,12 @@ class ProofGenerator {
       JSON.stringify(args)
     );
     const resp = await fetch(
-      `${process.env.LINK_TO_PROOF_PAGE}/addSmallLeaf?args=${encryptedArgs}`
+      `${process.env.LINK_TO_PROOF_PAGE}/addLeaf?args=${encryptedArgs}`
     );
     const data = await resp.json();
     // shape of response: { data: smallLeafProof: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] },  newSecret: newSecretAsBuffer.toString("hex") }
     // storeProof(data.data);
-    console.log("getAddSmallLeafProofCountry: retrieved proof");
+    console.log("getAddLeafProofCountry: retrieved proof");
     // TODO: Update countryCodeSecret stored in HoloStore
     return data.data;
   }
@@ -70,7 +70,6 @@ class ProofGenerator {
     );
     const data = await resp.json();
     // shape of response: { data: proofOfKnowledgeOfPreimage: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] } }
-    // TODO: Call MetaMask
     console.log("getPoKoPoMLCountry: retrieved proof");
   }
 }
