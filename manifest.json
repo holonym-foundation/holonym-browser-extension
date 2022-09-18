@@ -7,17 +7,17 @@
     "default_title": "Holonym",
     "default_popup": "default_popup.html",
     "default_icon": {
-      "16": "./Holo-Logo-new-no-text-16.png",
-      "32": "./Holo-Logo-new-no-text-32.png",
-      "48": "./Holo-Logo-new-no-text-48.png",
-      "128": "./Holo-Logo-new-no-text-128.png"
+      "16": "./Holo-Rounded-16.png",
+      "32": "./Holo-Rounded-32.png",
+      "48": "./Holo-Rounded-48.png",
+      "128": "./Holo-Rounded-128.png"
     }
   },
   "icons": {
-    "16": "./Holo-Logo-new-no-text-16.png",
-    "32": "./Holo-Logo-new-no-text-32.png",
-    "48": "./Holo-Logo-new-no-text-48.png",
-    "128": "./Holo-Logo-new-no-text-128.png"
+    "16": "./Holo-Rounded-16.png",
+    "32": "./Holo-Rounded-32.png",
+    "48": "./Holo-Rounded-48.png",
+    "128": "./Holo-Rounded-128.png"
   },
   "background": {
     "service_worker": "background.js"
