@@ -22,18 +22,18 @@ const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 
 let extensionId = "oehcghhbelloglknnpdgoeammglelgna";
-switch(process.env.NODE_ENV) {
+switch (process.env.NODE_ENV) {
   case "dev":
     extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
     break;
   case "caleb":
-      extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
-      break;
+    extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
+    break;
   case "nanak":
     extensionId = "lgmhnpjmdlgddnjchckodphblmacnhdo";
     break;
 }
-  
+
 console.log("extension ID should be ", extensionId);
 const popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [

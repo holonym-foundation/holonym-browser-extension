@@ -29,7 +29,7 @@ class ProofGenerator {
       JSON.stringify(args)
     );
     const resp = await fetch(
-      `${process.env.LINK_TO_PROOF_PAGE}/addLeaf?args=${encryptedArgs}`
+      `${process.env.LINK_TO_PROOF_GENERATION_ENDPOINT}/addLeaf?args=${encryptedArgs}`
     );
     const data = await resp.json();
     // shape of response: { data: smallLeafProof: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] },  newSecret: newSecretAsBuffer.toString("hex") }
@@ -65,8 +65,19 @@ class ProofGenerator {
     const encryptedArgs = Array.isArray(encryptedMessage)
       ? JSON.stringify(encryptedMessage)
       : encryptedMessage;
+    const body = {
+      args: encryptedArgs,
+      sharded: sharded,
+    };
     const resp = await fetch(
-      `${process.env.LINK_TO_PROOF_PAGE}/proveKnowledgeOfPreimageOfMemberLeaf?args=${encryptedArgs}&sharded=${sharded}`
+      `${process.env.LINK_TO_PROOF_GENERATION_ENDPOINT}/proveKnowledgeOfPreimageOfMemberLeaf`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
     );
     const data = await resp.json();
     // shape of response: { data: proofOfKnowledgeOfPreimage: { scheme: 'g16', curve: 'bn128', proof: [Object], inputs: [Array] } }

@@ -16,6 +16,10 @@ const linkToProofPage =
   process.env.NODE_ENV == "dev"
     ? "'http://localhost:3002/zk-id/proofs'"
     : "'https://app.holonym.id/zk-id/proofs'";
+const linkToProofGenerationEndpoint =
+  process.env.NODE_ENV == "dev"
+    ? "'http://localhost:3000/proofs'"
+    : "'https://zk.sciverse.id/proofs'";
 
 export default [
   // {
@@ -49,6 +53,7 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        "process.env.LINK_TO_PROOF_GENERATION_ENDPOINT": linkToProofGenerationEndpoint,
         preventAssignment: true,
       }),
       commonjs(),
