@@ -6,8 +6,6 @@ import ChangePassword from "./atoms/ChangePassword";
 function LandingPage({ onLoginSuccess }) {
   const [registered, setRegistered] = useState(false);
 
-  // TODO: Fix login! It's not working
-
   useEffect(() => {
     function getIsRegistered() {
       return new Promise((resolve) => {
