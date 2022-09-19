@@ -32,33 +32,8 @@
  * @property {EncryptedCredentials}
  */
 
-const credentialNames = [
-  "countryCode",
-  "city",
-  "subdivision",
-  "completedAt",
-  "birthdate",
-];
-
-const secretNames = [
-  "bigCredsSecret",
-  "countryCodeSecret",
-  "citySecret",
-  "subdivisionSecret",
-  "completedAtSecret",
-  "birthdateSecret",
-];
-
-const signatureNames = [
-  "bigCredsSignature",
-  "countryCodeSignature",
-  "citySignature",
-  "subdivisionSignature",
-  "completedAtSignature",
-  "birthdateSignature",
-];
-
-const requiredCredsKeys = [...credentialNames, ...secretNames, ...signatureNames];
+const credentialNames = ["countryCode", "subdivision", "completedAt", "birthdate"];
+const requiredCredsKeys = [...credentialNames, "secret", "signature"];
 
 /**
  * HoloStore has two stores:
