@@ -11,6 +11,7 @@
  */
 
 import passworder from "browser-passworder";
+import { maxEncryptableLength } from "./constants";
 
 /**
  * (Also defined in HoloStore.)
@@ -202,6 +203,48 @@ class CryptoController {
       decryptedDecodedShards.push(decodedShard);
     }
     return decryptedDecodedShards.join("");
+  }
+
+  /**
+   * @param {SubtleCrypto.JWK} publicKey
+   * @param {string} message
+   * @returns {Promise<string>} Encrypted message
+   */
+  async encrypt(publicKey, message = "hello world!") {
+    const algo = {
+      name: "RSA-OAEP",
+      modulusLength: 4096,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: "SHA-256",
+    };
+    let args = ["jwk", publicKey, algo, false, ["encrypt"]];
+    const pubKeyAsCryptoKey = await crypto.subtle.importKey(...args);
+    const encoder = new TextEncoder();
+    const encodedMessage = encoder.encode(message);
+    args = ["RSA-OAEP", pubKeyAsCryptoKey, encodedMessage];
+    const encryptedMessage = await crypto.subtle.encrypt(...args);
+    return JSON.stringify(Array.from(new Uint8Array(encryptedMessage)));
+  }
+
+  /**
+   * @param {Object} message
+   */
+  async encryptWithPublicKey(message) {
+    const encryptionKey = await this.getPublicKey();
+    const stringifiedMsg = JSON.stringify(message);
+    const usingSharding = stringifiedMsg.length > maxEncryptableLength;
+    let encryptedMessage; // array<string> if sharding, string if not sharding
+    if (usingSharding) {
+      encryptedMessage = [];
+      for (let i = 0; i < stringifiedMsg.length; i += maxEncryptableLength) {
+        const shard = stringifiedMsg.substring(i, i + maxEncryptableLength);
+        const encryptedShard = await this.encrypt(encryptionKey, shard);
+        encryptedMessage.push(encryptedShard);
+      }
+    } else {
+      encryptedMessage = await this.encrypt(encryptionKey, stringifiedMsg);
+    }
+    return { encryptedMessage: encryptedMessage, sharded: usingSharding };
   }
 
   /**

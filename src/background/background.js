@@ -2,6 +2,7 @@
  * This background script handles messages from both the webpage and
  * the confirmation popup.
  */
+import { ethers } from "ethers";
 import { CryptoController } from "./CryptoController";
 import { HoloStore } from "./HoloStore";
 import { sleep } from "./utils";
@@ -97,12 +98,10 @@ function popupListener(request, sender, sendResponse) {
   } else if (command == "confirmCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
-    let encryptedCreds = "";
     let unencryptedCreds;
     holoStore
       .getLatestMessage()
       .then((encryptedMsg) => {
-        encryptedCreds = encryptedMsg;
         return cryptoController.decryptWithPrivateKey(
           encryptedMsg.credentials,
           encryptedMsg.sharded
@@ -110,9 +109,15 @@ function popupListener(request, sender, sendResponse) {
       })
       .then((decryptedCreds) => {
         unencryptedCreds = JSON.parse(decryptedCreds);
+        const newSecret = new Uint8Array(16);
+        crypto.getRandomValues(newSecret); // Generate new secret
+        unencryptedCreds.newSecret = ethers.BigNumber.from(newSecret).toHexString();
+        return cryptoController.encryptWithPublicKey(unencryptedCreds);
+      })
+      .then((encryptedMsg) => {
         const credentials = {
           unencryptedCreds: unencryptedCreds,
-          encryptedCreds: encryptedCreds,
+          encryptedCreds: encryptedMsg,
         };
         return holoStore.setCredentials(credentials);
       })
