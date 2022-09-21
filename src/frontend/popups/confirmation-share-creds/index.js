@@ -6,7 +6,7 @@ import App from "./App";
 // release the confirmation popup lock
 window.addEventListener("beforeunload", (event) => {
   chrome.runtime.sendMessage({ command: "denyCredentials" });
-  chrome.runtime.sendMessage({ command: "closingHoloProofConfirmationPopup" });
+  chrome.runtime.sendMessage({ command: "closingHoloShareCredsConfirmationPopup" });
 });
 
 const container = document.getElementById("root");

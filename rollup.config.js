@@ -88,14 +88,14 @@ export default [
     ],
   },
   {
-    // Credentials confirmation popup script
+    // Credentials (add) confirmation popup script
     input: "./src/frontend/popups/confirmation-credentials/index.js",
     output: {
       file: "./dist/credentials_confirmation_popup.js",
       format: "es",
     },
     plugins: [
-      json(), // needed for MetaMask
+      // json(), // needed for MetaMask
       image(),
       resolve({
         browser: true,
@@ -115,14 +115,14 @@ export default [
     ],
   },
   {
-    // Proof confirmation popup script
-    input: "./src/frontend/popups/confirmation-proof/index.js",
+    // Credentials (share) confirmation popup script
+    input: "./src/frontend/popups/confirmation-share-creds/index.js",
     output: {
-      file: "./dist/proof_confirmation_popup.js",
+      file: "./dist/share_creds_confirmation_popup.js",
       format: "es",
     },
     plugins: [
-      json(), // needed for MetaMask
+      // json(), // needed for MetaMask
       image(),
       resolve({
         browser: true,

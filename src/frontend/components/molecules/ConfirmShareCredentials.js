@@ -1,15 +1,17 @@
 import React from "react";
+import Credentials from "../atoms/Credentials";
 
-function ConfirmShareProof({ proofType, onConfirmation }) {
+function ConfirmShareCredentials({ credentials, onConfirmation }) {
   return (
     <>
       <div style={{ textAlign: "center" }}>
-        <h2 className="header-base">Share Proof</h2>
+        <h2 className="header-base">Share Credentials</h2>
         <p className="small-paragraph">
-          Confirm that you would like to share the following proof with this website.
+          Confirm that you would like to share the following credentials with this
+          website.
         </p>
       </div>
-      <p style={{ fontSize: "14px" }}>{proofType}</p>
+      <Credentials credentials={credentials} />
       <div style={{ marginTop: "10px" }}>
         <button
           type="submit"
@@ -23,4 +25,4 @@ function ConfirmShareProof({ proofType, onConfirmation }) {
   );
 }
 
-export default ConfirmShareProof;
+export default ConfirmShareCredentials;

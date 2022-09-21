@@ -12,10 +12,9 @@ import { sleep } from "./utils";
 
 // TODO: Use an event emitter in place of some of these global variables
 let credentialsConfirmationPopupIsOpen = false;
-let proofConfirmationPopupIsOpen = false;
-let confirmShareProof = false;
+let shareCredsConfirmationPopupIsOpen = false;
+let confirmShareCredentials = false;
 let generatingProof = false;
-let typeOfRequestedProof;
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
@@ -44,10 +43,9 @@ const allowedPopupCommands = [
   "holoChangePassword",
   "holoInitializeAccount",
   "holoGetIsRegistered",
-  "confirmShareProof",
-  "getTypeOfRequestedProof",
+  "confirmShareCredentials",
   "closingHoloCredentialsConfirmationPopup",
-  "closingHoloProofConfirmationPopup",
+  "closingHoloShareCredsConfirmationPopup",
 ];
 
 function popupListener(request, sender, sendResponse) {
@@ -146,25 +144,12 @@ function popupListener(request, sender, sendResponse) {
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
     return true;
-  } else if (command == "confirmShareProof") {
-    async function waitForProofToBeGenerated() {
-      const timeout = new Date().getTime() + 180 * 1000;
-      while (new Date().getTime() <= timeout && generatingProof) {
-        await sleep(50);
-      }
-    }
-    confirmShareProof = true;
-    generatingProof = true;
-    waitForProofToBeGenerated().then(() => {
-      sendResponse({ finished: true });
-    });
-    return true;
-  } else if (command == "getTypeOfRequestedProof") {
-    sendResponse({ proofType: typeOfRequestedProof });
+  } else if (command == "confirmShareCredentials") {
+    confirmShareCredentials = true;
   } else if (command == "closingHoloCredentialsConfirmationPopup") {
     credentialsConfirmationPopupIsOpen = false;
-  } else if (command == "closingHoloProofConfirmationPopup") {
-    proofConfirmationPopupIsOpen = false;
+  } else if (command == "closingHoloShareCredsConfirmationPopup") {
+    shareCredsConfirmationPopupIsOpen = false;
   }
 }
 
@@ -177,12 +162,12 @@ async function displayConfirmationPopup(type) {
     if (credentialsConfirmationPopupIsOpen) return;
     credentialsConfirmationPopupIsOpen = true;
     url = "credentials_confirmation_popup.html";
-  } else if (type == "proof") {
+  } else if (type == "share-creds") {
     // TODO: Figure out best way to handle case where user closes popup, and
-    // proofConfirmationPopupIsOpen does not get set to false. Timeouts? Event emitters?
-    // if (proofConfirmationPopupIsOpen) return;
-    proofConfirmationPopupIsOpen = true;
-    url = "proof_confirmation_popup.html";
+    // shareCredsConfirmationPopupIsOpen does not get set to false. Timeouts? Event emitters?
+    // if (shareCredsConfirmationPopupIsOpen) return;
+    shareCredsConfirmationPopupIsOpen = true;
+    url = "share_creds_confirmation_popup.html";
   }
   const config = {
     focused: true,
@@ -198,7 +183,7 @@ async function displayConfirmationPopup(type) {
   } catch (err) {
     console.log(err);
     credentialsConfirmationPopupIsOpen = false;
-    proofConfirmationPopupIsOpen = false;
+    shareCredsConfirmationPopupIsOpen = false;
   }
 }
 
@@ -220,6 +205,7 @@ function getPublicKey() {
 const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
 const allowedWebPageCommands = [
   "getHoloPublicKey",
+  "getHoloCredentials",
   "setHoloCredentials",
   "holoGetIsRegistered",
 ];
@@ -240,6 +226,32 @@ function webPageListener(request, sender, sendResponse) {
 
   if (command == "getHoloPublicKey") {
     getPublicKey().then((publicKey) => sendResponse(publicKey));
+    return true;
+  } else if (command == "getHoloCredentials") {
+    async function waitForConfirmation() {
+      const timeout = new Date().getTime() + 180 * 1000;
+      while (new Date().getTime() <= timeout && !confirmShareCredentials) {
+        await sleep(50);
+      }
+      return confirmShareCredentials;
+    }
+    displayConfirmationPopup("share-creds");
+    waitForConfirmation()
+      .then((confirmShare) => {
+        console.log(`confirmShare: ${confirmShare}`);
+        if (!confirmShare) return;
+        confirmShareCredentials = false; // reset
+        const loggedIn = cryptoController.getIsLoggedIn();
+        if (!loggedIn) return;
+        return holoStore.getCredentials();
+      })
+      .then((encryptedMsg) =>
+        cryptoController.decryptWithPrivateKey(
+          encryptedMsg.credentials,
+          encryptedMsg.sharded
+        )
+      )
+      .then((decryptedCreds) => sendResponse(JSON.parse(decryptedCreds)));
     return true;
   } else if (command == "setHoloCredentials") {
     const latestMessage = {
