@@ -23,15 +23,16 @@ function Credentials({ credentials }) {
         <div className="holo-credentials-container">
           {Object.keys(credsToDisplay).map((credentialName, index) => {
             let formattedCred = credentialName.replace(/([A-Z])/g, " $1");
-            formattedCred = formattedCred.charAt(0).toUpperCase() + formattedCred.slice(1);
+            formattedCred =
+              formattedCred.charAt(0).toUpperCase() + formattedCred.slice(1);
             return (
               <div key={index} style={{ display: "flex", margin: "1.05rem" }}>
-                <span style={{ flex: "30%" }} className="credential-name">
+                <span style={{ flex: "35%" }} className="credential-name">
                   {formattedCred}
                 </span>
-                <span style={{ flex: "70%" }}>{credsToDisplay[credentialName]}</span>
+                <span style={{ flex: "65%" }}>{credsToDisplay[credentialName]}</span>
               </div>
-            )
+            );
           })}
         </div>
       )}
