@@ -4,7 +4,6 @@
  */
 import { CryptoController } from "./CryptoController";
 import { HoloStore } from "./HoloStore";
-import ProofGenerator from "./ProofGenerator";
 import { sleep } from "./utils";
 
 // --------------------------------------------------------------
@@ -223,7 +222,6 @@ const allowedWebPageCommands = [
   "getHoloPublicKey",
   "setHoloCredentials",
   "holoGetIsRegistered",
-  "holoGenerateProof",
 ];
 
 // Listener function for messages from webpage
@@ -235,7 +233,6 @@ function webPageListener(request, sender, sendResponse) {
   const command = request.command;
   const messageIsSharded = request.sharded;
   const newCreds = request.credentials;
-  const proofType = request.proofType;
 
   if (!allowedWebPageCommands.includes(command)) {
     return;
@@ -257,45 +254,6 @@ function webPageListener(request, sender, sendResponse) {
     cryptoController
       .getIsRegistered()
       .then((isRegistered) => sendResponse({ isRegistered: isRegistered }));
-    return true;
-  } else if (command == "holoGenerateProof") {
-    async function waitForConfirmation() {
-      typeOfRequestedProof = proofType;
-      const timeout = new Date().getTime() + 180 * 1000;
-      while (new Date().getTime() <= timeout && !confirmShareProof) {
-        await sleep(50);
-      }
-      typeOfRequestedProof = ""; // reset
-      return confirmShareProof;
-    }
-    // TODO: Delete this log
-    console.log(`holoGenerateProof: received request for proof: ${proofType}`);
-    displayConfirmationPopup("proof");
-    waitForConfirmation()
-      .then((confirmShare) => {
-        console.log(`confirmShare: ${confirmShare}`);
-        if (!confirmShare) return;
-        confirmShareProof = false; // reset
-        const loggedIn = cryptoController.getIsLoggedIn();
-        if (!loggedIn) return;
-        return holoStore.getCredentials();
-      })
-      .then((encryptedMsg) =>
-        cryptoController.decryptWithPrivateKey(
-          encryptedMsg.credentials,
-          encryptedMsg.sharded
-        )
-      )
-      .then((decryptedCreds) => {
-        console.log("generating proof...");
-        return ProofGenerator.generateProof(JSON.parse(decryptedCreds), proofType);
-      })
-      .then((proof) => {
-        console.log("generated proof...");
-        console.log(proof);
-        generatingProof = false;
-        sendResponse(proof);
-      });
     return true;
   }
 }

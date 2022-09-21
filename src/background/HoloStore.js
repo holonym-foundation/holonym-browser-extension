@@ -3,7 +3,6 @@
  */
 
 // import { ethers } from "ethers";
-// import { blake2s } from "blakejs";
 // import { Buffer } from "buffer/";
 // import { getStateAsBytes, getDateAsBytes } from "./utils";
 // import { serverAddress, threeZeroedBytes } from "./constants";

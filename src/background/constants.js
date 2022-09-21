@@ -70,3 +70,5 @@ export const unitedStatesCredsBuffer = Buffer.from("00".repeat(26) + "0002", "he
 // Max length of encrypt-able string using RSA-OAEP with SHA256 where
 // modulusLength == 4096: 446 characters.
 export const maxEncryptableLength = 446;
+
+export const treeDepth = 14;
