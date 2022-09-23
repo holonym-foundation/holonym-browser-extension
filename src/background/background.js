@@ -174,10 +174,28 @@ async function displayConfirmationPopup(type) {
     shareCredsConfirmationPopupIsOpen = true;
     url = "share_creds_confirmation_popup.html";
   }
+
+  // Get info needed to position popup at the top right of the currently focused window
+  function getWindowWidthAndTop() {
+    return new Promise((resolve) => {
+      const callback = (window) => {
+        const width = window.width + window.left;
+        const top = window.top;
+        resolve({ width: width, top: top });
+      };
+      chrome.windows.getCurrent(callback);
+    });
+  }
+  const { width: windowWidth, top: windowTop } = await getWindowWidthAndTop();
+  const leftPosition = Math.max(0, windowWidth - 400);
+  const topPosition = Math.max(0, windowTop);
+
   const config = {
     focused: true,
     height: 530,
     width: 400,
+    left: parseInt(leftPosition), // throws error: Expected integer, found number
+    top: topPosition,
     incognito: false,
     setSelfAsOpener: false,
     type: "popup",
