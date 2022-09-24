@@ -113,8 +113,6 @@ class HoloStore {
   getCredentials() {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(["holoCredentials"], (creds) => {
-        console.log("DELETE THIS CONSOLE LOG", creds)
-        console.log("DELETE THIS CONSOLE LOGg", creds.holoCredentials)
         resolve(creds?.holoCredentials);
       });
     });

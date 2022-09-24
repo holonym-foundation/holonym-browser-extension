@@ -188,12 +188,9 @@ class CryptoController {
       false,
       ["decrypt"]
     );
-    console.log("ec s", encryptedMessage, sharded);
     const shards = sharded ? encryptedMessage : [encryptedMessage];
     const decryptedDecodedShards = [];
     for (const shard of shards) {
-      console.log("shard", shard);
-      console.log("enc mes", encryptedMessage);
       const encodedShard = new Uint8Array(JSON.parse(shard)).buffer;
       const decryptedShard = await crypto.subtle.decrypt(
         { name: "RSA-OAEP" },
@@ -204,7 +201,6 @@ class CryptoController {
       const decodedShard = decoder.decode(decryptedShard);
       decryptedDecodedShards.push(decodedShard);
     }
-    console.log("returning: ", decryptedDecodedShards.join(""));
     return decryptedDecodedShards.join("");
   }
 

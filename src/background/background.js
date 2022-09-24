@@ -88,17 +88,11 @@ function popupListener(request, sender, sendResponse) {
     holoStore
       .getCredentials()
       .then((encryptedCreds) => {
-        console.log("DELETE THIS CONSOLE LOG encryped creds", encryptedCreds)
         cryptoController.decryptWithPrivateKey(
           encryptedCreds.encryptedMessage,
           encryptedCreds.sharded
         )
-      .then((decryptedCreds) => {
-        sendResponse({ credentials: JSON.parse(decryptedCreds) }); console.log({ credentials: JSON.parse(decryptedCreds) })
-        console.log("sent response");
-        console.log(sendResponse);
-      }
-      );
+      .then((decryptedCreds) => sendResponse({ credentials: JSON.parse(decryptedCreds) }))
       });
         
     return true;
@@ -280,7 +274,6 @@ function webPageListener(request, sender, sendResponse) {
           creds.sharded
       ))
       .then((decryptedCreds) => {
-        console.log("DC",decryptedCreds);
         sendResponse(JSON.parse(decryptedCreds))
       });
     return true;
