@@ -7,16 +7,15 @@ function ConfirmShareCredentials({ credentials, onConfirmation }) {
       <div style={{ textAlign: "center" }}>
         <h2 className="header-base">Share Credentials</h2>
         <p className="small-paragraph">
-          Confirm that you would like to share the following credentials with this
-          website.
+          Confirm you would like to create a ZK verification without revealing your identity
         </p>
       </div>
-      <Credentials credentials={credentials} />
+      {/* <Credentials credentials={credentials} /> */}
       <div style={{ marginTop: "10px" }}>
         <button
           type="submit"
           onClick={onConfirmation}
-          className="wide-button center-block"
+          className="x-button wide-button center-block"
         >
           Confirm
         </button>
