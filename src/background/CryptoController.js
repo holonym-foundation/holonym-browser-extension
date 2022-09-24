@@ -188,7 +188,7 @@ class CryptoController {
       false,
       ["decrypt"]
     );
-
+    console.log("ec s", encryptedMessage, sharded);
     const shards = sharded ? encryptedMessage : [encryptedMessage];
     const decryptedDecodedShards = [];
     for (const shard of shards) {
@@ -204,6 +204,7 @@ class CryptoController {
       const decodedShard = decoder.decode(decryptedShard);
       decryptedDecodedShards.push(decodedShard);
     }
+    console.log("returning: ", decryptedDecodedShards.join(""));
     return decryptedDecodedShards.join("");
   }
 

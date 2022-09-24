@@ -94,7 +94,9 @@ function popupListener(request, sender, sendResponse) {
           encryptedCreds.sharded
         )
       .then((decryptedCreds) => {
-        console.log(decryptedCreds, "decrypted creds"); sendResponse({ credentials: JSON.parse(decryptedCreds) })
+        sendResponse({ credentials: JSON.parse(decryptedCreds) }); console.log({ credentials: JSON.parse(decryptedCreds) })
+        console.log("sent response");
+        console.log(sendResponse);
       }
       );
       });
@@ -273,15 +275,14 @@ function webPageListener(request, sender, sendResponse) {
         if (!loggedIn) return;
         return holoStore.getCredentials();
       })
-      .then((creds) =>{
-        console.log("DELETE THIS CONSOLE LOG ENCRYPTED MSG", creds);
-        cryptoController.decryptWithPrivateKey(
+      .then((creds) =>cryptoController.decryptWithPrivateKey(
           creds.encryptedMessage,
           creds.sharded
-        )
-      }
-      )
-      .then((decryptedCreds) => sendResponse(JSON.parse(decryptedCreds)));
+      ))
+      .then((decryptedCreds) => {
+        console.log("DC",decryptedCreds);
+        sendResponse(JSON.parse(decryptedCreds))
+      });
     return true;
   } else if (command == "setHoloCredentials") {
     const latestMessage = {
