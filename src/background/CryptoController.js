@@ -192,6 +192,8 @@ class CryptoController {
     const shards = sharded ? encryptedMessage : [encryptedMessage];
     const decryptedDecodedShards = [];
     for (const shard of shards) {
+      console.log("shard", shard);
+      console.log("enc mes", encryptedMessage);
       const encodedShard = new Uint8Array(JSON.parse(shard)).buffer;
       const decryptedShard = await crypto.subtle.decrypt(
         { name: "RSA-OAEP" },

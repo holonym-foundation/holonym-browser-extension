@@ -32,8 +32,9 @@ switch (process.env.NODE_ENV) {
     extensionId = "lgmhnpjmdlgddnjchckodphblmacnhdo";
     break;
 }
+console.log("Extension ID should be ", extensionId);
 
-console.log("extension ID should be ", extensionId);
+
 const popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
@@ -82,18 +83,22 @@ function popupListener(request, sender, sendResponse) {
     return true;
   } else if (command == "getHoloCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
+    console.log("logged in", loggedIn);
     if (!loggedIn) return;
     holoStore
       .getCredentials()
-      .then((encryptedCreds) =>
+      .then((encryptedCreds) => {
+        console.log("DELETE THIS CONSOLE LOG encryped creds", encryptedCreds)
         cryptoController.decryptWithPrivateKey(
-          encryptedCreds.credentials,
+          encryptedCreds.encryptedMessage,
           encryptedCreds.sharded
         )
-      )
-      .then((decryptedCreds) =>
-        sendResponse({ credentials: JSON.parse(decryptedCreds) })
+      .then((decryptedCreds) => {
+        console.log(decryptedCreds, "decrypted creds"); sendResponse({ credentials: JSON.parse(decryptedCreds) })
+      }
       );
+      });
+        
     return true;
   } else if (command == "confirmCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
@@ -268,11 +273,13 @@ function webPageListener(request, sender, sendResponse) {
         if (!loggedIn) return;
         return holoStore.getCredentials();
       })
-      .then((encryptedMsg) =>
+      .then((creds) =>{
+        console.log("DELETE THIS CONSOLE LOG ENCRYPTED MSG", creds);
         cryptoController.decryptWithPrivateKey(
-          encryptedMsg.credentials,
-          encryptedMsg.sharded
+          creds.encryptedMessage,
+          creds.sharded
         )
+      }
       )
       .then((decryptedCreds) => sendResponse(JSON.parse(decryptedCreds)));
     return true;
