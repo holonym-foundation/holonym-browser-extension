@@ -117,7 +117,10 @@ function popupListener(request, sender, sendResponse) {
       .then((encryptedMsg) => {
         const credentials = {
           unencryptedCreds: unencryptedCreds,
-          encryptedCreds: encryptedMsg,
+          encryptedCreds: {
+            credentials: encryptedMsg.encryptedMessage,
+            sharded: encryptedMsg.sharded,
+          },
         };
         return holoStore.setCredentials(credentials);
       })
@@ -281,6 +284,8 @@ function webPageListener(request, sender, sendResponse) {
       sharded: messageIsSharded,
       credentials: newCreds,
     };
+    console.log("latestMessage...");
+    console.log(latestMessage);
     holoStore
       .setLatestMessage(latestMessage)
       .then(() => displayConfirmationPopup("credentials"));

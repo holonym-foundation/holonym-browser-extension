@@ -92,19 +92,6 @@ class HoloStore {
       );
       return false;
     }
-
-    // Ensure unencryptedCreds object has all and only the required keys
-    const unencryptedCredsKeys = Object.keys(credentials.unencryptedCreds);
-    const keysDiff = unencryptedCredsKeys
-      .filter((key) => !requiredCredsKeys.includes(key))
-      .concat(requiredCredsKeys.filter((key) => !unencryptedCredsKeys.includes(key)));
-    if (keysDiff.length > 0) {
-      console.log(
-        "HoloStore: credentials.unencryptedCreds does not have correct keys"
-      );
-      return false;
-    }
-
     return true;
   }
   /**
