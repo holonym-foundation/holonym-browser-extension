@@ -3,7 +3,8 @@
   "scripts": {
     "build:dev": "NODE_ENV=dev bash build.sh",
     "build:prod": "NODE_ENV=production bash build.sh",
-    "view-on-mac": "bash build.sh; open dist/default_popup.html"
+    "view-on-mac": "bash build.sh; open dist/default_popup.html",
+    "test": "npx mocha --timeout 3s"
   },
   "license": "MIT",
   "dependencies": {
@@ -28,6 +29,7 @@
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-wasm": "^5.2.0",
+    "chai": "^4.3.6",
     "mocha": "^10.0.0",
     "process": "^0.11.10",
     "puppeteer": "^18.0.5",
