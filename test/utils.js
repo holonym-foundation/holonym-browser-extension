@@ -1,7 +1,7 @@
 /**
  * Wrapper for chrome.runtime.sendMessage. Timeout after 5 seconds
- * @param {Puppeteer.Page} page
- * @param {string} extensionId
+ * @param {Puppeteer.Page} page The page from which the message is sent
+ * @param {string} extensionId The extension to which the message is sent
  * @param {Object} payload
  */
 export async function sendMessage(page, extensionId, payload) {

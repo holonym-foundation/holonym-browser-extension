@@ -9,7 +9,6 @@ const __dirname = dirname(__filename);
 const pathToExtension = `${__dirname}/../dist`;
 
 const devtools = false;
-const slowMo = false;
 
 async function initialize() {
   const browser = await puppeteer.launch({
@@ -20,7 +19,6 @@ async function initialize() {
       `--disable-extensions-except=${pathToExtension}`,
       `--load-extension=${pathToExtension}`,
     ],
-    ...(slowMo && { slowMo }),
   });
   const serviceWorkerTarget = await browser.waitForTarget(
     (target) => target.type() === "service_worker"
@@ -125,14 +123,10 @@ async function holoGetIsRegistered() {
 // holoGetIsRegistered();
 
 const allowedPopupCommands = [
-  "holoPopupLogin",
   "getHoloLatestMessage",
   "getHoloCredentials",
   "confirmCredentials",
   "denyCredentials",
-  "holoChangePassword",
-  "holoInitializeAccount",
-  "holoGetIsRegistered",
   "confirmShareCredentials",
   "closingHoloCredentialsConfirmationPopup",
   "closingHoloShareCredsConfirmationPopup",
@@ -143,6 +137,8 @@ describe("Messages: popup script -> service worker", async () => {
   let serviceWorkerTarget;
   let extensionId;
   let defaultPopupPage;
+
+  const validPassword = "thithithareallylongpathword$%$747$*227738";
 
   before(async () => {
     const initVals = await initialize();
@@ -168,17 +164,67 @@ describe("Messages: popup script -> service worker", async () => {
   });
 
   describe("holoInitializeAccount", async () => {
-    it("Should register the user, given a valid password", async () => {
+    it("Should register the user, given a password", async () => {
       // Call holoInitializeAccount
       const payload1 = {
         command: "holoInitializeAccount",
-        password: "thithithareallylongpathword$%$747$*227738",
+        password: validPassword,
       };
       const result1 = await sendMessage(defaultPopupPage, extensionId, payload1);
       // Check registration status
       const payload2 = { command: "holoGetIsRegistered" };
       const result2 = await sendMessage(defaultPopupPage, extensionId, payload2);
       assert.equal(result2.isRegistered, true);
+    });
+  });
+
+  describe("holoPopupLogin", async () => {
+    it("Should fail to login, given an incorrect password", async () => {
+      const payload = {
+        command: "holoPopupLogin",
+        password: "wrong-password",
+      };
+      const result = await sendMessage(defaultPopupPage, extensionId, payload);
+      assert.equal(result.success, false);
+    });
+
+    it("Should login, given the correct password", async () => {
+      const payload = {
+        command: "holoPopupLogin",
+        password: validPassword,
+      };
+      const result = await sendMessage(defaultPopupPage, extensionId, payload);
+      assert.equal(result.success, true);
+    });
+  });
+
+  describe("holoChangePassword", async () => {
+    it("Should fail to change the user's password, given an incorrect oldPassword", async () => {
+      const payload = {
+        command: "holoChangePassword",
+        oldPassword: "invalid-password",
+        newPassword: "new-password",
+      };
+      const result = await sendMessage(defaultPopupPage, extensionId, payload);
+      assert.equal(result.success, false);
+    });
+
+    it("Should change the user's password, given the correct oldPassword", async () => {
+      const payload1 = {
+        command: "holoChangePassword",
+        oldPassword: validPassword,
+        newPassword: "new-password",
+      };
+      const result1 = await sendMessage(defaultPopupPage, extensionId, payload1);
+      assert.equal(result1.success, true);
+      // Change pw back to validPassword
+      const payload2 = {
+        command: "holoChangePassword",
+        oldPassword: "new-password",
+        newPassword: validPassword,
+      };
+      const result2 = await sendMessage(defaultPopupPage, extensionId, payload2);
+      assert.equal(result2.success, true);
     });
   });
 });
