@@ -35,7 +35,11 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
   return (
     <>
       <div style={{ textAlign: "center" }}>
-        <form onSubmit={handleInitialize} autoComplete={"on"}>
+        <form
+          onSubmit={handleInitialize}
+          id="initialize-account-form"
+          autoComplete={"on"}
+        >
           <div className="header-base">
             <label>{inputLabel || "Enter Password"}</label>
             <div className="small-paragraph">{subLabel && <p>{subLabel}</p>}</div>
@@ -63,7 +67,6 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
             Submit
           </button>
         </form>
-        
       </div>
     </>
   );
