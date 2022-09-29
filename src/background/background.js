@@ -34,7 +34,7 @@ switch (process.env.NODE_ENV) {
 }
 
 console.log("extension ID should be ", extensionId);
-const popupOrigin = `chrome-extension://${extensionId}`;
+let popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
   "getHoloLatestMessage",
