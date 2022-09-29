@@ -7,7 +7,7 @@ import { sleep, sendMessage, encrypt } from "./utils.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const pathToExtension = __dirname.includes("github/workspace/")
-  ? `${__dirname}/dist`
+  ? `${__dirname}/prod-materials/dist`
   : `${__dirname}/../dist`;
 
 // NOTE: frontendUrl must be either "https://app.holonym.id" or "http://localhost:3002"

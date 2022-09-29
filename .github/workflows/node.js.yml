@@ -19,7 +19,7 @@ jobs:
         with:
           args: install
       - run: npm ci
-      - run: NODE_ENV=prod bash build.sh
+      - run: mkdir prod-materials && NODE_ENV=prod bash build.sh
       - run: ls
       - name: Test Code
         uses: mujo-code/puppeteer-headful@v2
