@@ -16,8 +16,8 @@ jobs:
         uses: actions/setup-node@v2
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
-        # with:
-        #   args: install
+        with:
+          args: install
       - run: npm ci
       - run: mkdir prod-materials && NODE_ENV=prod bash build.sh
       - name: Test Code
