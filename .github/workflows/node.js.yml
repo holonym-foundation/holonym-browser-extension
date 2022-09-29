@@ -14,7 +14,7 @@ jobs:
     name: Install Dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@Z
+      - uses: actions/checkout@3
       - name: Install Dependencies
         uses: actions/setup-node@v2
         env:
