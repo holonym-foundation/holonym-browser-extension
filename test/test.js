@@ -13,8 +13,6 @@ const pathToExtension = `${__dirname}/../dist`;
 const frontendUrl = "https://app.holonym.id";
 
 async function initialize() {
-  console.log(`pathToExtension... ${pathToExtension}`);
-  console.log("launching puppeteer...");
   const browser = await puppeteer.launch({
     executablePath: process.env.PUPPETEER_EXEC_PATH, // See puppeteer-headful GitHub Action
     headless: false,
@@ -25,12 +23,10 @@ async function initialize() {
       `--load-extension=${pathToExtension}`,
     ],
   });
-  console.log("Getting serviceWorkerTarget...");
   const serviceWorkerTarget = await browser.waitForTarget(
     (target) => target.type() === "service_worker"
   );
   const extensionId = serviceWorkerTarget.url().split("://")[1].split("/")[0];
-  console.log(`extensionId... ${extensionId}`);
   return {
     browser: browser,
     serviceWorkerTarget: serviceWorkerTarget,
@@ -59,14 +55,10 @@ describe("", async () => {
     browser = initVals.browser;
     serviceWorkerTarget = initVals.serviceWorkerTarget;
     extensionId = initVals.extensionId;
-    console.log("creating frontend page...");
     frontendPage = await browser.newPage();
-    console.log("creating default page...");
     defaultPopupPage = await browser.newPage();
     // Set extensionId and popupOrigin in the background script (i.e., service worker)
-    console.log("Getting serviceWorker...");
     const serviceWorker = await serviceWorkerTarget.worker();
-    console.log("Modifying extensionId and popupOrigin in serviceWorker...");
     await serviceWorker.evaluateHandle((extId) => {
       extensionId = extId;
       popupOrigin = `chrome-extension://${extensionId}`;
@@ -80,7 +72,6 @@ describe("", async () => {
   describe("Atomic messages from popup to service worker", async () => {
     before(async () => {
       const defaultPopupUrl = `chrome-extension://${extensionId}/default_popup.html`;
-      console.log(`Navigating defaultPopupPage to ${defaultPopupUrl}`);
       await defaultPopupPage.goto(defaultPopupUrl, { waitUntil: "networkidle0" });
       await defaultPopupPage.bringToFront();
     });
