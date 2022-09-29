@@ -21,7 +21,7 @@ jobs:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
         with:
           args: install
-      - run: NODE_ENV=dev bash build.sh
+      - run: mkdir prod-materials && NODE_ENV=dev bash build.sh
       - name: Test Code
         uses: mujo-code/puppeteer-headful@v2
         env:
