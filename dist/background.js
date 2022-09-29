@@ -26750,7 +26750,10 @@ let confirmShareCredentials = false;
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 
-let extensionId = "oehcghhbelloglknnpdgoeammglelgna";
+// https://chrome.google.com/webstore/detail/holonym/oehcghhbelloglknnpdgoeammglelgna
+// let extensionId = "oehcghhbelloglknnpdgoeammglelgna";
+// https://chrome.google.com/webstore/detail/holonym/obhgknpelgngeabaclepndihajndjjnb
+let extensionId = "obhgknpelgngeabaclepndihajndjjnb"; // Extension owned by extension@holonym.id
 switch ("production") {
   case "dev":
     extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
@@ -26764,7 +26767,7 @@ switch ("production") {
 }
 
 console.log("extension ID should be ", extensionId);
-const popupOrigin = `chrome-extension://${extensionId}`;
+let popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
   "getHoloLatestMessage",
