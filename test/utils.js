@@ -1,5 +1,7 @@
 import { webcrypto } from "crypto";
 
+export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 // Max length of encrypt-able string using RSA-OAEP with SHA256 where
 // modulusLength == 4096: 446 characters.
 const maxEncryptableLength = 446;

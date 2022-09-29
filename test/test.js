@@ -1,9 +1,8 @@
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import puppeteer from "puppeteer";
-// import assert from "assert";
 import chai from "chai";
-import { sendMessage, encrypt } from "./utils.js";
+import { sleep, sendMessage, encrypt } from "./utils.js";
 
 const { expect } = chai;
 
@@ -35,97 +34,6 @@ async function initialize() {
   };
 }
 
-async function test() {
-  // const browser = await puppeteer.launch({
-  //   // headless: "chrome",
-  //   headless: false,
-  //   devtools: devtools,
-  //   args: [
-  //     `--disable-extensions-except=${pathToExtension}`,
-  //     `--load-extension=${pathToExtension}`,
-  //   ],
-  //   ...(slowMo && { slowMo }),
-  // });
-  // console.log(`browser...`);
-  // console.log(browser);
-
-  // const appPage = await browser.newPage();
-  // // await appPage.goto('https://www.google.com', { waitUntil: "load" });
-
-  // const serviceWorkerTarget = await browser.waitForTarget(
-  //   (target) => target.type() === "service_worker"
-  // );
-  // const extensionId = serviceWorkerTarget.url().split("://")[1].split("/")[0];
-
-  const { browser, serviceWorkerTarget, extensionId } = await initialize();
-
-  const extPage = await browser.newPage();
-  const defaultPopupUrl = `chrome-extension://${extensionId}/default_popup.html`;
-  await extPage.goto(defaultPopupUrl, { waitUntil: "networkidle0" });
-  await extPage.bringToFront();
-  const initAccForm = await extPage.$("#initialize-account-form");
-  // const passwordInput = await extPage.$("#initialize-account-form");
-  // const passwordInput = await extPage.$("#login-form");
-  console.log("initAccForm");
-  console.log(initAccForm);
-  const pwInput = await initAccForm.$(".text-field");
-  await pwInput.type("thithithareallylongpathword$%$747$*227738");
-  console.log("pwInput");
-  console.log(pwInput.asElement());
-
-  const serviceWorker = await serviceWorkerTarget.worker();
-  // Test the serviceWorker page as you would any other page.
-  const func = "() => console.log(popupOrigin)";
-  // console.log("serviceWorker.evaluate(func)...");
-  // console.log(await serviceWorker.evaluate(func));
-
-  const otherPage = await browser.waitForTarget((target) => target.type() === "page");
-  // console.log("otherPage...");
-  // console.log(otherPage);
-  // console.log("otherPage.page()...");
-  // console.log(await otherPage.page());
-
-  await browser.close();
-}
-
-async function holoGetIsRegistered() {
-  const { browser, serviceWorkerTarget, extensionId } = await initialize();
-  const serviceWorker = await serviceWorkerTarget.worker();
-
-  const extPage = await browser.newPage();
-  const defaultPopupUrl = `chrome-extension://${extensionId}/default_popup.html`;
-  await extPage.goto(defaultPopupUrl, { waitUntil: "networkidle0" });
-  await extPage.bringToFront();
-  const windowKeys = JSON.parse(
-    await extPage.evaluate(() => JSON.stringify(Object.keys(window.chrome.runtime)))
-  );
-  // console.log("windowKeys...");
-  // for (const key of windowKeys) {
-  //   console.log(key);
-  // }
-
-  const payload = {
-    command: "holoGetIsRegistered",
-  };
-  const result = await sendMessage(extPage, extensionId, payload);
-  console.log("result...");
-  console.log(result);
-  // assert.equal(result.isRegistered, false);
-
-  // const initAccForm = await extPage.$("#initialize-account-form");
-  // const pwInput = await initAccForm.$(".text-field");
-  // await pwInput.type("thithithareallylongpathword$%$747$*227738");
-  // const submitBtn = await initAccForm.$(".x-button");
-  // await submitBtn.click();
-  // const submitBtnText = await submitBtn.evaluate((e) => e.innerText);
-  // console.log(`submitBtnText... ${submitBtnText}`);
-
-  await browser.close();
-}
-
-// test();
-// holoGetIsRegistered();
-
 /**
  * The following tests are separates into "atomic" and "interactive" tests.
  * Atomic messages are messages that, upon being called once, have an observable
@@ -138,6 +46,7 @@ describe("", async () => {
   let serviceWorkerTarget;
   let extensionId;
   let defaultPopupPage;
+  let frontendPage;
 
   const validPassword = "thithithareallylongpathword$%$747$*227738";
 
@@ -146,10 +55,8 @@ describe("", async () => {
     browser = initVals.browser;
     serviceWorkerTarget = initVals.serviceWorkerTarget;
     extensionId = initVals.extensionId;
+    frontendPage = await browser.newPage();
     defaultPopupPage = await browser.newPage();
-    const defaultPopupUrl = `chrome-extension://${extensionId}/default_popup.html`;
-    await defaultPopupPage.goto(defaultPopupUrl, { waitUntil: "networkidle0" });
-    await defaultPopupPage.bringToFront();
   });
 
   after(async () => {
@@ -157,6 +64,12 @@ describe("", async () => {
   });
 
   describe("Atomic messages from popup to service worker", async () => {
+    before(async () => {
+      const defaultPopupUrl = `chrome-extension://${extensionId}/default_popup.html`;
+      await defaultPopupPage.goto(defaultPopupUrl, { waitUntil: "networkidle0" });
+      await defaultPopupPage.bringToFront();
+    });
+
     describe("holoGetIsRegistered", async () => {
       it("Should return false before user has registered", async () => {
         const payload = { command: "holoGetIsRegistered" };
@@ -232,10 +145,7 @@ describe("", async () => {
   });
 
   describe("Atomic messages from frontend to service worker", async () => {
-    let frontendPage;
-
     before(async () => {
-      frontendPage = await browser.newPage();
       await frontendPage.goto(frontendUrl, { waitUntil: "networkidle0" });
       await frontendPage.bringToFront();
     });
@@ -260,36 +170,73 @@ describe("", async () => {
     });
   });
 
-  const allowedPopupCommands = [
-    "getHoloLatestMessage",
-    "getHoloCredentials",
-    "confirmCredentials",
-    "denyCredentials",
-    "confirmShareCredentials",
-    "closingHoloCredentialsConfirmationPopup",
-    "closingHoloShareCredsConfirmationPopup",
-  ];
-
-  const allowedWebPageCommands = ["getHoloCredentials", "setHoloCredentials"];
-
   describe("Interactive messages", async () => {
-    describe("getHoloLatestMessage", async () => {
-      it("Should fail to login, given an incorrect password", async () => {
-        // Test the following flow:
-        // frontend sends credentials ->
-        // user confirms [or denies] storage of credentials ->
-        // chrome storage state changes (both credentials and latest message)
-        const nonExtensionPage = await browser.newPage();
-        await nonExtensionPage.goto("https://app.holonym.id", {
-          waitUntil: "networkidle0",
-        });
-        await nonExtensionPage.bringToFront();
+    describe("Send user credentials from frontend and store in extension", async () => {
+      it("Should store credentials as latest message and, after confirmation, as credentials", async () => {
+        // TODO: Split this test up into multiple "it()"s
+        // Encrypt testCreds with user's public key
+        const payload1 = { command: "getHoloPublicKey" };
+        const publicKey = await sendMessage(frontendPage, extensionId, payload1);
+        const testCreds = {
+          secret: "0x4704a39e96c1753b525d8734a37685b8",
+          signature:
+            "0x07138e4c38e8d8541920a087641017f4d32dcf1d100e94db46d1fd67fa59edf23ab7514a2b9cdc613d7264485764e79aa01d243dfba0b87171675f5219aae7651c",
+          birthdate: "",
+          completedAt: "2022-09-13",
+          countryCode: 2,
+          subdivision: "",
+        };
+        const encryptedCreds = await encrypt(publicKey, JSON.stringify(testCreds));
         const payload = {
           command: "setHoloCredentials",
-          credentials: { key: "value" },
+          credentials: encryptedCreds,
+          sharded: false,
         };
-        sendMessage(nonExtensionPage, extensionId, payload);
+        sendMessage(frontendPage, extensionId, payload);
+        // Get confirmation popup
+        let confirmationPopup;
+        await sleep(100);
+        const pages = await browser.pages();
+        for (const page of pages) {
+          const loginForm = await page.$("#login-form");
+          if (loginForm) {
+            confirmationPopup = page;
+          }
+        }
+        // Login
+        const payload2 = { command: "holoPopupLogin", password: validPassword };
+        const result = await sendMessage(confirmationPopup, extensionId, payload2);
+        expect(result.success).to.equal(true);
+        await sleep(100);
+        // Check holoLatestMessage
+        const payload3 = { command: "getHoloLatestMessage" };
+        const latestMsg = await sendMessage(confirmationPopup, extensionId, payload3);
+        expect(latestMsg.message.credentials).to.deep.equal(testCreds);
+        // Confirm credentials
+        const payload4 = { command: "confirmCredentials" };
+        await sendMessage(confirmationPopup, extensionId, payload4);
+        await sleep(100);
+        // Check stored credentials
+        const payload5 = { command: "getHoloCredentials" };
+        const creds = await sendMessage(confirmationPopup, extensionId, payload5);
+        const credsSansNewSecret = Object.assign({}, creds.credentials);
+        delete credsSansNewSecret.newSecret;
+        expect(credsSansNewSecret).to.deep.equal(testCreds);
+        // Close
+        const payload6 = { command: "closingHoloCredentialsConfirmationPopup" };
+        await sendMessage(confirmationPopup, extensionId, payload6);
+        await confirmationPopup.close();
       });
     });
+    // TODO: Test deny credentials
+    // TODO: Test sharing credentials with frontend
   });
 });
+
+// NOTE: Commands left to test
+const allowedPopupCommands = [
+  "denyCredentials",
+  "confirmShareCredentials",
+  "closingHoloShareCredsConfirmationPopup",
+];
+const allowedWebPageCommands = ["getHoloCredentials", "setHoloCredentials"];
