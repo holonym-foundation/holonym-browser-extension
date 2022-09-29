@@ -19,6 +19,7 @@ jobs:
         with:
           args: install
       - run: npm ci
+      - run: npm install --global rollup
       - run: NODE_ENV=prod bash build.sh no_zip
       - name: Test Code
         uses: mujo-code/puppeteer-headful@v2
