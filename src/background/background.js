@@ -20,7 +20,10 @@ let generatingProof = false;
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 
-let extensionId = "oehcghhbelloglknnpdgoeammglelgna";
+// https://chrome.google.com/webstore/detail/holonym/oehcghhbelloglknnpdgoeammglelgna
+// let extensionId = "oehcghhbelloglknnpdgoeammglelgna";
+// https://chrome.google.com/webstore/detail/holonym/obhgknpelgngeabaclepndihajndjjnb
+let extensionId = "obhgknpelgngeabaclepndihajndjjnb"; // Extension owned by extension@holonym.id
 switch (process.env.NODE_ENV) {
   case "dev":
     extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
