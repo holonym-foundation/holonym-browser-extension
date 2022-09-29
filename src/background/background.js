@@ -170,7 +170,7 @@ function popupListener(request, sender, sendResponse) {
 async function displayConfirmationPopup(type) {
   let url = "";
   if (type == "credentials") {
-    if (credentialsConfirmationPopupIsOpen) return;
+    // if (credentialsConfirmationPopupIsOpen) return;
     credentialsConfirmationPopupIsOpen = true;
     url = "credentials_confirmation_popup.html";
   } else if (type == "share-creds") {
@@ -289,9 +289,10 @@ function webPageListener(request, sender, sendResponse) {
     };
     console.log("latestMessage...");
     console.log(latestMessage);
-    holoStore
-      .setLatestMessage(latestMessage)
-      .then(() => displayConfirmationPopup("credentials"));
+    holoStore.setLatestMessage(latestMessage).then(() => {
+      console.log("displaying confirmation popup");
+      displayConfirmationPopup("credentials");
+    });
     return;
   } else if (command == "holoGetIsRegistered") {
     cryptoController
