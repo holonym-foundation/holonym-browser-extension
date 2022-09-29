@@ -1,10 +1,8 @@
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import puppeteer from "puppeteer";
-import chai from "chai";
+import { expect } from "chai";
 import { sleep, sendMessage, encrypt } from "./utils.js";
-
-const { expect } = chai;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,9 +14,11 @@ const frontendUrl = "https://app.holonym.id";
 
 async function initialize() {
   const browser = await puppeteer.launch({
+    executablePath: process.env.PUPPETEER_EXEC_PATH, // See puppeteer-headful GitHub Action
     headless: false,
     devtools: false,
     args: [
+      `--no-sandbox`,
       `--disable-extensions-except=${pathToExtension}`,
       `--load-extension=${pathToExtension}`,
     ],
