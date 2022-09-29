@@ -7,8 +7,8 @@ on:
     branches: ["main"]
 
 jobs:
-  installDependencies:
-    name: Install Dependencies
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
