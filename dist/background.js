@@ -26660,38 +26660,6 @@ class CryptoController {
  * API for storing Holo credentials.
  */
 
-// import { ethers } from "ethers";
-// import { Buffer } from "buffer/";
-// import { getStateAsBytes, getDateAsBytes } from "./utils";
-// import { serverAddress, threeZeroedBytes } from "./constants";
-
-/**
- * @typedef {Object} DecryptedCredentials
- * (See credentialNames, secretNames, and signatureNames for properties.)
- */
-
-/**
- * (Also defined in CryptoController.)
- * An encrypted message sent to the extension and stored by HoloStore as
- * 'latestHoloMessage'. The unencrypted message must be a string.
- * @typedef {Object} EncryptedCredentials
- * @property {boolean} sharded Whether message is represented as encrypted shards.
- * @property {string|Array<string>} credentials If not sharded, this is a string
- * representation of the encrypted message. If sharded, it is an array consisting
- * of parts of the message that were individually encrypted; in this case, the
- * decrypted message can be recovered by decrypting each shard and concatenating
- * the result.
- */
-
-/**
- * @typedef {Object} FullCredentials
- * @property {DecryptedCredentials}
- * @property {EncryptedCredentials}
- */
-
-const credentialNames = ["countryCode", "subdivision", "completedAt", "birthdate"];
-const requiredCredsKeys = [...credentialNames, "secret", "signature"];
-
 /**
  * HoloStore has two stores:
  * (1) "latestHoloMessage"--This stores the latest message sent to the user.
@@ -26750,19 +26718,6 @@ class HoloStore {
       );
       return false;
     }
-
-    // Ensure unencryptedCreds object has all and only the required keys
-    const unencryptedCredsKeys = Object.keys(credentials.unencryptedCreds);
-    const keysDiff = unencryptedCredsKeys
-      .filter((key) => !requiredCredsKeys.includes(key))
-      .concat(requiredCredsKeys.filter((key) => !unencryptedCredsKeys.includes(key)));
-    if (keysDiff.length > 0) {
-      console.log(
-        "HoloStore: credentials.unencryptedCreds does not have correct keys"
-      );
-      return false;
-    }
-
     return true;
   }
   /**
@@ -26892,7 +26847,10 @@ function popupListener(request, sender, sendResponse) {
       .then((encryptedMsg) => {
         const credentials = {
           unencryptedCreds: unencryptedCreds,
-          encryptedCreds: encryptedMsg,
+          encryptedCreds: {
+            credentials: encryptedMsg.encryptedMessage,
+            sharded: encryptedMsg.sharded,
+          },
         };
         return holoStore.setCredentials(credentials);
       })
@@ -27049,6 +27007,8 @@ function webPageListener(request, sender, sendResponse) {
       sharded: messageIsSharded,
       credentials: newCreds,
     };
+    console.log("latestMessage...");
+    console.log(latestMessage);
     holoStore
       .setLatestMessage(latestMessage)
       .then(() => displayConfirmationPopup("credentials"));

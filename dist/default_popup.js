@@ -1477,6 +1477,7 @@ function InitializeAccount({
     }
   }, /*#__PURE__*/React$1.createElement("form", {
     onSubmit: handleInitialize,
+    id: "initialize-account-form",
     autoComplete: "on"
   }, /*#__PURE__*/React$1.createElement("div", {
     className: "header-base"
@@ -1593,7 +1594,7 @@ function PasswordLogin({
     name: "password",
     placeholder: "password",
     autoComplete: "current-password",
-    className: "password-input text-field"
+    className: "text-field"
   })), /*#__PURE__*/React$1.createElement("button", {
     className: "x-button",
     style: {

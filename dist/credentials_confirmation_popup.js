@@ -1443,7 +1443,7 @@ function PasswordLogin({
     name: "password",
     placeholder: "password",
     autoComplete: "current-password",
-    className: "password-input text-field"
+    className: "text-field"
   })), /*#__PURE__*/React$1.createElement("button", {
     className: "x-button",
     style: {
@@ -1502,6 +1502,7 @@ function InitializeAccount({
     }
   }, /*#__PURE__*/React$1.createElement("form", {
     onSubmit: handleInitialize,
+    id: "initialize-account-form",
     autoComplete: "on"
   }, /*#__PURE__*/React$1.createElement("div", {
     className: "header-base"
@@ -1654,6 +1655,8 @@ function ConfirmCredentials({
   onConfirmation
 }) {
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+    id: "confirm-credentials-page"
+  }, /*#__PURE__*/React$1.createElement("div", {
     style: {
       textAlign: "center"
     }
@@ -1667,7 +1670,7 @@ function ConfirmCredentials({
     type: "submit",
     onClick: onConfirmation,
     className: "wide-button center-block"
-  }, "Confirm")));
+  }, "Confirm"))));
 }
 
 const credsConfSuccessMessage = "Your credentials have been encrypted and stored. " + "You can now generate zero knowledge proofs of identity.";
