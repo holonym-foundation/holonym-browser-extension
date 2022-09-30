@@ -86,6 +86,14 @@ describe("", async () => {
       });
     });
 
+    describe("holoGetIsLoggedIn", async () => {
+      it("Should return false when user is not logged in", async () => {
+        const payload = { command: "holoGetIsLoggedIn" };
+        const result = await sendMessage(defaultPopupPage, extensionId, payload);
+        expect(result.isLoggedIn).to.equal(false);
+      });
+    });
+
     describe("holoInitializeAccount", async () => {
       it("Should register the user, given a password", async () => {
         // Call holoInitializeAccount
@@ -118,6 +126,14 @@ describe("", async () => {
         };
         const result = await sendMessage(defaultPopupPage, extensionId, payload);
         expect(result.success).to.equal(true);
+      });
+
+      describe("holoGetIsLoggedIn", async () => {
+        it("Should return true when user is logged in", async () => {
+          const payload = { command: "holoGetIsLoggedIn" };
+          const result = await sendMessage(defaultPopupPage, extensionId, payload);
+          expect(result.isLoggedIn).to.equal(true);
+        });
       });
     });
 
@@ -276,13 +292,6 @@ describe("", async () => {
         await confirmationPopup.close();
       });
 
-      // it("Login attempt should succeed", async () => {
-      //   const payload = { command: "holoPopupLogin", password: validPassword };
-      //   const result = await sendMessage(confirmationPopup, extensionId, payload);
-      //   expect(result.success).to.equal(true);
-      //   await sleep(100);
-      // });
-
       it("Latest message in extension should contain testCreds", async () => {
         const payload = { command: "getHoloLatestMessage" };
         const latestMsg = await sendMessage(confirmationPopup, extensionId, payload);
@@ -343,6 +352,3 @@ describe("", async () => {
     });
   });
 });
-
-// NOTE: Commands left to test
-const allowedPopupCommands = ["holoGetIsLoggedIn"];
