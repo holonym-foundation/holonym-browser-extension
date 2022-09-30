@@ -15,6 +15,7 @@ import { sleep } from "./utils";
 let credentialsConfirmationPopupIsOpen = false;
 let shareCredsConfirmationPopupIsOpen = false;
 let confirmShareCredentials = false;
+let confirmCredentials = false;
 let generatingProof = false;
 
 const cryptoController = new CryptoController();
@@ -101,6 +102,7 @@ function popupListener(request, sender, sendResponse) {
   } else if (command == "confirmCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
+    confirmCredentials = true;
     let unencryptedCreds;
     holoStore
       .getLatestMessage()
@@ -283,17 +285,26 @@ function webPageListener(request, sender, sendResponse) {
       .then((decryptedCreds) => sendResponse(JSON.parse(decryptedCreds)));
     return true;
   } else if (command == "setHoloCredentials") {
+    async function waitForConfirmation() {
+      const timeout = new Date().getTime() + 180 * 1000;
+      while (new Date().getTime() <= timeout && !confirmCredentials) {
+        await sleep(50);
+      }
+      return confirmCredentials;
+    }
     const latestMessage = {
       sharded: messageIsSharded,
       credentials: newCreds,
     };
-    console.log("latestMessage...");
-    console.log(latestMessage);
     holoStore.setLatestMessage(latestMessage).then(() => {
       console.log("displaying confirmation popup");
       displayConfirmationPopup("credentials");
     });
-    return;
+    waitForConfirmation().then((confirm) => {
+      confirmCredentials = false; // reset
+      sendResponse({ success: confirm });
+    });
+    return true;
   } else if (command == "holoGetIsRegistered") {
     cryptoController
       .getIsRegistered()
