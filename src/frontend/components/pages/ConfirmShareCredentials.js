@@ -4,7 +4,10 @@ import Credentials from "../atoms/Credentials";
 function ConfirmShareCredentials({ credentials, onConfirmation }) {
   return (
     <>
-      <div style={{ textAlign: "center", marginTop: "10px" }}>
+      <div
+        id="confirm-share-credentials-page"
+        style={{ textAlign: "center", marginTop: "10px" }}
+      >
         <h2 className="header-base">Share Credentials</h2>
         <p className="small-paragraph">
           Confirm that you would like to share the following credentials with this

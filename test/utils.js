@@ -16,7 +16,7 @@ export async function sendMessage(page, extensionId, payload) {
   return new Promise(async (resolve, reject) => {
     setTimeout(() => {
       reject();
-    }, 5000);
+    }, 10000);
     const result = await page.evaluate(
       (extensionId, payload) => {
         return new Promise((resolve) => {
