@@ -19,6 +19,44 @@ function AppRoutes() {
   }
 
   useEffect(() => {
+    async function fn() {
+      // NOTE: This works
+      // const publicKeyCredentialCreationOptions = {
+      //   challenge: Uint8Array.from("random-string", (c) => c.charCodeAt(0)),
+      //   rp: {
+      //     name: "Holonym",
+      //     // id: "duosecurity.com",
+      //   },
+      //   user: {
+      //     id: Uint8Array.from("UZSL85T9AFC", (c) => c.charCodeAt(0)),
+      //     name: "random-user",
+      //     displayName: "rando",
+      //   },
+      //   pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+      //   authenticatorSelection: {
+      //     authenticatorAttachment: "cross-platform",
+      //   },
+      //   timeout: 60000,
+      //   attestation: "direct",
+      // };
+      // const credential = await navigator.credentials.create({
+      //   publicKey: publicKeyCredentialCreationOptions,
+      // });
+
+      // NOTE: This DOES NOT work
+      // const pwCreds = new PasswordCredential({
+      //   id: Uint8Array.from("UZSL85T9AFC", (c) => c.charCodeAt(0)),
+      //   // name: "random-user",
+      //   password: "test",
+      // });
+      // const credential = await navigator.credentials.store(pwCreds);
+
+      console.log(credential);
+    }
+    fn();
+  }, []);
+
+  useEffect(() => {
     if (loggedIn) return;
     function requestCredentials() {
       return new Promise((resolve, reject) => {

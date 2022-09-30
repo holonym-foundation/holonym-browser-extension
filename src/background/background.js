@@ -41,6 +41,7 @@ console.log("extension ID should be ", extensionId);
 let popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
+  "holoGetIsLoggedIn",
   "getHoloLatestMessage",
   "getHoloCredentials",
   "confirmCredentials",
@@ -65,6 +66,10 @@ function popupListener(request, sender, sendResponse) {
       sendResponse({ success: success });
     });
     return true; // <-- This is required in order to use sendResponse async
+  } else if (command == "holoGetIsLoggedIn") {
+    const loggedIn = cryptoController.getIsLoggedIn();
+    sendResponse({ isLoggedIn: loggedIn });
+    return;
   } else if (command == "getHoloLatestMessage") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
