@@ -41,8 +41,9 @@ function AppRoutes() {
 
   function handleConfirmation() {
     const message = { command: "confirmShareCredentials" };
-    navigate("/share-creds-success");
     chrome.runtime.sendMessage(message);
+    // navigate("/share-creds-success");
+    onExit();
   }
 
   function onExit() {
@@ -67,7 +68,7 @@ function AppRoutes() {
             />
           }
         />
-        <Route
+        {/* <Route
           path="/share-creds-success"
           element={
             <div style={{ marginTop: "150px" }}>
@@ -78,7 +79,7 @@ function AppRoutes() {
               />
             </div>
           }
-        />
+        /> */}
       </Routes>
     </>
   );

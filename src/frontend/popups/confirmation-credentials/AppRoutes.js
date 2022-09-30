@@ -33,7 +33,8 @@ function AppRoutes() {
   function handleCredsConfirmation() {
     const message = { command: "confirmCredentials" };
     const callback = (resp) => {
-      navigate("/creds-confirmation-success", { replace: true });
+      // navigate("/creds-confirmation-success", { replace: true });
+      onExit();
     };
     chrome.runtime.sendMessage(message, callback);
   }
@@ -43,20 +44,6 @@ function AppRoutes() {
     chrome.runtime.sendMessage(message);
     window.close();
   }
-
-  // const testCredentialsDeleteMe = {
-  //   firstName: "Vitalik",
-  //   lastName: "Buterin",
-  //   middleInitial: "",
-  //   countryCode: 0,
-  //   streetAddr1: "6969 Second Street",
-  //   streetAddr2: "",
-  //   city: "Los Angeles",
-  //   subdivision: "",
-  //   postalCode: "696969",
-  //   completedAt: "1234",
-  //   birthdate: "06/09/1969",
-  // };
 
   return (
     <>
@@ -86,7 +73,7 @@ function AppRoutes() {
             />
           }
         />
-        <Route
+        {/* <Route
           path="/creds-confirmation-success"
           element={
             <div style={{ marginTop: "150px" }}>
@@ -97,7 +84,7 @@ function AppRoutes() {
               />
             </div>
           }
-        />
+        /> */}
       </Routes>
     </>
   );
