@@ -26738,14 +26738,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * This background script handles messages from both the webpage and
  * the confirmation popup.
  */
-
-// --------------------------------------------------------------
-// Functions for listening to messages from popups
-// --------------------------------------------------------------
-
-// TODO: Use an event emitter in place of some of these global variables
-let credentialsConfirmationPopupIsOpen = false;
 let confirmShareCredentials = false;
+let confirmCredentials = false;
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
@@ -26770,6 +26764,7 @@ console.log("extension ID should be ", extensionId);
 let popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
+  "holoGetIsLoggedIn",
   "getHoloLatestMessage",
   "getHoloCredentials",
   "confirmCredentials",
@@ -26794,6 +26789,10 @@ function popupListener(request, sender, sendResponse) {
       sendResponse({ success: success });
     });
     return true; // <-- This is required in order to use sendResponse async
+  } else if (command == "holoGetIsLoggedIn") {
+    const loggedIn = cryptoController.getIsLoggedIn();
+    sendResponse({ isLoggedIn: loggedIn });
+    return;
   } else if (command == "getHoloLatestMessage") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
@@ -26831,6 +26830,7 @@ function popupListener(request, sender, sendResponse) {
   } else if (command == "confirmCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
+    confirmCredentials = true;
     let unencryptedCreds;
     holoStore
       .getLatestMessage()
@@ -26887,8 +26887,6 @@ function popupListener(request, sender, sendResponse) {
     return true;
   } else if (command == "confirmShareCredentials") {
     confirmShareCredentials = true;
-  } else if (command == "closingHoloCredentialsConfirmationPopup") {
-    credentialsConfirmationPopupIsOpen = false;
   } else ;
 }
 
@@ -26898,8 +26896,6 @@ function popupListener(request, sender, sendResponse) {
 async function displayConfirmationPopup(type) {
   let url = "";
   if (type == "credentials") {
-    if (credentialsConfirmationPopupIsOpen) return;
-    credentialsConfirmationPopupIsOpen = true;
     url = "credentials_confirmation_popup.html";
   } else if (type == "share-creds") {
     url = "share_creds_confirmation_popup.html";
@@ -26935,7 +26931,6 @@ async function displayConfirmationPopup(type) {
     const window = await chrome.windows.create(config);
   } catch (err) {
     console.log(err);
-    credentialsConfirmationPopupIsOpen = false;
   }
 }
 
@@ -27006,16 +27001,26 @@ function webPageListener(request, sender, sendResponse) {
       .then((decryptedCreds) => sendResponse(JSON.parse(decryptedCreds)));
     return true;
   } else if (command == "setHoloCredentials") {
+    async function waitForConfirmation() {
+      const timeout = new Date().getTime() + 180 * 1000;
+      while (new Date().getTime() <= timeout && !confirmCredentials) {
+        await sleep(50);
+      }
+      return confirmCredentials;
+    }
     const latestMessage = {
       sharded: messageIsSharded,
       credentials: newCreds,
     };
-    console.log("latestMessage...");
-    console.log(latestMessage);
-    holoStore
-      .setLatestMessage(latestMessage)
-      .then(() => displayConfirmationPopup("credentials"));
-    return;
+    holoStore.setLatestMessage(latestMessage).then(() => {
+      console.log("displaying confirmation popup");
+      displayConfirmationPopup("credentials");
+    });
+    waitForConfirmation().then((confirm) => {
+      confirmCredentials = false; // reset
+      sendResponse({ success: confirm });
+    });
+    return true;
   } else if (command == "holoGetIsRegistered") {
     cryptoController
       .getIsRegistered()

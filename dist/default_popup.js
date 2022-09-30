@@ -1621,7 +1621,27 @@ function LandingPage({
       });
     }
 
-    getIsRegistered().then(val => setRegistered(val));
+    function getIsLoggedIn() {
+      return new Promise(resolve => {
+        const message = {
+          command: "holoGetIsLoggedIn"
+        };
+
+        const callback = resp => resolve(resp.isLoggedIn);
+
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+
+    (async () => {
+      const registeredTemp = await getIsRegistered();
+      setRegistered(registeredTemp);
+
+      if (registeredTemp) {
+        const isLoggedIn = await getIsLoggedIn();
+        if (isLoggedIn) onLoginSuccess();
+      }
+    })();
   }, []);
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
     style: {
@@ -27776,6 +27796,42 @@ function AppRoutes() {
     });
   }
 
+  react.exports.useEffect(() => {
+    async function fn() {
+      // NOTE: This works
+      // const publicKeyCredentialCreationOptions = {
+      //   challenge: Uint8Array.from("random-string", (c) => c.charCodeAt(0)),
+      //   rp: {
+      //     name: "Holonym",
+      //     // id: "duosecurity.com",
+      //   },
+      //   user: {
+      //     id: Uint8Array.from("UZSL85T9AFC", (c) => c.charCodeAt(0)),
+      //     name: "random-user",
+      //     displayName: "rando",
+      //   },
+      //   pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+      //   authenticatorSelection: {
+      //     authenticatorAttachment: "cross-platform",
+      //   },
+      //   timeout: 60000,
+      //   attestation: "direct",
+      // };
+      // const credential = await navigator.credentials.create({
+      //   publicKey: publicKeyCredentialCreationOptions,
+      // });
+      // NOTE: This DOES NOT work
+      // const pwCreds = new PasswordCredential({
+      //   id: Uint8Array.from("UZSL85T9AFC", (c) => c.charCodeAt(0)),
+      //   // name: "random-user",
+      //   password: "test",
+      // });
+      // const credential = await navigator.credentials.store(pwCreds);
+      console.log(credential);
+    }
+
+    fn();
+  }, []);
   react.exports.useEffect(() => {
     if (loggedIn) return;
 

@@ -1584,7 +1584,27 @@ function LandingPage({
       });
     }
 
-    getIsRegistered().then(val => setRegistered(val));
+    function getIsLoggedIn() {
+      return new Promise(resolve => {
+        const message = {
+          command: "holoGetIsLoggedIn"
+        };
+
+        const callback = resp => resolve(resp.isLoggedIn);
+
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+
+    (async () => {
+      const registeredTemp = await getIsRegistered();
+      setRegistered(registeredTemp);
+
+      if (registeredTemp) {
+        const isLoggedIn = await getIsLoggedIn();
+        if (isLoggedIn) onLoginSuccess();
+      }
+    })();
   }, []);
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
     style: {
@@ -1641,8 +1661,10 @@ function ConfirmShareCredentials({
   onConfirmation
 }) {
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+    id: "confirm-share-credentials-page",
     style: {
-      textAlign: "center"
+      textAlign: "center",
+      marginTop: "10px"
     }
   }, /*#__PURE__*/React$1.createElement("h2", {
     className: "header-base"
@@ -1707,8 +1729,9 @@ function AppRoutes() {
     const message = {
       command: "confirmShareCredentials"
     };
-    navigate("/share-creds-success");
-    chrome.runtime.sendMessage(message);
+    chrome.runtime.sendMessage(message); // navigate("/share-creds-success");
+
+    onExit();
   }
 
   function onExit() {
@@ -1726,25 +1749,10 @@ function AppRoutes() {
     })
   }), /*#__PURE__*/React$1.createElement(Route, {
     path: "/confirm-share-creds",
-    element: /*#__PURE__*/React$1.createElement("div", {
-      style: {
-        marginTop: "10px"
-      }
-    }, /*#__PURE__*/React$1.createElement(ConfirmShareCredentials, {
+    element: /*#__PURE__*/React$1.createElement(ConfirmShareCredentials, {
       credentials: credentials,
       onConfirmation: handleConfirmation
-    }))
-  }), /*#__PURE__*/React$1.createElement(Route, {
-    path: "/share-creds-success",
-    element: /*#__PURE__*/React$1.createElement("div", {
-      style: {
-        marginTop: "150px"
-      }
-    }, /*#__PURE__*/React$1.createElement(Success, {
-      message: "Successfully shared credentials",
-      onExit: onExit,
-      exitButtonText: "Close"
-    }))
+    })
   })));
 }
 

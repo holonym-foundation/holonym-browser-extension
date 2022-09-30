@@ -1598,7 +1598,27 @@ function LandingPage({
       });
     }
 
-    getIsRegistered().then(val => setRegistered(val));
+    function getIsLoggedIn() {
+      return new Promise(resolve => {
+        const message = {
+          command: "holoGetIsLoggedIn"
+        };
+
+        const callback = resp => resolve(resp.isLoggedIn);
+
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+
+    (async () => {
+      const registeredTemp = await getIsRegistered();
+      setRegistered(registeredTemp);
+
+      if (registeredTemp) {
+        const isLoggedIn = await getIsLoggedIn();
+        if (isLoggedIn) onLoginSuccess();
+      }
+    })();
   }, []);
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
     style: {
@@ -1673,8 +1693,6 @@ function ConfirmCredentials({
   }, "Confirm"))));
 }
 
-const credsConfSuccessMessage = "Your credentials have been encrypted and stored. " + "You can now generate zero knowledge proofs of identity.";
-
 function AppRoutes() {
   const [credentials, setCredentials] = react.exports.useState();
   const navigate = useNavigate();
@@ -1708,9 +1726,8 @@ function AppRoutes() {
     };
 
     const callback = resp => {
-      navigate("/creds-confirmation-success", {
-        replace: true
-      });
+      // navigate("/creds-confirmation-success", { replace: true });
+      onExit();
     };
 
     chrome.runtime.sendMessage(message, callback);
@@ -1722,20 +1739,7 @@ function AppRoutes() {
     };
     chrome.runtime.sendMessage(message);
     window.close();
-  } // const testCredentialsDeleteMe = {
-  //   firstName: "Vitalik",
-  //   lastName: "Buterin",
-  //   middleInitial: "",
-  //   countryCode: 0,
-  //   streetAddr1: "6969 Second Street",
-  //   streetAddr2: "",
-  //   city: "Los Angeles",
-  //   subdivision: "",
-  //   postalCode: "696969",
-  //   completedAt: "1234",
-  //   birthdate: "06/09/1969",
-  // };
-
+  }
 
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement(Routes, null, /*#__PURE__*/React$1.createElement(Route, {
     path: "/",
@@ -1748,17 +1752,6 @@ function AppRoutes() {
       credentials: credentials,
       onConfirmation: handleCredsConfirmation
     })
-  }), /*#__PURE__*/React$1.createElement(Route, {
-    path: "/creds-confirmation-success",
-    element: /*#__PURE__*/React$1.createElement("div", {
-      style: {
-        marginTop: "150px"
-      }
-    }, /*#__PURE__*/React$1.createElement(Success, {
-      message: credsConfSuccessMessage,
-      onExit: onExit,
-      exitButtonText: "Close"
-    }))
   })));
 }
 
