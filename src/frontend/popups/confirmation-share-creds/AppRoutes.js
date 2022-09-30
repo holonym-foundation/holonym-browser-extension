@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import PasswordLogin from "../../components/atoms/PasswordLogin";
-import LandingPage from "../../components/LandingPage";
-import ConfirmShareCredentials from "../../components/molecules/ConfirmShareCredentials";
+import LandingPage from "../../components/pages/LandingPage";
+import ConfirmShareCredentials from "../../components/pages/ConfirmShareCredentials";
 import Success from "../../components/atoms/Success";
 import Loading from "../../components/atoms/Loading";
 
@@ -61,12 +61,10 @@ function AppRoutes() {
         <Route
           path="/confirm-share-creds"
           element={
-            <div style={{ marginTop: "10px" }}>
-              <ConfirmShareCredentials
-                credentials={credentials}
-                onConfirmation={handleConfirmation}
-              />
-            </div>
+            <ConfirmShareCredentials
+              credentials={credentials}
+              onConfirmation={handleConfirmation}
+            />
           }
         />
         <Route

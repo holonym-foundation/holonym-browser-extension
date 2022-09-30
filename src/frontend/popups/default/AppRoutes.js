@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import LandingPage from "../../components/LandingPage";
+import LandingPage from "../../components/pages/LandingPage";
 import Credentials from "../../components/atoms/Credentials";
 import ResetAccount from "../../components/molecules/ResetAccount";
 import { sleep } from "../../../background/utils";

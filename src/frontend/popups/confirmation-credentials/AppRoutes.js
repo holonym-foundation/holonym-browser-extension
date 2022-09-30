@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import PasswordLogin from "../../components/atoms/PasswordLogin";
-import LandingPage from "../../components/LandingPage";
-import ConfirmCredentials from "../../components/molecules/ConfirmCredentials";
+import LandingPage from "../../components/pages/LandingPage";
+import ConfirmCredentials from "../../components/pages/ConfirmCredentials";
 import Success from "../../components/atoms/Success";
 import Loading from "../../components/atoms/Loading";
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import SetPassword from "./molecules/SetPassword";
-import PasswordLogin from "./atoms/PasswordLogin";
-import ChangePassword from "./atoms/ChangePassword";
+import SetPassword from "../molecules/SetPassword";
+import PasswordLogin from "../atoms/PasswordLogin";
+import ChangePassword from "../atoms/ChangePassword";
 
 function LandingPage({ onLoginSuccess }) {
   const [registered, setRegistered] = useState(false);
