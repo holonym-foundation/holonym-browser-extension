@@ -8,7 +8,7 @@ function ConfirmShareCredentials({ credentials, onConfirmation }) {
         id="confirm-share-credentials-page"
         style={{ textAlign: "center", marginTop: "10px" }}
       >
-        <h2 className="header-base">Share Credentials</h2>
+        <h1>Share Credentials</h1>
         <p className="small-paragraph">
           Confirm that you would like to share the following credentials with this
           website.

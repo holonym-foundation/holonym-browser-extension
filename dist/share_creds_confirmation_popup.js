@@ -1666,9 +1666,7 @@ function ConfirmShareCredentials({
       textAlign: "center",
       marginTop: "10px"
     }
-  }, /*#__PURE__*/React$1.createElement("h2", {
-    className: "header-base"
-  }, "Share Credentials"), /*#__PURE__*/React$1.createElement("p", {
+  }, /*#__PURE__*/React$1.createElement("h1", null, "Share Credentials"), /*#__PURE__*/React$1.createElement("p", {
     className: "small-paragraph"
   }, "Confirm that you would like to share the following credentials with this website.")), /*#__PURE__*/React$1.createElement(Credentials, {
     credentials: credentials
