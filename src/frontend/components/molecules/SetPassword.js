@@ -21,6 +21,7 @@ function SetPassword({ onAccountCreated }) {
         ) : (
           <InitializeAccount
             inputLabel="Set Password"
+            subLabel="We suggest that you write down your password and store it somewhere safe"
             onInitializeSuccess={onInitializeSuccess}
           />
         )}
