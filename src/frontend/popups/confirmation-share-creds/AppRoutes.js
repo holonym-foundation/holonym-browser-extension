@@ -39,9 +39,10 @@ function AppRoutes() {
     getAndSetCredentials();
   }
 
-  function handleConfirmation() {
+  async function handleConfirmation() {
     const message = { command: "confirmShareCredentials" };
     chrome.runtime.sendMessage(message);
+    await sleep(50); // give background script time to handle this message before sending the next message
     // navigate("/share-creds-success");
     onExit();
   }
