@@ -4,7 +4,6 @@ prod-materials/
 */.DS_Store
 .parcel-cache/
 
-.vscode/
 .env
 
 rollup-temp
