@@ -16,7 +16,6 @@ let credentialsConfirmationPopupIsOpen = false;
 let shareCredsConfirmationPopupIsOpen = false;
 let confirmShareCredentials = false;
 let confirmCredentials = false;
-let generatingProof = false;
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
@@ -73,21 +72,17 @@ function popupListener(request, sender, sendResponse) {
   } else if (command == "getHoloLatestMessage") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
-    let isStoringCreds = false;
     holoStore
       .getLatestMessage()
       .then((encryptedMsg) => {
-        isStoringCreds = encryptedMsg?.credentials ? true : false;
-        const message = encryptedMsg.credentials || encryptedMsg.proof;
-        return cryptoController.decryptWithPrivateKey(message, encryptedMsg.sharded);
+        return cryptoController.decryptWithPrivateKey(
+          encryptedMsg.credentials,
+          encryptedMsg.sharded
+        );
       })
-      .then((decryptedMsg) => {
-        if (isStoringCreds) {
-          sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } });
-        } else {
-          sendResponse({ message: { proof: JSON.parse(decryptedMsg) } });
-        }
-      });
+      .then((decryptedMsg) =>
+        sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } })
+      );
     return true;
   } else if (command == "getHoloCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
@@ -172,7 +167,7 @@ function popupListener(request, sender, sendResponse) {
 }
 
 /**
- * @param {string} type Either "credentials" or "proof"; the desired popup type
+ * @param {string} type Either "credentials" or "share-creds"; the desired popup type
  */
 async function displayConfirmationPopup(type) {
   let url = "";
