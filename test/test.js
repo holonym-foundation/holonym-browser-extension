@@ -286,10 +286,10 @@ describe("", async () => {
         }
       });
 
-      after(async () => {
+      after(() => {
         const payload = { command: "closingHoloCredentialsConfirmationPopup" };
-        await sendMessage(confirmationPopup, extensionId, payload);
-        await confirmationPopup.close();
+        sendMessage(confirmationPopup, extensionId, payload);
+        confirmationPopup.close();
       });
 
       it("Latest message in extension should contain testCreds", async () => {
