@@ -6,6 +6,8 @@ import ConfirmShareCredentials from "../../components/pages/ConfirmShareCredenti
 import Success from "../../components/atoms/Success";
 import Loading from "../../components/atoms/Loading";
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 function AppRoutes() {
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState();
