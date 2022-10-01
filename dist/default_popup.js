@@ -1441,6 +1441,7 @@ function InitializeAccount({
   onInitializeSuccess
 }) {
   const [password, setPassword] = react.exports.useState("");
+  const [passwordConf, setPasswordConf] = react.exports.useState("");
   const [passwordScore, setPasswordScore] = react.exports.useState(0);
 
   async function handleInitialize(event) {
@@ -1448,6 +1449,11 @@ function InitializeAccount({
 
     if (passwordScore < 4) {
       alert("Please choose a stronger password");
+      return;
+    }
+
+    if (password != passwordConf) {
+      alert("Passwords must match");
       return;
     }
 
@@ -1489,6 +1495,14 @@ function InitializeAccount({
     value: password,
     onChange: e => setPassword(e.target.value),
     placeholder: "password",
+    autoComplete: "current-password",
+    className: "text-field"
+  }), /*#__PURE__*/React$1.createElement("input", {
+    type: "password",
+    name: "password-confirmation",
+    value: passwordConf,
+    onChange: e => setPasswordConf(e.target.value),
+    placeholder: "confirm password",
     autoComplete: "current-password",
     className: "text-field"
   })), /*#__PURE__*/React$1.createElement("div", {
@@ -1552,6 +1566,7 @@ function SetPassword({
     exitButtonText: "Exit"
   }) : /*#__PURE__*/React$1.createElement(InitializeAccount, {
     inputLabel: "Set Password",
+    subLabel: "We suggest that you write down your password and store it somewhere safe",
     onInitializeSuccess: onInitializeSuccess
   })));
 }
@@ -27796,42 +27811,6 @@ function AppRoutes() {
     });
   }
 
-  react.exports.useEffect(() => {
-    async function fn() {
-      // NOTE: This works
-      // const publicKeyCredentialCreationOptions = {
-      //   challenge: Uint8Array.from("random-string", (c) => c.charCodeAt(0)),
-      //   rp: {
-      //     name: "Holonym",
-      //     // id: "duosecurity.com",
-      //   },
-      //   user: {
-      //     id: Uint8Array.from("UZSL85T9AFC", (c) => c.charCodeAt(0)),
-      //     name: "random-user",
-      //     displayName: "rando",
-      //   },
-      //   pubKeyCredParams: [{ alg: -7, type: "public-key" }],
-      //   authenticatorSelection: {
-      //     authenticatorAttachment: "cross-platform",
-      //   },
-      //   timeout: 60000,
-      //   attestation: "direct",
-      // };
-      // const credential = await navigator.credentials.create({
-      //   publicKey: publicKeyCredentialCreationOptions,
-      // });
-      // NOTE: This DOES NOT work
-      // const pwCreds = new PasswordCredential({
-      //   id: Uint8Array.from("UZSL85T9AFC", (c) => c.charCodeAt(0)),
-      //   // name: "random-user",
-      //   password: "test",
-      // });
-      // const credential = await navigator.credentials.store(pwCreds);
-      console.log(credential);
-    }
-
-    fn();
-  }, []);
   react.exports.useEffect(() => {
     if (loggedIn) return;
 

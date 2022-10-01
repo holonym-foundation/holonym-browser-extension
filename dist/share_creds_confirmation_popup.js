@@ -1452,6 +1452,7 @@ function InitializeAccount({
   onInitializeSuccess
 }) {
   const [password, setPassword] = react.exports.useState("");
+  const [passwordConf, setPasswordConf] = react.exports.useState("");
   const [passwordScore, setPasswordScore] = react.exports.useState(0);
 
   async function handleInitialize(event) {
@@ -1459,6 +1460,11 @@ function InitializeAccount({
 
     if (passwordScore < 4) {
       alert("Please choose a stronger password");
+      return;
+    }
+
+    if (password != passwordConf) {
+      alert("Passwords must match");
       return;
     }
 
@@ -1500,6 +1506,14 @@ function InitializeAccount({
     value: password,
     onChange: e => setPassword(e.target.value),
     placeholder: "password",
+    autoComplete: "current-password",
+    className: "text-field"
+  }), /*#__PURE__*/React$1.createElement("input", {
+    type: "password",
+    name: "password-confirmation",
+    value: passwordConf,
+    onChange: e => setPasswordConf(e.target.value),
+    placeholder: "confirm password",
     autoComplete: "current-password",
     className: "text-field"
   })), /*#__PURE__*/React$1.createElement("div", {
@@ -1563,6 +1577,7 @@ function SetPassword({
     exitButtonText: "Exit"
   }) : /*#__PURE__*/React$1.createElement(InitializeAccount, {
     inputLabel: "Set Password",
+    subLabel: "We suggest that you write down your password and store it somewhere safe",
     onInitializeSuccess: onInitializeSuccess
   })));
 }
@@ -1723,11 +1738,13 @@ function AppRoutes() {
     getAndSetCredentials();
   }
 
-  function handleConfirmation() {
+  async function handleConfirmation() {
     const message = {
       command: "confirmShareCredentials"
     };
-    chrome.runtime.sendMessage(message); // navigate("/share-creds-success");
+    chrome.runtime.sendMessage(message);
+    await sleep(50); // give background script time to handle this message before sending the next message
+    // navigate("/share-creds-success");
 
     onExit();
   }
