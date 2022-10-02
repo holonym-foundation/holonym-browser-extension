@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { initialize, sleep } from "./utils/utils.js";
 
 // NOTE: Sometimes the following error is thrown:
-// "Evaluation failed: ReferenceError: HoloStore is not defined."
+// "Evaluation failed: ReferenceError: HoloStore is not defined"
 // Just re-run if this happens.
 describe("HoloStore", async () => {
   let browser;

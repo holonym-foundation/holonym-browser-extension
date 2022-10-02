@@ -140,17 +140,15 @@ class CryptoController {
         encryptedPrivateKey: encryptedPrivateKey,
         publicKey: publicKey,
       };
-      chrome.storage.local.set({ holoKeyPair: keyPair }, () => {
-        resolve();
-      });
+      chrome.storage.local.set({ holoKeyPair: keyPair }, resolve);
     });
   }
 
   getKeyPair() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(["holoKeyPair"], (result) => {
-        resolve(result?.holoKeyPair);
-      });
+      chrome.storage.local.get(["holoKeyPair"], (result) =>
+        resolve(result?.holoKeyPair)
+      );
     });
   }
 
@@ -159,9 +157,9 @@ class CryptoController {
    */
   getPublicKey() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(["holoKeyPair"], (result) => {
-        resolve(result?.holoKeyPair?.publicKey);
-      });
+      chrome.storage.local.get(["holoKeyPair"], (result) =>
+        resolve(result?.holoKeyPair?.publicKey)
+      );
     });
   }
 
@@ -282,9 +280,7 @@ class CryptoController {
    */
   setPasswordHash(passwordHash) {
     return new Promise((resolve) => {
-      chrome.storage.local.set({ holoPasswordHash: passwordHash }, () => {
-        resolve();
-      });
+      chrome.storage.local.set({ holoPasswordHash: passwordHash }, resolve);
     });
   }
 
@@ -298,9 +294,7 @@ class CryptoController {
 
   setPasswordSalt(salt) {
     return new Promise((resolve) => {
-      chrome.storage.local.set({ holoPasswordSalt: salt }, () => {
-        resolve();
-      });
+      chrome.storage.local.set({ holoPasswordSalt: salt }, resolve);
     });
   }
 
