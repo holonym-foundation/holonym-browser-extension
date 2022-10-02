@@ -97,7 +97,8 @@ function popupListener(request, sender, sendResponse) {
       )
       .then((decryptedCreds) =>
         sendResponse({ credentials: JSON.parse(decryptedCreds) })
-      );
+      )
+      .catch((err) => sendResponse({}));
     return true;
   } else if (command == "confirmCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();

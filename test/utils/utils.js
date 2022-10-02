@@ -45,7 +45,7 @@ export async function sendMessage(page, extensionId, payload) {
   return new Promise(async (resolve, reject) => {
     setTimeout(() => {
       reject();
-    }, 10000);
+    }, 9000);
     const result = await page.evaluate(
       (extensionId, payload) => {
         return new Promise((resolve) => {
@@ -111,6 +111,7 @@ export async function login(popupPage, extensionId, password) {
 
 /**
  * Get public key, encrypt credentials, and send credentials to extension.
+ * Spawns a confirmation popup.
  * @param {Puppeteer.Page} frontendPage e.g., the page at app.holonym.id
  * @param {string} extensionId
  */

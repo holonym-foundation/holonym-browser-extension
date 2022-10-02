@@ -201,7 +201,7 @@ describe("Message passing", async () => {
       // TODO: Latest message should be inaccessible to extension if message isn't encrypted with extension's public key
       // TODO: Test cases with invalid credentials
 
-      it("Credentials sent from frontend should not be stored if popup sends denyCredentials", async () => {
+      it("Credentials sent by frontend should not be stored if popup sends denyCredentials", async () => {
         confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
         const loginResult = await login(confirmationPopup, extensionId, validPassword);
         expect(loginResult.success).to.equal(true);
@@ -217,7 +217,7 @@ describe("Message passing", async () => {
         // Check that credentials are not stored as credentials
         const payload3 = { command: "getHoloCredentials" };
         const creds = await sendMessage(confirmationPopup, extensionId, payload3);
-        expect(creds).to.equal(undefined);
+        expect(creds).to.be.an("object").that.is.empty;
         // Check that credentials are not stored as latest message
         const payload4 = { command: "getHoloLatestMessage" };
         const resp2 = await sendMessage(confirmationPopup, extensionId, payload4);
@@ -233,15 +233,15 @@ describe("Message passing", async () => {
         const payload1 = { command: "getHoloLatestMessage" };
         const latestMsg = await sendMessage(confirmationPopup, extensionId, payload1);
         expect(latestMsg.message.credentials).to.deep.equal(testCreds);
-        // TODO: Clear latest message by calling chrome.storage directly from within service worker rather than by sending a denyCredentials message
-        // Deny credentials
-        const payload2 = { command: "denyCredentials" };
-        await sendMessage(confirmationPopup, extensionId, payload2);
-        // await sleep(50);
-        // // Check stored credentials
-        // const payload3 = { command: "getHoloCredentials" };
-        // const creds = await sendMessage(confirmationPopup, extensionId, payload3);
-        // expect(creds).to.equal(undefined);
+        // Clear latest message
+        await serviceWorker.evaluate(() => {
+          chrome.storage.local.set({ latestHoloMessage: "" });
+        });
+        await sleep(50);
+        // Check that latest message is empty
+        const payload4 = { command: "getHoloLatestMessage" };
+        const resp2 = await sendMessage(confirmationPopup, extensionId, payload4);
+        expect(resp2).to.equal(undefined);
       });
 
       it("Credentials sent by frontend should be stored after popup sends confirmCredentials", async () => {

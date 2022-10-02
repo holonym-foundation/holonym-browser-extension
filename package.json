@@ -4,7 +4,7 @@
     "build:dev": "NODE_ENV=dev bash build.sh",
     "build:prod": "NODE_ENV=production bash build.sh",
     "view-on-mac": "bash build.sh; open dist/default_popup.html",
-    "test": "npx mocha --timeout 6s"
+    "test": "npx mocha --timeout 10s"
   },
   "license": "MIT",
   "dependencies": {
