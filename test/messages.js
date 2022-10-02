@@ -35,15 +35,10 @@ describe("Message passing", async () => {
   before(async () => {
     const initVals = await initialize();
     browser = initVals.browser;
+    serviceWorker = initVals.serviceWorker;
     extensionId = initVals.extensionId;
     frontendPage = await browser.newPage();
     defaultPopupPage = await browser.newPage();
-    // Set extensionId and popupOrigin in the background script (i.e., service worker)
-    serviceWorker = await initVals.serviceWorkerTarget.worker();
-    await serviceWorker.evaluateHandle((extId) => {
-      extensionId = extId;
-      popupOrigin = `chrome-extension://${extensionId}`;
-    }, extensionId);
   });
 
   after(async () => {

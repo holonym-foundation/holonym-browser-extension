@@ -13,12 +13,7 @@ describe("HoloStore", async () => {
     const initVals = await initialize();
     browser = initVals.browser;
     extensionId = initVals.extensionId;
-    // Set extensionId and popupOrigin in the background script (i.e., service worker)
-    serviceWorker = await initVals.serviceWorkerTarget.worker();
-    await serviceWorker.evaluateHandle((extId) => {
-      extensionId = extId;
-      popupOrigin = `chrome-extension://${extensionId}`;
-    }, extensionId);
+    serviceWorker = initVals.serviceWorker;
   });
 
   after(async () => {
