@@ -1,38 +1,17 @@
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import puppeteer from "puppeteer";
 import { expect } from "chai";
-import { sleep, sendMessage, encrypt } from "./utils.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const pathToExtension = `${__dirname}/../dist`;
+import {
+  initialize,
+  sleep,
+  sendMessage,
+  encrypt,
+  login,
+  sendEncryptedCredentials,
+  getPopupPage,
+} from "./utils/utils.js";
 
 // NOTE: frontendUrl must be either "https://app.holonym.id" or "http://localhost:3002"
 // Use "http://localhost:3002" if testing without internet connection
 const frontendUrl = "https://app.holonym.id";
-
-async function initialize() {
-  const browser = await puppeteer.launch({
-    executablePath: process.env.PUPPETEER_EXEC_PATH, // See puppeteer-headful GitHub Action
-    headless: false,
-    devtools: false,
-    args: [
-      `--no-sandbox`,
-      `--disable-extensions-except=${pathToExtension}`,
-      `--load-extension=${pathToExtension}`,
-    ],
-  });
-  const serviceWorkerTarget = await browser.waitForTarget(
-    (target) => target.type() === "service_worker"
-  );
-  const extensionId = serviceWorkerTarget.url().split("://")[1].split("/")[0];
-  return {
-    browser: browser,
-    serviceWorkerTarget: serviceWorkerTarget,
-    extensionId: extensionId,
-  };
-}
 
 /**
  * The following tests are separates into "atomic" and "interactive" tests.
@@ -43,7 +22,7 @@ async function initialize() {
  * NOTE: The sequence of the tests matters. Specifically, items stored in chrome storage
  * persist across tests. This includes password, latest message, and credentials.
  */
-describe("", async () => {
+describe("Message passing", async () => {
   let browser;
   let serviceWorkerTarget;
   let extensionId;
@@ -95,7 +74,7 @@ describe("", async () => {
     });
 
     describe("holoInitializeAccount", async () => {
-      it("Should register the user, given a password", async () => {
+      it("Should register the user, given a valid password", async () => {
         // Call holoInitializeAccount
         const payload1 = {
           command: "holoInitializeAccount",
@@ -127,13 +106,13 @@ describe("", async () => {
         const result = await sendMessage(defaultPopupPage, extensionId, payload);
         expect(result.success).to.equal(true);
       });
+    });
 
-      describe("holoGetIsLoggedIn", async () => {
-        it("Should return true when user is logged in", async () => {
-          const payload = { command: "holoGetIsLoggedIn" };
-          const result = await sendMessage(defaultPopupPage, extensionId, payload);
-          expect(result.isLoggedIn).to.equal(true);
-        });
+    describe("holoGetIsLoggedIn", async () => {
+      it("Should return true when user is logged in", async () => {
+        const payload = { command: "holoGetIsLoggedIn" };
+        const result = await sendMessage(defaultPopupPage, extensionId, payload);
+        expect(result.isLoggedIn).to.equal(true);
       });
     });
 
@@ -204,116 +183,91 @@ describe("", async () => {
       countryCode: 2,
       subdivision: "NY",
     };
-    describe("Fail to send credentials from frontend to store in extension", async () => {
+
+    describe("Frontend sends credentials to extension", async () => {
       let confirmationPopup;
 
-      // TODO: Create function for setup. This setup is used in this and the next set of tests
-      before(async () => {
-        // Setup: Get public key, encrypt credentials, and send credentials to extension
-        const payload1 = { command: "getHoloPublicKey" };
-        const publicKey = await sendMessage(frontendPage, extensionId, payload1);
-        const encryptedCreds = await encrypt(publicKey, JSON.stringify(testCreds));
-        const payload2 = {
-          command: "setHoloCredentials",
-          credentials: encryptedCreds,
-          sharded: false,
-        };
-        sendMessage(frontendPage, extensionId, payload2);
-        // Get confirmation popup
-        await sleep(100);
-        const pages = await browser.pages();
-        for (const page of pages) {
-          const loginForm = await page.$("#login-form");
-          if (loginForm) {
-            confirmationPopup = page;
-          }
-        }
-      });
-
       after(async () => {
-        const payload = { command: "closingHoloCredentialsConfirmationPopup" };
-        await sendMessage(confirmationPopup, extensionId, payload);
+        const payload3 = { command: "closingHoloCredentialsConfirmationPopup" };
+        await sendMessage(confirmationPopup, extensionId, payload3);
         await confirmationPopup.close();
       });
 
-      it("Login attempt should succeed", async () => {
-        const payload = { command: "holoPopupLogin", password: validPassword };
-        const result = await sendMessage(confirmationPopup, extensionId, payload);
-        expect(result.success).to.equal(true);
-        await sleep(100);
-      });
+      // TODO: Latest message should be inaccessible to extension if message isn't encrypted with extension's public key
 
-      it("Latest message in extension should contain testCreds", async () => {
-        const payload = { command: "getHoloLatestMessage" };
-        const latestMsg = await sendMessage(confirmationPopup, extensionId, payload);
-        expect(latestMsg.message.credentials).to.deep.equal(testCreds);
-      });
-
-      it("Credentials should not be stored when they are denied", async () => {
-        // Confirm credentials
-        const payload1 = { command: "denyCredentials" };
-        await sendMessage(confirmationPopup, extensionId, payload1);
+      it("Credentials sent from frontend should not be stored if popup sends denyCredentials", async () => {
+        sendEncryptedCredentials(frontendPage, extensionId, testCreds);
         await sleep(100);
-        // Check stored credentials
-        const payload2 = { command: "getHoloCredentials" };
-        const creds = await sendMessage(confirmationPopup, extensionId, payload2);
+        confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
+        const loginResult = await login(confirmationPopup, extensionId, validPassword);
+        expect(loginResult.success).to.equal(true);
+        await sleep(100);
+        // Get latest message
+        const payload1 = { command: "getHoloLatestMessage" };
+        const resp1 = await sendMessage(confirmationPopup, extensionId, payload1);
+        expect(resp1.message.credentials).to.deep.equal(testCreds);
+        // Deny credentials
+        const payload2 = { command: "denyCredentials" };
+        await sendMessage(confirmationPopup, extensionId, payload2);
+        await sleep(100);
+        // Check that credentials are not stored as credentials
+        const payload3 = { command: "getHoloCredentials" };
+        const creds = await sendMessage(confirmationPopup, extensionId, payload3);
         expect(creds).to.equal(undefined);
+        // Check that credentials are not stored as latest message
+        const payload4 = { command: "getHoloLatestMessage" };
+        const resp2 = await sendMessage(confirmationPopup, extensionId, payload4);
+        expect(resp2).to.equal(undefined);
       });
-    });
 
-    describe("Successfully send credentials from frontend to store in extension", async () => {
-      let confirmationPopup;
-
-      before(async () => {
-        // Setup: Get public key, encrypt credentials, and send credentials to extension
-        const payload1 = { command: "getHoloPublicKey" };
-        const publicKey = await sendMessage(frontendPage, extensionId, payload1);
-        const encryptedCreds = await encrypt(publicKey, JSON.stringify(testCreds));
-        const payload2 = {
-          command: "setHoloCredentials",
-          credentials: encryptedCreds,
-          sharded: false,
-        };
-        sendMessage(frontendPage, extensionId, payload2);
-        // Get confirmation popup
+      it("Latest message in extension should contain the encrypted credentials sent by frontend", async () => {
+        sendEncryptedCredentials(frontendPage, extensionId, testCreds);
         await sleep(100);
-        const pages = await browser.pages();
-        for (const page of pages) {
-          const loginForm = await page.$("#login-form");
-          if (loginForm) {
-            confirmationPopup = page;
-          }
-        }
-      });
-
-      after(() => {
-        const payload = { command: "closingHoloCredentialsConfirmationPopup" };
-        sendMessage(confirmationPopup, extensionId, payload);
-        confirmationPopup.close();
-      });
-
-      it("Latest message in extension should contain testCreds", async () => {
-        const payload = { command: "getHoloLatestMessage" };
-        const latestMsg = await sendMessage(confirmationPopup, extensionId, payload);
+        confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
+        const loginResult = await login(confirmationPopup, extensionId, validPassword);
+        expect(loginResult.success).to.equal(true);
+        await sleep(100);
+        // Get latest message
+        const payload1 = { command: "getHoloLatestMessage" };
+        const latestMsg = await sendMessage(confirmationPopup, extensionId, payload1);
         expect(latestMsg.message.credentials).to.deep.equal(testCreds);
+        // TODO: Clear latest message by calling chrome.storage directly from within service worker rather than by sending a denyCredentials message
+        // Deny credentials
+        const payload2 = { command: "denyCredentials" };
+        await sendMessage(confirmationPopup, extensionId, payload2);
+        // await sleep(100);
+        // // Check stored credentials
+        // const payload3 = { command: "getHoloCredentials" };
+        // const creds = await sendMessage(confirmationPopup, extensionId, payload3);
+        // expect(creds).to.equal(undefined);
       });
 
-      it("Credentials with new secret should be stored when credentials are confirmed", async () => {
+      it("Credentials sent by frontend should be stored after popup sends confirmCredentials", async () => {
+        sendEncryptedCredentials(frontendPage, extensionId, testCreds);
+        await sleep(100);
+        confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
+        const loginResult = await login(confirmationPopup, extensionId, validPassword);
+        expect(loginResult.success).to.equal(true);
+        await sleep(100);
+        // Get latest message
+        const payload2 = { command: "getHoloLatestMessage" };
+        const resp1 = await sendMessage(confirmationPopup, extensionId, payload2);
+        expect(resp1.message.credentials).to.deep.equal(testCreds);
         // Confirm credentials
-        const payload1 = { command: "confirmCredentials" };
-        await sendMessage(confirmationPopup, extensionId, payload1);
+        const payload3 = { command: "confirmCredentials" };
+        await sendMessage(confirmationPopup, extensionId, payload3);
         await sleep(100);
         // Check stored credentials
-        const payload2 = { command: "getHoloCredentials" };
-        const creds = await sendMessage(confirmationPopup, extensionId, payload2);
-        expect(creds.credentials.newSecret).to.not.equal(undefined);
-        const credsSansNewSecret = Object.assign({}, creds.credentials);
+        const payload4 = { command: "getHoloCredentials" };
+        const resp2 = await sendMessage(confirmationPopup, extensionId, payload4);
+        expect(resp2.credentials.newSecret).to.not.equal(undefined);
+        const credsSansNewSecret = Object.assign({}, resp2.credentials);
         delete credsSansNewSecret.newSecret;
         expect(credsSansNewSecret).to.deep.equal(testCreds);
       });
     });
 
-    describe("Successfully share credentials with frontend", async () => {
+    describe("Frontend requests credentials from extension", async () => {
       let confirmationPopup;
 
       after(async () => {
@@ -322,7 +276,7 @@ describe("", async () => {
         await confirmationPopup.close();
       });
 
-      it("Should confirm the sharing of credentials", async () => {
+      it("Frontend should receive credentials after popup sends confirmShareCredentials", async () => {
         const payload1 = { command: "getHoloCredentials" };
         sendMessage(frontendPage, extensionId, payload1)
           .then((creds) => {
@@ -334,16 +288,11 @@ describe("", async () => {
           .catch((err) => {
             console.log(err);
             console.log("error after getHoloCredentials");
+            expect(false).to.equal(true);
           });
         // Get confirmation popup
         await sleep(100);
-        const pages = await browser.pages();
-        for (const page of pages) {
-          const shareCredsDiv = await page.$("#confirm-share-credentials-page");
-          if (shareCredsDiv) {
-            confirmationPopup = page;
-          }
-        }
+        confirmationPopup = await getPopupPage(browser, "share_creds_confirmation");
         // Confirm credentials
         const payload3 = { command: "confirmShareCredentials" };
         sendMessage(confirmationPopup, extensionId, payload3);

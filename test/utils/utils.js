@@ -1,4 +1,33 @@
 import { webcrypto } from "crypto";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import puppeteer from "puppeteer";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const pathToExtension = `${__dirname}/../../dist`;
+
+export async function initialize() {
+  const browser = await puppeteer.launch({
+    executablePath: process.env.PUPPETEER_EXEC_PATH, // See puppeteer-headful GitHub Action
+    headless: false,
+    devtools: false,
+    args: [
+      `--no-sandbox`,
+      `--disable-extensions-except=${pathToExtension}`,
+      `--load-extension=${pathToExtension}`,
+    ],
+  });
+  const serviceWorkerTarget = await browser.waitForTarget(
+    (target) => target.type() === "service_worker"
+  );
+  const extensionId = serviceWorkerTarget.url().split("://")[1].split("/")[0];
+  return {
+    browser: browser,
+    serviceWorkerTarget: serviceWorkerTarget,
+    extensionId: extensionId,
+  };
+}
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -33,6 +62,7 @@ export async function sendMessage(page, extensionId, payload) {
     resolve(result);
   });
 }
+
 /**
  * @param {SubtleCrypto.JWK} publicKey
  * @param {string} message
@@ -72,4 +102,44 @@ export async function encryptForExtension(page, extensionId, message) {
     encryptedMessage = await encrypt(encryptionKey, stringifiedMsg);
   }
   return { encryptedMessage: encryptedMessage, sharded: usingSharding };
+}
+
+export async function login(popupPage, extensionId, password) {
+  const payload1 = { command: "holoPopupLogin", password: password };
+  return await sendMessage(popupPage, extensionId, payload1);
+}
+
+/**
+ * Get public key, encrypt credentials, and send credentials to extension.
+ * @param {Puppeteer.Page} frontendPage e.g., the page at app.holonym.id
+ * @param {string} extensionId
+ */
+export async function sendEncryptedCredentials(frontendPage, extensionId, creds) {
+  const payload1 = { command: "getHoloPublicKey" };
+  const publicKey = await sendMessage(frontendPage, extensionId, payload1);
+  const encryptedCreds = await encrypt(publicKey, JSON.stringify(creds));
+  const payload2 = {
+    command: "setHoloCredentials",
+    credentials: encryptedCreds,
+    sharded: false,
+  };
+  sendMessage(frontendPage, extensionId, payload2);
+}
+
+/**
+ * @param {Puppeteer.Browser} browser
+ * @param {string} popupType "default" | "credentials_confirmation" | "share_creds_confirmation"
+ */
+export async function getPopupPage(browser, popupType) {
+  if (
+    popupType != "default" &&
+    popupType != "credentials_confirmation" &&
+    popupType != "share_creds_confirmation"
+  ) {
+    throw new Error("Attempting to get a type of popup that does not exist");
+  }
+  const pages = await browser.pages();
+  for (const page of pages) {
+    if (page.url().includes(popupType)) return page;
+  }
 }
