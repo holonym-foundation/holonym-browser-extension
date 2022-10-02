@@ -194,7 +194,7 @@ describe("Message passing", async () => {
         await sleep(50);
       });
 
-      // TODO: Test cases with invalid credentials
+      // TODO: More test cases with invalid credentials
 
       it("Unencrypted credentials sent by frontend should not be returned by getHoloLatestMessage", async () => {
         sendMessage(frontendPage, extensionId, {
