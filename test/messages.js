@@ -245,7 +245,6 @@ describe("Message passing", async () => {
       });
 
       it("Credentials sent by frontend should be stored after popup sends confirmCredentials", async () => {
-        sendEncryptedCredentials(frontendPage, extensionId, testCreds);
         await sleep(50);
         confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
         const loginResult = await login(confirmationPopup, extensionId, validPassword);
