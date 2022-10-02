@@ -82,7 +82,8 @@ function popupListener(request, sender, sendResponse) {
       })
       .then((decryptedMsg) =>
         sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } })
-      );
+      )
+      .catch(() => sendResponse({ message: {} }));
     return true;
   } else if (command == "getHoloCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();

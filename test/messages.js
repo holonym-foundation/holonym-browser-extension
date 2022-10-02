@@ -7,6 +7,7 @@ import {
   login,
   sendEncryptedCredentials,
   getPopupPage,
+  clearLatestMessage,
 } from "./utils/utils.js";
 
 // NOTE: frontendUrl must be either "https://app.holonym.id" or "http://localhost:3002"
@@ -186,11 +187,6 @@ describe("Message passing", async () => {
     describe("Frontend sends credentials to extension", async () => {
       let confirmationPopup;
 
-      beforeEach(async () => {
-        sendEncryptedCredentials(frontendPage, extensionId, testCreds);
-        await sleep(50);
-      });
-
       afterEach(async () => {
         const payload3 = { command: "closingHoloCredentialsConfirmationPopup" };
         sendMessage(confirmationPopup, extensionId, payload3);
@@ -198,10 +194,29 @@ describe("Message passing", async () => {
         await sleep(50);
       });
 
-      // TODO: Latest message should be inaccessible to extension if message isn't encrypted with extension's public key
       // TODO: Test cases with invalid credentials
 
-      it("Credentials sent by frontend should not be stored if popup sends denyCredentials", async () => {
+      it("Unencrypted credentials sent by frontend should not be returned by getHoloLatestMessage", async () => {
+        sendMessage(frontendPage, extensionId, {
+          command: "setHoloCredentials",
+          credentials: testCreds,
+        });
+        await sleep(50);
+        confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
+        const loginResult = await login(confirmationPopup, extensionId, validPassword);
+        expect(loginResult.success).to.equal(true);
+        await sleep(50);
+        // Get latest message
+        const payload1 = { command: "getHoloLatestMessage" };
+        const resp1 = await sendMessage(confirmationPopup, extensionId, payload1);
+        expect(resp1.message).to.be.empty;
+        await clearLatestMessage(serviceWorker);
+        await sleep(50);
+      });
+
+      it("Correctly encrypted credentials sent by frontend should not be stored if popup sends denyCredentials", async () => {
+        sendEncryptedCredentials(frontendPage, extensionId, testCreds);
+        await sleep(50);
         confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
         const loginResult = await login(confirmationPopup, extensionId, validPassword);
         expect(loginResult.success).to.equal(true);
@@ -221,10 +236,12 @@ describe("Message passing", async () => {
         // Check that credentials are not stored as latest message
         const payload4 = { command: "getHoloLatestMessage" };
         const resp2 = await sendMessage(confirmationPopup, extensionId, payload4);
-        expect(resp2).to.equal(undefined);
+        expect(resp2.message).to.be.empty;
       });
 
       it("Latest message in extension should contain the encrypted credentials sent by frontend", async () => {
+        sendEncryptedCredentials(frontendPage, extensionId, testCreds);
+        await sleep(50);
         confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
         const loginResult = await login(confirmationPopup, extensionId, validPassword);
         expect(loginResult.success).to.equal(true);
@@ -233,18 +250,16 @@ describe("Message passing", async () => {
         const payload1 = { command: "getHoloLatestMessage" };
         const latestMsg = await sendMessage(confirmationPopup, extensionId, payload1);
         expect(latestMsg.message.credentials).to.deep.equal(testCreds);
-        // Clear latest message
-        await serviceWorker.evaluate(() => {
-          chrome.storage.local.set({ latestHoloMessage: "" });
-        });
+        await clearLatestMessage(serviceWorker);
         await sleep(50);
         // Check that latest message is empty
         const payload4 = { command: "getHoloLatestMessage" };
         const resp2 = await sendMessage(confirmationPopup, extensionId, payload4);
-        expect(resp2).to.equal(undefined);
+        expect(resp2.message).to.be.empty;
       });
 
       it("Credentials sent by frontend should be stored after popup sends confirmCredentials", async () => {
+        sendEncryptedCredentials(frontendPage, extensionId, testCreds);
         await sleep(50);
         confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
         const loginResult = await login(confirmationPopup, extensionId, validPassword);

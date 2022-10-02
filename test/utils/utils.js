@@ -144,3 +144,9 @@ export async function getPopupPage(browser, popupType) {
     if (page.url().includes(popupType)) return page;
   }
 }
+
+export async function clearLatestMessage(serviceWorker) {
+  await serviceWorker.evaluate(() => {
+    chrome.storage.local.set({ latestHoloMessage: "" });
+  });
+}
