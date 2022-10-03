@@ -2,6 +2,8 @@ import { webcrypto } from "crypto";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import puppeteer from "puppeteer";
+import dotenv from "dotenv";
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,7 +37,13 @@ export async function initialize() {
   };
 }
 
-export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+export const sleep = (ms) =>
+  new Promise((r) =>
+    setTimeout(
+      r,
+      process?.env?.NODE_ENV && process.env.NODE_ENV == "prod" ? ms * 4 : ms
+    )
+  );
 
 // Max length of encrypt-able string using RSA-OAEP with SHA256 where
 // modulusLength == 4096: 446 characters.
