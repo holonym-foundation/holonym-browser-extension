@@ -50,7 +50,11 @@ const maxEncryptableLength = 446;
 export async function sendMessage(page, extensionId, payload) {
   return new Promise(async (resolve, reject) => {
     setTimeout(() => {
-      reject();
+      reject(
+        new Error(
+          `sendMessage timed out. Payload: ${payload && JSON.stringify(payload)}`
+        )
+      );
     }, 9000);
     const result = await page.evaluate(
       (extensionId, payload) => {

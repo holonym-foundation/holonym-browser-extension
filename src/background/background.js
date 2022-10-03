@@ -61,9 +61,10 @@ function popupListener(request, sender, sendResponse) {
 
   if (command == "holoPopupLogin") {
     const password = request.password;
-    cryptoController.login(password).then((success) => {
-      sendResponse({ success: success });
-    });
+    cryptoController
+      .login(password)
+      .then((success) => sendResponse({ success: success }))
+      .catch((err) => sendResponse({ error: err?.message }));
     return true; // <-- This is required in order to use sendResponse async
   } else if (command == "holoGetIsLoggedIn") {
     const loggedIn = cryptoController.getIsLoggedIn();

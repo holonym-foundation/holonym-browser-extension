@@ -391,6 +391,62 @@ describe("CryptoController", async () => {
     });
   });
 
+  describe("encryptWithPassword & decryptWithPassword", async () => {
+    it("Should encrypt and decrypt a message if user is logged in", async () => {
+      const message = { message: "this-is-a-short-message" };
+      const password = "test-password";
+      const encryptedMessage = await serviceWorker.evaluate(
+        async (password, message) => {
+          const tempCryptoController = new CryptoController();
+          await tempCryptoController.initialize(password);
+          return await tempCryptoController.encryptWithPassword(message);
+        },
+        password,
+        message
+      );
+      expect(encryptedMessage).to.be.a("string");
+      expect(encryptedMessage).to.not.equal(message);
+      const decryptedMessage = await serviceWorker.evaluate(
+        async (password, message) => {
+          const tempCryptoController = new CryptoController();
+          await tempCryptoController.login(password);
+          return await tempCryptoController.decryptWithPassword(message);
+        },
+        password,
+        encryptedMessage
+      );
+      expect(decryptedMessage).to.deep.equal(message);
+    });
+
+    it("Should be unable to encrypt and decrypt a message if user is not logged in", async () => {
+      const message = { message: "this-is-a-short-message" };
+      const validPassword = "test-password";
+      const encryptedMessage = await serviceWorker.evaluate(
+        async (password, message) => {
+          const tempCryptoController = new CryptoController();
+          await tempCryptoController.initialize(password);
+          await tempCryptoController.logout();
+          return await tempCryptoController.encryptWithPassword(message);
+        },
+        validPassword,
+        message
+      );
+      expect(encryptedMessage).to.equal(undefined);
+      const decryptedMessage = await serviceWorker.evaluate(
+        async (password, message) => {
+          const tempCryptoController = new CryptoController();
+          await tempCryptoController.initialize(password);
+          const encryptedMsg = await tempCryptoController.encryptWithPassword(message);
+          await tempCryptoController.logout();
+          return await tempCryptoController.decryptWithPassword(encryptedMsg);
+        },
+        validPassword,
+        message
+      );
+      expect(decryptedMessage).to.equal(undefined);
+    });
+  });
+
   describe("generateKeyPair", async () => {
     it("Should generate a keypair, encrypt the private key with the password, and store the keypair", async () => {
       // Get key pair before to compare
@@ -402,6 +458,7 @@ describe("CryptoController", async () => {
       const testPassword = "test-password";
       const retrievedKeyPair = await serviceWorker.evaluate(async (password) => {
         const tempCryptoController = new CryptoController();
+        tempCryptoController.isLoggedIn = true; // Ensure user is logged in
         tempCryptoController.store.password = password; // Ensure password is set
         await tempCryptoController.generateKeyPair();
         return await tempCryptoController.getKeyPair();
@@ -428,6 +485,7 @@ describe("CryptoController", async () => {
       const decryptedMessage = await serviceWorker.evaluate(
         async (encryptedPrivateKey, password, encryptedMessage) => {
           const tempCryptoController = new CryptoController();
+          tempCryptoController.isLoggedIn = true;
           tempCryptoController.store.password = password;
           const privateKey = await tempCryptoController.decryptWithPassword(
             encryptedPrivateKey
@@ -455,6 +513,7 @@ describe("CryptoController", async () => {
       }, testPassword);
       const retrievedPrivateKey = await serviceWorker.evaluate(async (password) => {
         const tempCryptoController = new CryptoController();
+        tempCryptoController.isLoggedIn = true;
         tempCryptoController.store.password = password;
         const keyPair = await tempCryptoController.getKeyPair();
         const privateKey = await tempCryptoController.decryptWithPassword(
@@ -583,4 +642,32 @@ describe("CryptoController", async () => {
       expect(JSON.parse(decryptedMessage)).to.deep.equal(message);
     });
   });
+
+  // describe("encrypt", async () => {
+  //   it("Should encrypt a message using the given public key", async () => {
+  //     const testPassword = "this-is-the-password";
+  //     const beforeValues = await serviceWorker.evaluate(async (password, message) => {
+  //       const tempCryptoController = new CryptoController();
+  //       await tempCryptoController.initialize(password);
+  //       const publicKey =
+  //       return await tempCryptoController.encrypt()
+  //     }, testPassword);
+  //     expect(beforeValues.password).to.not.equal(undefined);
+  //     expect(beforeValues.decryptedPrivateKey).to.not.equal(undefined);
+  //     expect(beforeValues.isLoggedIn).to.equal(true);
+  //     const afterValues = await serviceWorker.evaluate(async () => {
+  //       const tempCryptoController = new CryptoController();
+  //       await tempCryptoController.logout();
+  //       return {
+  //         password: tempCryptoController.store.password,
+  //         decryptedPrivateKey: tempCryptoController.store.decryptedPrivateKey,
+  //         isLoggedIn: tempCryptoController.isLoggedIn,
+  //       };
+  //     }, testPassword);
+  //     expect(afterValues.password).to.equal(undefined);
+  //     expect(afterValues.decryptedPrivateKey).to.equal(undefined);
+  //     expect(afterValues.isLoggedIn).to.equal(false);
+  //   });
+  // });
+  // TODO: encryptWithPublicKey()
 });

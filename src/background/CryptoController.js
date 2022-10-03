@@ -45,8 +45,8 @@ class CryptoController {
    */
   async initialize(password) {
     await this.createPassword(password);
-    await this.generateKeyPair();
     this.isLoggedIn = true;
+    await this.generateKeyPair();
   }
 
   /**
@@ -94,12 +94,12 @@ class CryptoController {
     const passwordHash = await this.hashPassword(password, salt);
     const storedPasswordHash = await this.getPasswordHash();
     if (passwordHash != storedPasswordHash) return false;
+    this.isLoggedIn = true;
     this.store.password = password;
     const keyPair = await this.getKeyPair();
     this.store.decryptedPrivateKey = await this.decryptWithPassword(
       keyPair.encryptedPrivateKey
     );
-    this.isLoggedIn = true;
     return true;
   }
 
@@ -173,6 +173,9 @@ class CryptoController {
    * @returns {string}
    */
   async decryptWithPrivateKey(encryptedMessage, sharded) {
+    if (!encryptedMessage) {
+      throw new Error(`Cannot decrypt the following message: ${encryptedMessage}`);
+    }
     const algo = {
       name: "RSA-OAEP",
       modulusLength: 4096,
@@ -249,6 +252,7 @@ class CryptoController {
    * @param {object} data
    */
   async encryptWithPassword(data) {
+    if (!this.isLoggedIn) return;
     return await passworder.encrypt(this.store.password, data);
   }
 
@@ -256,6 +260,7 @@ class CryptoController {
    * @param {string} data
    */
   async decryptWithPassword(data) {
+    if (!this.isLoggedIn) return;
     return await passworder.decrypt(this.store.password, data);
   }
 
