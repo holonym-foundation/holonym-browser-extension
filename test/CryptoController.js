@@ -4,7 +4,7 @@ import { encrypt, initialize, sleep } from "./utils/utils.js";
 // NOTE: Sometimes the following error is thrown:
 // "Evaluation failed: ReferenceError: CryptoController is not defined"
 // Just re-run if this happens.
-describe("CryptoController", async () => {
+describe.only("CryptoController", async () => {
   let browser;
   let serviceWorker;
   let extensionId;
@@ -364,6 +364,71 @@ describe("CryptoController", async () => {
         encryptedMessage
       );
       expect(decryptedMessage).to.equal(testMessage);
+    });
+  });
+
+  describe("login", async () => {
+    it("Should set isLoggedIn, set decryptedPrivateKey, and return true, given correct password", async () => {
+      const testPassword = "this-is-the-password";
+      await serviceWorker.evaluate(async (password) => {
+        const tempCryptoController = new CryptoController();
+        await tempCryptoController.initialize(password);
+        tempCryptoController.isLoggedIn = false;
+        tempCryptoController.store.decryptedPrivateKey = undefined;
+        tempCryptoController.store.password = undefined;
+      }, testPassword);
+      const retrievedPrivateKey = await serviceWorker.evaluate(async (password) => {
+        const tempCryptoController = new CryptoController();
+        tempCryptoController.store.password = password;
+        const keyPair = await tempCryptoController.getKeyPair();
+        const privateKey = await tempCryptoController.decryptWithPassword(
+          keyPair.encryptedPrivateKey
+        );
+        tempCryptoController.store.password = undefined;
+        return privateKey;
+      }, testPassword);
+      const retrievedValues = await serviceWorker.evaluate(async (password) => {
+        const tempCryptoController = new CryptoController();
+        await tempCryptoController.login(password);
+        return {
+          password: tempCryptoController.store.password,
+          decryptedPrivateKey: tempCryptoController.store.decryptedPrivateKey,
+          isLoggedIn: tempCryptoController.isLoggedIn,
+        };
+      }, testPassword);
+      expect(retrievedValues.password).to.equal(testPassword);
+      expect(retrievedValues.decryptedPrivateKey).to.deep.equal(retrievedPrivateKey);
+      expect(retrievedValues.isLoggedIn).to.equal(true);
+    });
+  });
+
+  describe("logout", async () => {
+    it("Should set isLoggedIn to false, set decryptedPrivateKey and password to false, given incorrect password", async () => {
+      const testPassword = "this-is-the-password";
+      const beforeValues = await serviceWorker.evaluate(async (password) => {
+        const tempCryptoController = new CryptoController();
+        await tempCryptoController.initialize(password);
+        return {
+          password: tempCryptoController.store.password,
+          decryptedPrivateKey: tempCryptoController.store.decryptedPrivateKey,
+          isLoggedIn: tempCryptoController.isLoggedIn,
+        };
+      }, testPassword);
+      expect(beforeValues.password).to.not.equal(undefined);
+      expect(beforeValues.decryptedPrivateKey).to.not.equal(undefined);
+      expect(beforeValues.isLoggedIn).to.equal(true);
+      const afterValues = await serviceWorker.evaluate(async () => {
+        const tempCryptoController = new CryptoController();
+        await tempCryptoController.logout();
+        return {
+          password: tempCryptoController.store.password,
+          decryptedPrivateKey: tempCryptoController.store.decryptedPrivateKey,
+          isLoggedIn: tempCryptoController.isLoggedIn,
+        };
+      }, testPassword);
+      expect(afterValues.password).to.equal(undefined);
+      expect(afterValues.decryptedPrivateKey).to.equal(undefined);
+      expect(afterValues.isLoggedIn).to.equal(false);
     });
   });
 });
