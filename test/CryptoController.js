@@ -1,3 +1,4 @@
+import { webcrypto } from "crypto";
 import { expect } from "chai";
 import { encrypt, initialize, sleep } from "./utils/utils.js";
 
@@ -567,8 +568,44 @@ describe("CryptoController", async () => {
     });
   });
 
-  describe("decryptWithPrivateKey", async () => {
-    it("Should decrypt an un-sharded message encrypted with the public key if user is logged in", async () => {
+  describe("encrypt", async () => {
+    it("Should encrypt a message using the given public key", async () => {
+      const message = "some-message";
+      const algo = {
+        name: "RSA-OAEP",
+        modulusLength: 4096,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256",
+      };
+      const usage = ["encrypt", "decrypt"];
+      const keyPair = await webcrypto.subtle.generateKey(algo, true, usage);
+      const publicKey = await webcrypto.subtle.exportKey("jwk", keyPair.publicKey);
+      // Encrypt
+      const encryptedMessage = await serviceWorker.evaluate(
+        async (publicKey, message) => {
+          const tempCryptoController = new CryptoController();
+          return await tempCryptoController.encrypt(publicKey, message);
+        },
+        publicKey,
+        message
+      );
+      expect(encryptedMessage).to.not.equal(message);
+      expect(encryptedMessage).to.be.a("string");
+      expect(JSON.parse(encryptedMessage)).to.be.an("array");
+      // Decrypt
+      const decryptedMessage = new TextDecoder("utf-8").decode(
+        await webcrypto.subtle.decrypt(
+          { name: "RSA-OAEP" },
+          keyPair.privateKey,
+          new Uint8Array(JSON.parse(encryptedMessage)).buffer
+        )
+      );
+      expect(decryptedMessage).to.equal(message);
+    });
+  });
+
+  describe("encryptWithPublicKey & decryptWithPrivateKey", async () => {
+    it("Should encrypt and decrypt an un-sharded message if user is logged in", async () => {
       const message = { message: "this-is-a-short-message" };
       const password = "test-password";
       const returnVal = await serviceWorker.evaluate(
@@ -603,7 +640,7 @@ describe("CryptoController", async () => {
       expect(JSON.parse(decryptedMessage)).to.deep.equal(message);
     });
 
-    it("Should decrypt a sharded message encrypted with the public key if user is logged in", async () => {
+    it("Should encrypt and decrypt a sharded message if user is logged in", async () => {
       const message = {
         message: Array(maxEncryptableLength + 1)
           .fill("a")
@@ -642,32 +679,4 @@ describe("CryptoController", async () => {
       expect(JSON.parse(decryptedMessage)).to.deep.equal(message);
     });
   });
-
-  // describe("encrypt", async () => {
-  //   it("Should encrypt a message using the given public key", async () => {
-  //     const testPassword = "this-is-the-password";
-  //     const beforeValues = await serviceWorker.evaluate(async (password, message) => {
-  //       const tempCryptoController = new CryptoController();
-  //       await tempCryptoController.initialize(password);
-  //       const publicKey =
-  //       return await tempCryptoController.encrypt()
-  //     }, testPassword);
-  //     expect(beforeValues.password).to.not.equal(undefined);
-  //     expect(beforeValues.decryptedPrivateKey).to.not.equal(undefined);
-  //     expect(beforeValues.isLoggedIn).to.equal(true);
-  //     const afterValues = await serviceWorker.evaluate(async () => {
-  //       const tempCryptoController = new CryptoController();
-  //       await tempCryptoController.logout();
-  //       return {
-  //         password: tempCryptoController.store.password,
-  //         decryptedPrivateKey: tempCryptoController.store.decryptedPrivateKey,
-  //         isLoggedIn: tempCryptoController.isLoggedIn,
-  //       };
-  //     }, testPassword);
-  //     expect(afterValues.password).to.equal(undefined);
-  //     expect(afterValues.decryptedPrivateKey).to.equal(undefined);
-  //     expect(afterValues.isLoggedIn).to.equal(false);
-  //   });
-  // });
-  // TODO: encryptWithPublicKey()
 });
