@@ -212,7 +212,7 @@ describe("Message passing", async () => {
 
       it("Correctly encrypted credentials sent by frontend should not be stored if popup sends denyCredentials", async () => {
         sendEncryptedCredentials(frontendPage, extensionId, testCreds);
-        await sleep(50);
+        await sleep(100);
         confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
         const loginResult = await login(confirmationPopup, extensionId, validPassword);
         expect(loginResult.success).to.equal(true);
@@ -237,7 +237,7 @@ describe("Message passing", async () => {
 
       it("Latest message in extension should contain the encrypted credentials sent by frontend", async () => {
         sendEncryptedCredentials(frontendPage, extensionId, testCreds);
-        await sleep(50);
+        await sleep(100);
         confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
         const loginResult = await login(confirmationPopup, extensionId, validPassword);
         expect(loginResult.success).to.equal(true);
@@ -256,7 +256,7 @@ describe("Message passing", async () => {
 
       it("Credentials sent by frontend should be stored after popup sends confirmCredentials", async () => {
         sendEncryptedCredentials(frontendPage, extensionId, testCreds);
-        await sleep(50);
+        await sleep(100);
         confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
         const loginResult = await login(confirmationPopup, extensionId, validPassword);
         expect(loginResult.success).to.equal(true);
