@@ -315,6 +315,39 @@ describe.only("CryptoController", async () => {
     });
   });
 
+  describe("changePassword", async () => {
+    it("Should change stored password hash and allow the user to login with the new password", async () => {
+      const oldPassword = "old-password";
+      const newPassword = "new-password";
+      const oldPasswordHash = await serviceWorker.evaluate(async (password) => {
+        const tempCryptoController = new CryptoController();
+        await tempCryptoController.createPassword(password);
+        return await tempCryptoController.getPasswordHash();
+      }, oldPassword);
+      const retrievedValues = await serviceWorker.evaluate(
+        async (oldPassword, newPassword) => {
+          const tempCryptoController = new CryptoController();
+          const success = await tempCryptoController.changePassword(
+            oldPassword,
+            newPassword
+          );
+          const passwordHash = await tempCryptoController.getPasswordHash();
+          return {
+            success: success,
+            passwordHash: passwordHash,
+          };
+        },
+        oldPassword,
+        newPassword
+      );
+      expect(retrievedValues.success).to.equal(true);
+      expect(retrievedValues.passwordHash).to.be.a("string");
+      expect(retrievedValues.passwordHash.length).to.be.above(0);
+      expect(retrievedValues.passwordHash).to.not.equal(oldPasswordHash);
+    });
+    // TODO: Fail case
+  });
+
   describe("generateKeyPair", async () => {
     it("Should generate a keypair, encrypt the private key with the password, and store the keypair", async () => {
       // Get key pair before to compare
@@ -403,7 +436,7 @@ describe.only("CryptoController", async () => {
   });
 
   describe("logout", async () => {
-    it("Should set isLoggedIn to false, set decryptedPrivateKey and password to false, given incorrect password", async () => {
+    it("Should set isLoggedIn to false, decryptedPrivateKey to undefined, and password to false", async () => {
       const testPassword = "this-is-the-password";
       const beforeValues = await serviceWorker.evaluate(async (password) => {
         const tempCryptoController = new CryptoController();
