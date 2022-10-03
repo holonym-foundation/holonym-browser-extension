@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { initialize, sleep } from "./utils/utils.js";
+import { encrypt, initialize, sleep } from "./utils/utils.js";
 
 // NOTE: Sometimes the following error is thrown:
 // "Evaluation failed: ReferenceError: CryptoController is not defined"
@@ -240,10 +240,8 @@ describe("CryptoController", async () => {
   describe("getIsRegistered", async () => {
     it("Should return false if the user does not have a public key", async () => {
       const retrievedIsRegistered = await serviceWorker.evaluate(async () => {
-        await new Promise((resolve) =>
-          chrome.storage.local.set({ holoKeyPair: {} }, resolve)
-        );
         const tempCryptoController = new CryptoController();
+        await tempCryptoController.setKeyPair("", "");
         return await tempCryptoController.getIsRegistered();
       });
       expect(retrievedIsRegistered).to.equal(false);
@@ -266,4 +264,106 @@ describe("CryptoController", async () => {
   // -------------------------
   // END getters and setters
   // -------------------------
+
+  describe("hashPassword", async () => {
+    it("Should return false if the user does not have a public key", async () => {
+      const testPassword = "test-password";
+      const testSalt = "test-salt";
+      const retrievedPassword = await serviceWorker.evaluate(
+        async (password, salt) => {
+          const tempCryptoController = new CryptoController();
+          return await tempCryptoController.hashPassword(password, salt);
+        },
+        testPassword,
+        testSalt
+      );
+      expect(retrievedPassword).to.be.a("string");
+      expect(retrievedPassword.length).to.be.above(0);
+      expect(retrievedPassword).to.not.equal(testPassword);
+    });
+  });
+
+  describe("createPassword", async () => {
+    it("Should generate a salt, store the salt, and store a hash of salt + password", async () => {
+      await serviceWorker.evaluate(async () => {
+        // Reset password salt
+        const tempCryptoController = new CryptoController();
+        await tempCryptoController.setPasswordSalt("");
+      });
+      const testPassword = "test-password";
+      const retrievedValues = await serviceWorker.evaluate(async (password) => {
+        const tempCryptoController = new CryptoController();
+        await tempCryptoController.createPassword(password);
+        const tempSalt = await tempCryptoController.getPasswordSalt();
+        const tempPasswordHash = await tempCryptoController.getPasswordHash();
+        return { salt: tempSalt, passwordHash: tempPasswordHash };
+      }, testPassword);
+      expect(retrievedValues.salt).to.be.a("string");
+      expect(retrievedValues.salt.length).to.equal(36);
+      expect(retrievedValues.passwordHash).to.be.a("string");
+      expect(retrievedValues.passwordHash.length).to.be.above(0);
+      expect(retrievedValues.passwordHash).to.not.equal(testPassword);
+      const passwordHash = await serviceWorker.evaluate(
+        async (password, salt) => {
+          const tempCryptoController = new CryptoController();
+          return await tempCryptoController.hashPassword(password, salt);
+        },
+        testPassword,
+        retrievedValues.salt
+      );
+      expect(passwordHash).to.equal(retrievedValues.passwordHash);
+    });
+  });
+
+  describe("generateKeyPair", async () => {
+    it("Should generate a keypair, encrypt the private key with the password, and store the keypair", async () => {
+      // Get key pair before to compare
+      const keyPairBefore = await serviceWorker.evaluate(async () => {
+        const tempCryptoController = new CryptoController();
+        return await tempCryptoController.getKeyPair();
+      });
+      // Generate keyPair
+      const testPassword = "test-password";
+      const retrievedKeyPair = await serviceWorker.evaluate(async (password) => {
+        const tempCryptoController = new CryptoController();
+        tempCryptoController.store.password = password; // Ensure password is set
+        await tempCryptoController.generateKeyPair();
+        return await tempCryptoController.getKeyPair();
+      }, testPassword);
+      expect(retrievedKeyPair).to.be.an("object");
+      expect(Object.keys(retrievedKeyPair)).to.include.members([
+        "encryptedPrivateKey",
+        "publicKey",
+      ]);
+      expect(retrievedKeyPair).to.deep.not.equal(keyPairBefore);
+      // Encrypt with public key
+      const testMessage = "test-message";
+      const encryptedMessage = await serviceWorker.evaluate(
+        async (publicKey, message) => {
+          const tempCryptoController = new CryptoController();
+          return await tempCryptoController.encrypt(publicKey, message);
+        },
+        retrievedKeyPair.publicKey,
+        testMessage
+      );
+      expect(encryptedMessage).to.be.a("string");
+      expect(encryptedMessage).to.not.equal(testMessage);
+      // Decrypt with private key
+      const decryptedMessage = await serviceWorker.evaluate(
+        async (encryptedPrivateKey, password, encryptedMessage) => {
+          const tempCryptoController = new CryptoController();
+          tempCryptoController.store.password = password;
+          const privateKey = await tempCryptoController.decryptWithPassword(
+            encryptedPrivateKey
+          );
+          tempCryptoController.store.decryptedPrivateKey = privateKey;
+          return await tempCryptoController.decryptWithPrivateKey(encryptedMessage);
+        },
+        retrievedKeyPair.encryptedPrivateKey,
+        testPassword,
+        encryptedMessage
+      );
+      expect(decryptedMessage).to.equal(testMessage);
+    });
+  });
 });
