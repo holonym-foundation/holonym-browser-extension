@@ -1,6 +1,10 @@
 import { expect } from "chai";
 import { encrypt, initialize, sleep } from "./utils/utils.js";
 
+// Max length of encrypt-able string using RSA-OAEP with SHA256 where
+// modulusLength == 4096: 446 characters.
+const maxEncryptableLength = 446;
+
 // NOTE: Sometimes the following error is thrown:
 // "Evaluation failed: ReferenceError: CryptoController is not defined"
 // Just re-run if this happens.
@@ -345,7 +349,45 @@ describe.only("CryptoController", async () => {
       expect(retrievedValues.passwordHash.length).to.be.above(0);
       expect(retrievedValues.passwordHash).to.not.equal(oldPasswordHash);
     });
-    // TODO: Fail case
+
+    it("Should return false and not modify passwordHash or salt, given an incorrect oldPassword", async () => {
+      const validOldPassword = "old-password";
+      const invalidOldPassword = "invalid-old-password";
+      const newPassword = "new-password";
+      const valuesBefore = await serviceWorker.evaluate(async (password) => {
+        const tempCryptoController = new CryptoController();
+        await tempCryptoController.createPassword(password);
+        const passwordHash = await tempCryptoController.getPasswordHash();
+        const salt = await tempCryptoController.getPasswordSalt();
+        return {
+          passwordHash: passwordHash,
+          salt: salt,
+        };
+      }, validOldPassword);
+      const valuesAfter = await serviceWorker.evaluate(
+        async (oldPassword, newPassword) => {
+          const tempCryptoController = new CryptoController();
+          const success = await tempCryptoController.changePassword(
+            oldPassword,
+            newPassword
+          );
+          const passwordHash = await tempCryptoController.getPasswordHash();
+          const salt = await tempCryptoController.getPasswordSalt();
+          return {
+            success: success,
+            passwordHash: passwordHash,
+            salt: salt,
+          };
+        },
+        invalidOldPassword,
+        newPassword
+      );
+      expect(valuesAfter.success).to.equal(false);
+      expect(valuesAfter.passwordHash).to.be.a("string");
+      expect(valuesAfter.passwordHash.length).to.be.above(0);
+      expect(valuesAfter.passwordHash).to.equal(valuesBefore.passwordHash);
+      expect(valuesAfter.salt).to.equal(valuesBefore.salt);
+    });
   });
 
   describe("generateKeyPair", async () => {
@@ -462,6 +504,82 @@ describe.only("CryptoController", async () => {
       expect(afterValues.password).to.equal(undefined);
       expect(afterValues.decryptedPrivateKey).to.equal(undefined);
       expect(afterValues.isLoggedIn).to.equal(false);
+    });
+  });
+
+  describe("decryptWithPrivateKey", async () => {
+    it("Should decrypt an un-sharded message encrypted with the public key if user is logged in", async () => {
+      const message = { message: "this-is-a-short-message" };
+      const password = "test-password";
+      const returnVal = await serviceWorker.evaluate(
+        async (password, message) => {
+          const tempCryptoController = new CryptoController();
+          await tempCryptoController.initialize(password);
+          return await tempCryptoController.encryptWithPublicKey(message);
+        },
+        password,
+        message
+      );
+      expect(returnVal).to.not.equal(message);
+      expect(returnVal).to.be.an("object");
+      expect(Object.keys(returnVal)).to.include.members([
+        "encryptedMessage",
+        "sharded",
+      ]);
+      expect(returnVal.encryptedMessage.length).to.be.above(0);
+      expect(returnVal.sharded).to.equal(false);
+      const decryptedMessage = await serviceWorker.evaluate(
+        async (password, encryptedMessage) => {
+          const tempCryptoController = new CryptoController();
+          await tempCryptoController.login(password);
+          return await tempCryptoController.decryptWithPrivateKey(
+            encryptedMessage,
+            false
+          );
+        },
+        password,
+        returnVal.encryptedMessage
+      );
+      expect(JSON.parse(decryptedMessage)).to.deep.equal(message);
+    });
+
+    it("Should decrypt a sharded message encrypted with the public key if user is logged in", async () => {
+      const message = {
+        message: Array(maxEncryptableLength + 1)
+          .fill("a")
+          .join(""),
+      };
+      const password = "test-password";
+      const returnVal = await serviceWorker.evaluate(
+        async (password, message) => {
+          const tempCryptoController = new CryptoController();
+          await tempCryptoController.initialize(password);
+          return await tempCryptoController.encryptWithPublicKey(message);
+        },
+        password,
+        message
+      );
+      expect(returnVal).to.not.equal(message);
+      expect(returnVal).to.be.an("object");
+      expect(Object.keys(returnVal)).to.include.members([
+        "encryptedMessage",
+        "sharded",
+      ]);
+      expect(returnVal.encryptedMessage.length).to.be.above(0);
+      expect(returnVal.sharded).to.equal(true);
+      const decryptedMessage = await serviceWorker.evaluate(
+        async (password, encryptedMessage) => {
+          const tempCryptoController = new CryptoController();
+          await tempCryptoController.login(password);
+          return await tempCryptoController.decryptWithPrivateKey(
+            encryptedMessage,
+            true
+          );
+        },
+        password,
+        returnVal.encryptedMessage
+      );
+      expect(JSON.parse(decryptedMessage)).to.deep.equal(message);
     });
   });
 });
