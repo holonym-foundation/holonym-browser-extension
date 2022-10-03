@@ -186,7 +186,7 @@ describe("Message passing", async () => {
       afterEach(async () => {
         const payload3 = { command: "closingHoloCredentialsConfirmationPopup" };
         sendMessage(confirmationPopup, extensionId, payload3);
-        if (confirmationPopup) confirmationPopup.close();
+        if (confirmationPopup) await confirmationPopup.close();
         await sleep(50);
       });
 
@@ -290,17 +290,20 @@ describe("Message passing", async () => {
 
       it("Frontend should receive credentials after popup sends confirmShareCredentials", async () => {
         const payload1 = { command: "getHoloCredentials" };
+        let receivedResponse = false;
         sendMessage(frontendPage, extensionId, payload1)
           .then((creds) => {
             // This expect depends on the confirmShareCredentials message (see below)
             const credsSansNewSecret = Object.assign({}, creds);
             delete credsSansNewSecret.newSecret;
             expect(credsSansNewSecret).to.deep.equal(testCreds);
+            receivedResponse = true;
           })
           .catch((err) => {
             console.log(err);
             console.log("error after getHoloCredentials");
             expect(false).to.equal(true);
+            receivedResponse = true;
           });
         // Get confirmation popup
         await sleep(50);
@@ -308,7 +311,15 @@ describe("Message passing", async () => {
         // Confirm credentials
         const payload3 = { command: "confirmShareCredentials" };
         sendMessage(confirmationPopup, extensionId, payload3);
-        await sleep(1000); // sleep so that background has time to respond to getHoloCredentials
+        // wait for background to respond to getHoloCredentials
+        async function waitForResponse() {
+          const timeout = new Date().getTime() + 3000;
+          while (new Date().getTime() <= timeout && !receivedResponse) {
+            await sleep(50);
+          }
+          return receivedResponse;
+        }
+        await waitForResponse();
       });
     });
   });
