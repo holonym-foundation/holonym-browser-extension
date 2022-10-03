@@ -26483,17 +26483,15 @@ class CryptoController {
         encryptedPrivateKey: encryptedPrivateKey,
         publicKey: publicKey,
       };
-      chrome.storage.local.set({ holoKeyPair: keyPair }, () => {
-        resolve();
-      });
+      chrome.storage.local.set({ holoKeyPair: keyPair }, resolve);
     });
   }
 
   getKeyPair() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(["holoKeyPair"], (result) => {
-        resolve(result?.holoKeyPair);
-      });
+      chrome.storage.local.get(["holoKeyPair"], (result) =>
+        resolve(result?.holoKeyPair)
+      );
     });
   }
 
@@ -26502,9 +26500,9 @@ class CryptoController {
    */
   getPublicKey() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(["holoKeyPair"], (result) => {
-        resolve(result?.holoKeyPair?.publicKey);
-      });
+      chrome.storage.local.get(["holoKeyPair"], (result) =>
+        resolve(result?.holoKeyPair?.publicKey)
+      );
     });
   }
 
@@ -26625,9 +26623,7 @@ class CryptoController {
    */
   setPasswordHash(passwordHash) {
     return new Promise((resolve) => {
-      chrome.storage.local.set({ holoPasswordHash: passwordHash }, () => {
-        resolve();
-      });
+      chrome.storage.local.set({ holoPasswordHash: passwordHash }, resolve);
     });
   }
 
@@ -26641,9 +26637,7 @@ class CryptoController {
 
   setPasswordSalt(salt) {
     return new Promise((resolve) => {
-      chrome.storage.local.set({ holoPasswordSalt: salt }, () => {
-        resolve();
-      });
+      chrome.storage.local.set({ holoPasswordSalt: salt }, resolve);
     });
   }
 
@@ -26671,7 +26665,7 @@ class CryptoController {
  */
 class HoloStore {
   /**
-   * @param {string} message
+   * @param {*} message
    * @returns True if successful, false otherwise.
    */
   setLatestMessage(message) {
@@ -26712,10 +26706,8 @@ class HoloStore {
   }
 
   validateCredentials(credentials) {
-    if (!credentials.unencryptedCreds || !credentials.encryptedCreds) {
-      console.log(
-        "HoloStore: credentials object missing unencryptedCreds or encryptedCreds"
-      );
+    if (!credentials.encryptedCreds) {
+      console.log("HoloStore: credentials object missing encryptedCreds property");
       return false;
     }
     return true;
@@ -26796,21 +26788,18 @@ function popupListener(request, sender, sendResponse) {
   } else if (command == "getHoloLatestMessage") {
     const loggedIn = cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
-    let isStoringCreds = false;
     holoStore
       .getLatestMessage()
       .then((encryptedMsg) => {
-        isStoringCreds = encryptedMsg?.credentials ? true : false;
-        const message = encryptedMsg.credentials || encryptedMsg.proof;
-        return cryptoController.decryptWithPrivateKey(message, encryptedMsg.sharded);
+        return cryptoController.decryptWithPrivateKey(
+          encryptedMsg.credentials,
+          encryptedMsg.sharded
+        );
       })
-      .then((decryptedMsg) => {
-        if (isStoringCreds) {
-          sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } });
-        } else {
-          sendResponse({ message: { proof: JSON.parse(decryptedMsg) } });
-        }
-      });
+      .then((decryptedMsg) =>
+        sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } })
+      )
+      .catch(() => sendResponse({ message: {} }));
     return true;
   } else if (command == "getHoloCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
@@ -26825,7 +26814,8 @@ function popupListener(request, sender, sendResponse) {
       )
       .then((decryptedCreds) =>
         sendResponse({ credentials: JSON.parse(decryptedCreds) })
-      );
+      )
+      .catch((err) => sendResponse({}));
     return true;
   } else if (command == "confirmCredentials") {
     const loggedIn = cryptoController.getIsLoggedIn();
@@ -26891,7 +26881,7 @@ function popupListener(request, sender, sendResponse) {
 }
 
 /**
- * @param {string} type Either "credentials" or "proof"; the desired popup type
+ * @param {string} type Either "credentials" or "share-creds"; the desired popup type
  */
 async function displayConfirmationPopup(type) {
   let url = "";
