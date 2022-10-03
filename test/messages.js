@@ -37,6 +37,12 @@ describe("Message passing", async () => {
     browser = initVals.browser;
     serviceWorker = initVals.serviceWorker;
     extensionId = initVals.extensionId;
+    await sleep(1000);
+    // Setting extensionId sometimes doesn't work
+    await serviceWorker.evaluateHandle((extId) => {
+      extensionId = extId;
+      popupOrigin = `chrome-extension://${extensionId}`;
+    }, extensionId);
     frontendPage = await browser.newPage();
     defaultPopupPage = await browser.newPage();
     await sleep(300); // Seems to reduce ReferenceErrors
@@ -197,7 +203,7 @@ describe("Message passing", async () => {
           command: "setHoloCredentials",
           credentials: testCreds,
         });
-        await sleep(50);
+        await sleep(100);
         confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
         const loginResult = await login(confirmationPopup, extensionId, validPassword);
         expect(loginResult.success).to.equal(true);

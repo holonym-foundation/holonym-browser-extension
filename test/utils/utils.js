@@ -26,10 +26,6 @@ export async function initialize() {
   const extensionId = serviceWorkerTarget.url().split("://")[1].split("/")[0];
   // Set extensionId and popupOrigin in the background script (i.e., service worker)
   const serviceWorker = await serviceWorkerTarget.worker();
-  await serviceWorker.evaluateHandle((extId) => {
-    extensionId = extId;
-    popupOrigin = `chrome-extension://${extensionId}`;
-  }, extensionId);
   return {
     browser: browser,
     serviceWorker: serviceWorker,
