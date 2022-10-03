@@ -85,6 +85,7 @@ class HoloStore {
       console.log("HoloStore: credentials object missing encryptedCreds property");
       return false;
     }
+    // TODO: More rigorous validation?
     return true;
   }
   /**
