@@ -96,9 +96,7 @@ function popupListener(request, sender, sendResponse) {
           encryptedCreds.sharded
         )
       )
-      .then((decryptedCreds) =>
-        sendResponse({ credentials: JSON.parse(decryptedCreds) })
-      )
+      .then((decryptedCreds) => sendResponse(JSON.parse(decryptedCreds)))
       .catch((err) => sendResponse({}));
     return true;
   } else if (command == "confirmCredentials") {

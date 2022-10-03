@@ -14,6 +14,7 @@ describe("HoloStore", async () => {
     browser = initVals.browser;
     extensionId = initVals.extensionId;
     serviceWorker = initVals.serviceWorker;
+    await sleep(300); // Seems to reduce ReferenceErrors
   });
 
   after(async () => {

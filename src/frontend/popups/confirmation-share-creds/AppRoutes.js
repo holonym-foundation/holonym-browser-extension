@@ -17,7 +17,7 @@ function AppRoutes() {
         const message = { command: "getHoloCredentials" };
         const callback = (resp) => {
           if (!resp) reject();
-          resolve(resp.credentials);
+          resolve(resp);
         };
         chrome.runtime.sendMessage(message, callback);
       });

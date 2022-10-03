@@ -185,7 +185,7 @@ describe("Message passing", async () => {
       afterEach(async () => {
         const payload3 = { command: "closingHoloCredentialsConfirmationPopup" };
         sendMessage(confirmationPopup, extensionId, payload3);
-        confirmationPopup.close();
+        if (confirmationPopup) confirmationPopup.close();
         await sleep(50);
       });
 
@@ -262,17 +262,17 @@ describe("Message passing", async () => {
         await sleep(50);
         // Get latest message
         const payload2 = { command: "getHoloLatestMessage" };
-        const resp1 = await sendMessage(confirmationPopup, extensionId, payload2);
-        expect(resp1.message.credentials).to.deep.equal(testCreds);
+        const resp = await sendMessage(confirmationPopup, extensionId, payload2);
+        expect(resp.message.credentials).to.deep.equal(testCreds);
         // Confirm credentials
         const payload3 = { command: "confirmCredentials" };
         await sendMessage(confirmationPopup, extensionId, payload3);
         await sleep(50);
         // Check stored credentials
         const payload4 = { command: "getHoloCredentials" };
-        const resp2 = await sendMessage(confirmationPopup, extensionId, payload4);
-        expect(resp2.credentials.newSecret).to.not.equal(undefined);
-        const credsSansNewSecret = Object.assign({}, resp2.credentials);
+        const creds = await sendMessage(confirmationPopup, extensionId, payload4);
+        expect(creds.newSecret).to.not.equal(undefined);
+        const credsSansNewSecret = Object.assign({}, creds);
         delete credsSansNewSecret.newSecret;
         expect(credsSansNewSecret).to.deep.equal(testCreds);
       });

@@ -8,7 +8,7 @@ const maxEncryptableLength = 446;
 // NOTE: Sometimes the following error is thrown:
 // "Evaluation failed: ReferenceError: CryptoController is not defined"
 // Just re-run if this happens.
-describe.only("CryptoController", async () => {
+describe("CryptoController", async () => {
   let browser;
   let serviceWorker;
   let extensionId;
@@ -18,6 +18,7 @@ describe.only("CryptoController", async () => {
     browser = initVals.browser;
     extensionId = initVals.extensionId;
     serviceWorker = initVals.serviceWorker;
+    await sleep(300); // Seems to reduce ReferenceErrors
   });
 
   after(async () => {
