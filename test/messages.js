@@ -39,6 +39,7 @@ describe("Message passing", async () => {
     extensionId = initVals.extensionId;
     frontendPage = await browser.newPage();
     defaultPopupPage = await browser.newPage();
+    await sleep(300); // Seems to reduce ReferenceErrors
   });
 
   after(async () => {
