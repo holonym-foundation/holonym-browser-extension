@@ -1,0 +1,29 @@
+name: Tests with Puppeteer
+
+on:
+  push:
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["main", "dev"]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        uses: actions/setup-node@v2
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+        with:
+          args: install
+      - run: npm ci
+      - run: npm install --global rollup
+      - run: NODE_ENV=prod bash build.sh no_zip
+      - name: Test Code
+        uses: mujo-code/puppeteer-headful@v2
+        env:
+          CI: "true"
+        with:
+          args: npm test

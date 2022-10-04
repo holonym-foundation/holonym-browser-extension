@@ -1443,7 +1443,7 @@ function PasswordLogin({
     name: "password",
     placeholder: "password",
     autoComplete: "current-password",
-    className: "password-input text-field"
+    className: "text-field"
   })), /*#__PURE__*/React$1.createElement("button", {
     className: "x-button",
     style: {
@@ -1466,6 +1466,7 @@ function InitializeAccount({
   onInitializeSuccess
 }) {
   const [password, setPassword] = react.exports.useState("");
+  const [passwordConf, setPasswordConf] = react.exports.useState("");
   const [passwordScore, setPasswordScore] = react.exports.useState(0);
 
   async function handleInitialize(event) {
@@ -1473,6 +1474,11 @@ function InitializeAccount({
 
     if (passwordScore < 4) {
       alert("Please choose a stronger password");
+      return;
+    }
+
+    if (password != passwordConf) {
+      alert("Passwords must match");
       return;
     }
 
@@ -1502,6 +1508,7 @@ function InitializeAccount({
     }
   }, /*#__PURE__*/React$1.createElement("form", {
     onSubmit: handleInitialize,
+    id: "initialize-account-form",
     autoComplete: "on"
   }, /*#__PURE__*/React$1.createElement("div", {
     className: "header-base"
@@ -1513,6 +1520,14 @@ function InitializeAccount({
     value: password,
     onChange: e => setPassword(e.target.value),
     placeholder: "password",
+    autoComplete: "current-password",
+    className: "text-field"
+  }), /*#__PURE__*/React$1.createElement("input", {
+    type: "password",
+    name: "password-confirmation",
+    value: passwordConf,
+    onChange: e => setPasswordConf(e.target.value),
+    placeholder: "confirm password",
     autoComplete: "current-password",
     className: "text-field"
   })), /*#__PURE__*/React$1.createElement("div", {
@@ -1576,6 +1591,7 @@ function SetPassword({
     exitButtonText: "Exit"
   }) : /*#__PURE__*/React$1.createElement(InitializeAccount, {
     inputLabel: "Set Password",
+    subLabel: "We suggest that you write down your password and store it somewhere safe",
     onInitializeSuccess: onInitializeSuccess
   })));
 }
@@ -1597,7 +1613,27 @@ function LandingPage({
       });
     }
 
-    getIsRegistered().then(val => setRegistered(val));
+    function getIsLoggedIn() {
+      return new Promise(resolve => {
+        const message = {
+          command: "holoGetIsLoggedIn"
+        };
+
+        const callback = resp => resolve(resp.isLoggedIn);
+
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+
+    (async () => {
+      const registeredTemp = await getIsRegistered();
+      setRegistered(registeredTemp);
+
+      if (registeredTemp) {
+        const isLoggedIn = await getIsLoggedIn();
+        if (isLoggedIn) onLoginSuccess();
+      }
+    })();
   }, []);
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
     style: {
@@ -1654,6 +1690,8 @@ function ConfirmCredentials({
   onConfirmation
 }) {
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+    id: "confirm-credentials-page"
+  }, /*#__PURE__*/React$1.createElement("div", {
     style: {
       textAlign: "center"
     }
@@ -1667,10 +1705,8 @@ function ConfirmCredentials({
     type: "submit",
     onClick: onConfirmation,
     className: "wide-button center-block"
-  }, "Confirm")));
+  }, "Confirm"))));
 }
-
-const credsConfSuccessMessage = "Your credentials have been encrypted and stored. " + "You can now generate zero knowledge proofs of identity.";
 
 function AppRoutes() {
   const [credentials, setCredentials] = react.exports.useState();
@@ -1705,9 +1741,8 @@ function AppRoutes() {
     };
 
     const callback = resp => {
-      navigate("/creds-confirmation-success", {
-        replace: true
-      });
+      // navigate("/creds-confirmation-success", { replace: true });
+      onExit();
     };
 
     chrome.runtime.sendMessage(message, callback);
@@ -1719,20 +1754,7 @@ function AppRoutes() {
     };
     chrome.runtime.sendMessage(message);
     window.close();
-  } // const testCredentialsDeleteMe = {
-  //   firstName: "Vitalik",
-  //   lastName: "Buterin",
-  //   middleInitial: "",
-  //   countryCode: 0,
-  //   streetAddr1: "6969 Second Street",
-  //   streetAddr2: "",
-  //   city: "Los Angeles",
-  //   subdivision: "",
-  //   postalCode: "696969",
-  //   completedAt: "1234",
-  //   birthdate: "06/09/1969",
-  // };
-
+  }
 
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement(Routes, null, /*#__PURE__*/React$1.createElement(Route, {
     path: "/",
@@ -1745,17 +1767,6 @@ function AppRoutes() {
       credentials: credentials,
       onConfirmation: handleCredsConfirmation
     })
-  }), /*#__PURE__*/React$1.createElement(Route, {
-    path: "/creds-confirmation-success",
-    element: /*#__PURE__*/React$1.createElement("div", {
-      style: {
-        marginTop: "150px"
-      }
-    }, /*#__PURE__*/React$1.createElement(Success, {
-      message: credsConfSuccessMessage,
-      onExit: onExit,
-      exitButtonText: "Close"
-    }))
   })));
 }
 

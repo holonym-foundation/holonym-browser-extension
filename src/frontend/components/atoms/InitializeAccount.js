@@ -6,11 +6,17 @@ import PasswordStrengthBar from "react-password-strength-bar";
 // During account resets, the user will lose access to their credentials.
 function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
   const [password, setPassword] = useState("");
+  const [passwordConf, setPasswordConf] = useState("");
   const [passwordScore, setPasswordScore] = useState(0);
+
   async function handleInitialize(event) {
     event.preventDefault();
     if (passwordScore < 4) {
       alert("Please choose a stronger password");
+      return;
+    }
+    if (password != passwordConf) {
+      alert("Passwords must match");
       return;
     }
     function initializeAccount() {
@@ -35,7 +41,11 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
   return (
     <>
       <div style={{ textAlign: "center" }}>
-        <form onSubmit={handleInitialize} autoComplete={"on"}>
+        <form
+          onSubmit={handleInitialize}
+          id="initialize-account-form"
+          autoComplete={"on"}
+        >
           <div className="header-base">
             <label>{inputLabel || "Enter Password"}</label>
             <div className="small-paragraph">{subLabel && <p>{subLabel}</p>}</div>
@@ -47,6 +57,15 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
+              autoComplete="current-password"
+              className="text-field"
+            />
+            <input
+              type="password"
+              name="password-confirmation"
+              value={passwordConf}
+              onChange={(e) => setPasswordConf(e.target.value)}
+              placeholder="confirm password"
               autoComplete="current-password"
               className="text-field"
             />
@@ -63,7 +82,6 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
             Submit
           </button>
         </form>
-        
       </div>
     </>
   );

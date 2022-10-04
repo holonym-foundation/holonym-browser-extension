@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import SetPassword from "./molecules/SetPassword";
-import PasswordLogin from "./atoms/PasswordLogin";
-import ChangePassword from "./atoms/ChangePassword";
+import SetPassword from "../molecules/SetPassword";
+import PasswordLogin from "../atoms/PasswordLogin";
+import ChangePassword from "../atoms/ChangePassword";
 
 function LandingPage({ onLoginSuccess }) {
   const [registered, setRegistered] = useState(false);
@@ -16,7 +16,23 @@ function LandingPage({ onLoginSuccess }) {
         chrome.runtime.sendMessage(message, callback);
       });
     }
-    getIsRegistered().then((val) => setRegistered(val));
+    function getIsLoggedIn() {
+      return new Promise((resolve) => {
+        const message = {
+          command: "holoGetIsLoggedIn",
+        };
+        const callback = (resp) => resolve(resp.isLoggedIn);
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+    (async () => {
+      const registeredTemp = await getIsRegistered();
+      setRegistered(registeredTemp);
+      if (registeredTemp) {
+        const isLoggedIn = await getIsLoggedIn();
+        if (isLoggedIn) onLoginSuccess();
+      }
+    })();
   }, []);
 
   return (

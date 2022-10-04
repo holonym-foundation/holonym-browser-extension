@@ -1429,7 +1429,7 @@ function PasswordLogin({
     name: "password",
     placeholder: "password",
     autoComplete: "current-password",
-    className: "password-input text-field"
+    className: "text-field"
   })), /*#__PURE__*/React$1.createElement("button", {
     className: "x-button",
     style: {
@@ -1452,6 +1452,7 @@ function InitializeAccount({
   onInitializeSuccess
 }) {
   const [password, setPassword] = react.exports.useState("");
+  const [passwordConf, setPasswordConf] = react.exports.useState("");
   const [passwordScore, setPasswordScore] = react.exports.useState(0);
 
   async function handleInitialize(event) {
@@ -1459,6 +1460,11 @@ function InitializeAccount({
 
     if (passwordScore < 4) {
       alert("Please choose a stronger password");
+      return;
+    }
+
+    if (password != passwordConf) {
+      alert("Passwords must match");
       return;
     }
 
@@ -1488,6 +1494,7 @@ function InitializeAccount({
     }
   }, /*#__PURE__*/React$1.createElement("form", {
     onSubmit: handleInitialize,
+    id: "initialize-account-form",
     autoComplete: "on"
   }, /*#__PURE__*/React$1.createElement("div", {
     className: "header-base"
@@ -1499,6 +1506,14 @@ function InitializeAccount({
     value: password,
     onChange: e => setPassword(e.target.value),
     placeholder: "password",
+    autoComplete: "current-password",
+    className: "text-field"
+  }), /*#__PURE__*/React$1.createElement("input", {
+    type: "password",
+    name: "password-confirmation",
+    value: passwordConf,
+    onChange: e => setPasswordConf(e.target.value),
+    placeholder: "confirm password",
     autoComplete: "current-password",
     className: "text-field"
   })), /*#__PURE__*/React$1.createElement("div", {
@@ -1562,6 +1577,7 @@ function SetPassword({
     exitButtonText: "Exit"
   }) : /*#__PURE__*/React$1.createElement(InitializeAccount, {
     inputLabel: "Set Password",
+    subLabel: "We suggest that you write down your password and store it somewhere safe",
     onInitializeSuccess: onInitializeSuccess
   })));
 }
@@ -1583,7 +1599,27 @@ function LandingPage({
       });
     }
 
-    getIsRegistered().then(val => setRegistered(val));
+    function getIsLoggedIn() {
+      return new Promise(resolve => {
+        const message = {
+          command: "holoGetIsLoggedIn"
+        };
+
+        const callback = resp => resolve(resp.isLoggedIn);
+
+        chrome.runtime.sendMessage(message, callback);
+      });
+    }
+
+    (async () => {
+      const registeredTemp = await getIsRegistered();
+      setRegistered(registeredTemp);
+
+      if (registeredTemp) {
+        const isLoggedIn = await getIsLoggedIn();
+        if (isLoggedIn) onLoginSuccess();
+      }
+    })();
   }, []);
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
     style: {
@@ -1640,12 +1676,12 @@ function ConfirmShareCredentials({
   onConfirmation
 }) {
   return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+    id: "confirm-share-credentials-page",
     style: {
-      textAlign: "center"
+      textAlign: "center",
+      marginTop: "10px"
     }
-  }, /*#__PURE__*/React$1.createElement("h2", {
-    className: "header-base"
-  }, "Share Credentials"), /*#__PURE__*/React$1.createElement("p", {
+  }, /*#__PURE__*/React$1.createElement("h1", null, "Share Credentials"), /*#__PURE__*/React$1.createElement("p", {
     className: "small-paragraph"
   }, "Confirm that you would like to share the following credentials with this website.")), /*#__PURE__*/React$1.createElement(Credentials, {
     credentials: credentials
@@ -1660,6 +1696,8 @@ function ConfirmShareCredentials({
   }, "Confirm")));
 }
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 function AppRoutes() {
   const navigate = useNavigate();
   const [credentials, setCredentials] = react.exports.useState();
@@ -1673,7 +1711,7 @@ function AppRoutes() {
 
         const callback = resp => {
           if (!resp) reject();
-          resolve(resp.credentials);
+          resolve(resp);
         };
 
         chrome.runtime.sendMessage(message, callback);
@@ -1702,12 +1740,15 @@ function AppRoutes() {
     getAndSetCredentials();
   }
 
-  function handleConfirmation() {
+  async function handleConfirmation() {
     const message = {
       command: "confirmShareCredentials"
     };
-    navigate("/share-creds-success");
     chrome.runtime.sendMessage(message);
+    await sleep(50); // give background script time to handle this message before sending the next message
+    // navigate("/share-creds-success");
+
+    onExit();
   }
 
   function onExit() {
@@ -1725,25 +1766,10 @@ function AppRoutes() {
     })
   }), /*#__PURE__*/React$1.createElement(Route, {
     path: "/confirm-share-creds",
-    element: /*#__PURE__*/React$1.createElement("div", {
-      style: {
-        marginTop: "10px"
-      }
-    }, /*#__PURE__*/React$1.createElement(ConfirmShareCredentials, {
+    element: /*#__PURE__*/React$1.createElement(ConfirmShareCredentials, {
       credentials: credentials,
       onConfirmation: handleConfirmation
-    }))
-  }), /*#__PURE__*/React$1.createElement(Route, {
-    path: "/share-creds-success",
-    element: /*#__PURE__*/React$1.createElement("div", {
-      style: {
-        marginTop: "150px"
-      }
-    }, /*#__PURE__*/React$1.createElement(Success, {
-      message: "Successfully shared credentials",
-      onExit: onExit,
-      exitButtonText: "Close"
-    }))
+    })
   })));
 }
 

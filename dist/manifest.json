@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Holonym",
-  "description": "Generate and store zero knowledge proofs for your identity.",
-  "version": "0.0.0.3",
+  "description": "Store info to generating zero knowledge proofs for your identity.",
+  "version": "0.0.0.9",
   "action": {
     "default_title": "Holonym",
     "default_popup": "default_popup.html",

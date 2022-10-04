@@ -2,14 +2,9 @@
  * API for storing Holo credentials.
  */
 
-// import { ethers } from "ethers";
-// import { Buffer } from "buffer/";
-// import { getStateAsBytes, getDateAsBytes } from "./utils";
-// import { serverAddress, threeZeroedBytes } from "./constants";
-
 /**
  * @typedef {Object} DecryptedCredentials
- * (See credentialNames, secretNames, and signatureNames for properties.)
+ * (See requiredCredsKeys below for properties.)
  */
 
 /**
@@ -27,8 +22,8 @@
 
 /**
  * @typedef {Object} FullCredentials
- * @property {DecryptedCredentials}
- * @property {EncryptedCredentials}
+ * @property {EncryptedCredentials} encryptedCreds
+ * @property {DecryptedCredentials} [unencryptedCreds] Used for validation
  */
 
 const credentialNames = ["countryCode", "subdivision", "completedAt", "birthdate"];
@@ -45,7 +40,7 @@ const requiredCredsKeys = [...credentialNames, "secret", "signature"];
  */
 class HoloStore {
   /**
-   * @param {string} message
+   * @param {*} message
    * @returns True if successful, false otherwise.
    */
   setLatestMessage(message) {
@@ -86,25 +81,11 @@ class HoloStore {
   }
 
   validateCredentials(credentials) {
-    if (!credentials.unencryptedCreds || !credentials.encryptedCreds) {
-      console.log(
-        "HoloStore: credentials object missing unencryptedCreds or encryptedCreds"
-      );
+    if (!credentials.encryptedCreds) {
+      console.log("HoloStore: credentials object missing encryptedCreds property");
       return false;
     }
-
-    // Ensure unencryptedCreds object has all and only the required keys
-    const unencryptedCredsKeys = Object.keys(credentials.unencryptedCreds);
-    const keysDiff = unencryptedCredsKeys
-      .filter((key) => !requiredCredsKeys.includes(key))
-      .concat(requiredCredsKeys.filter((key) => !unencryptedCredsKeys.includes(key)));
-    if (keysDiff.length > 0) {
-      console.log(
-        "HoloStore: credentials.unencryptedCreds does not have correct keys"
-      );
-      return false;
-    }
-
+    // TODO: More rigorous validation?
     return true;
   }
   /**
