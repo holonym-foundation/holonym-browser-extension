@@ -63,7 +63,7 @@ function AppRoutes() {
                   <a
                     href={linkToStartVerification}
                     target="_blank"
-                    className="x-button link wide-button center-block"
+                    className="x-button center-block"
                   >
                     Get your credentials
                   </a>
@@ -78,13 +78,15 @@ function AppRoutes() {
               >
                 Reset Account
               </button> */}
-              <button
-                type="submit"
-                onClick={() => navigate("/proof-menu", { replace: true })}
-                className="x-button wide-button center-block"
-              >
-                Proof Menu
-              </button>
+              {credentials && (
+                <button
+                  type="submit"
+                  onClick={() => navigate("/proof-menu", { replace: true })}
+                  className="x-button center-block"
+                >
+                  Proof Menu
+                </button>
+              )}
             </div>
           }
         />
@@ -104,7 +106,7 @@ function AppRoutes() {
                 href={linkToProofPage + "/lobby3"}
                 target="_blank"
                 style={{ marginTop: "10px" }}
-                className="x-button link wide-button center-block"
+                className="x-button center-block"
               >
                 Generate Lobby3 Proofs
               </a>
@@ -112,7 +114,7 @@ function AppRoutes() {
                 href={linkToProofPage + "/addLeaf-country"}
                 target="_blank"
                 style={{ marginTop: "10px" }}
-                className="link wide-button center-block"
+                className="center-block"
               >
                 Generate addLeaf-country Proof
               </a> */}
@@ -120,7 +122,7 @@ function AppRoutes() {
                 href={linkToProofPage + "/PoKoPoML-country"}
                 target="_blank"
                 style={{ marginTop: "10px" }}
-                className="link wide-button center-block"
+                className="center-block"
               >
                 Generate PoKoPoML Proof
               </a> */}
@@ -128,7 +130,7 @@ function AppRoutes() {
                 <button
                   type="submit"
                   onClick={() => navigate("/home", { replace: true })}
-                  className="x-button wide-button center-block"
+                  className="x-button center-block"
                 >
                   Return To Credentials
                 </button>

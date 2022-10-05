@@ -14,7 +14,7 @@ function ConfirmCredentials({ credentials, onConfirmation }) {
           <button
             type="submit"
             onClick={onConfirmation}
-            className="x-button wide-button center-block"
+            className="x-button center-block"
             style={{ margin: "10px" }}
           >
             Confirm
