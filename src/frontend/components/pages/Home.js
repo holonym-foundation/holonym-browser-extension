@@ -51,7 +51,7 @@ function Home() {
             </a>
           )}
         </div>
-        <h2 className="header-base">Credentials</h2>
+        <h1 style={{ textAlign: "center" }}>Credentials</h1>
         <Credentials credentials={credentials} />
         {/* <button
         type="submit"

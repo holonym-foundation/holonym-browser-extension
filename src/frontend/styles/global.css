@@ -71,12 +71,6 @@ button:hover {
   border-color: var(--default-red);
 }
 
-.header-base {
-  text-align: center;
-  font-weight: normal;
-  font-size: 18px;
-}
-
 .small-paragraph {
   font-size: 0.7rem;
 }
