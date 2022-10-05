@@ -43,14 +43,14 @@ function About() {
         <div style={{ marginTop: "10px" }}>
           {links &&
             links.length > 0 &&
-            links.map(({ text, destination }) => (
-              <ExternalLink text={text} destination={destination} />
+            links.map(({ text, destination }, index) => (
+              <ExternalLink key={index} text={text} destination={destination} />
             ))}
           <button
             type="submit"
             onClick={() => navigate("/home", { replace: true })}
             className="x-button center-block"
-            style={{ margin: "20px" }}
+            style={{ marginTop: "20px", marginBottom: "20px", width: "100%" }}
           >
             Return To Credentials
           </button>

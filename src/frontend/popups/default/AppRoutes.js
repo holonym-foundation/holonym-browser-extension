@@ -35,14 +35,16 @@ function AppRoutes() {
           path="/proof-menu"
           element={
             <div style={{ marginTop: "150px" }}>
-              <a
-                href={linkToProofPage + "/lobby3"}
-                target="_blank"
-                style={{ marginTop: "10px" }}
+              <button
+                type="submit"
+                onClick={() =>
+                  navigate(linkToProofPage + "/lobby3", { replace: true })
+                }
                 className="x-button center-block"
+                style={{ width: "100%" }}
               >
                 Generate Lobby3 Proofs
-              </a>
+              </button>
               {/* <a
                 href={linkToProofPage + "/addLeaf-country"}
                 target="_blank"
@@ -64,6 +66,7 @@ function AppRoutes() {
                   type="submit"
                   onClick={() => navigate("/home", { replace: true })}
                   className="x-button center-block"
+                  style={{ width: "100%" }}
                 >
                   Return To Credentials
                 </button>
