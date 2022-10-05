@@ -19,7 +19,7 @@ function ConfirmShareCredentials({ credentials, onConfirmation }) {
         <button
           type="submit"
           onClick={onConfirmation}
-          className="wide-button center-block"
+          className="x-button wide-button center-block"
         >
           Confirm
         </button>

@@ -49,7 +49,9 @@ function ChangePassword({ onPasswordChange }) {
               className="text-field"
             />
           </div>
-          <button type="submit">Submit</button>
+          <button className="x-button" style={{ margin: "10px" }} type="submit">
+            Submit
+          </button>
         </form>
       </div>
     </>

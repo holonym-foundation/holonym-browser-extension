@@ -63,7 +63,7 @@ function AppRoutes() {
                   <a
                     href={linkToStartVerification}
                     target="_blank"
-                    className="link wide-button center-block"
+                    className="x-button link wide-button center-block"
                   >
                     Get your credentials
                   </a>
@@ -81,9 +81,9 @@ function AppRoutes() {
               <button
                 type="submit"
                 onClick={() => navigate("/proof-menu", { replace: true })}
-                className="wide-button center-block"
+                className="x-button wide-button center-block"
               >
-                View Proof Menu
+                Proof Menu
               </button>
             </div>
           }
@@ -104,7 +104,7 @@ function AppRoutes() {
                 href={linkToProofPage + "/lobby3"}
                 target="_blank"
                 style={{ marginTop: "10px" }}
-                className="link wide-button center-block"
+                className="x-button link wide-button center-block"
               >
                 Generate Lobby3 Proofs
               </a>
@@ -128,7 +128,7 @@ function AppRoutes() {
                 <button
                   type="submit"
                   onClick={() => navigate("/home", { replace: true })}
-                  className="wide-button center-block"
+                  className="x-button wide-button center-block"
                 >
                   Return To Credentials
                 </button>
