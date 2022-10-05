@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const links = [
   {
-    text: "Holonym Homepage",
+    text: "Holonym Website",
     destination: "https://holonym.id",
   },
   {

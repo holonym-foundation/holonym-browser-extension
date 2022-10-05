@@ -259,10 +259,12 @@ button:hover {
 h5 {
   margin-top: 10px;
   margin-bottom: 10px;
-  font-family: "Clover Semibold", sans-serif;
-  font-size: 21px;
+  /* font-family: "Clover Semibold", sans-serif; */
+  font-family: "Montserrat", sans-serif;
+  /* font-size: 21px; */
+  font-size: 18px;
   line-height: 1.2;
-  font-weight: 700;
+  /* font-weight: 700; */
 }
 
 a {
