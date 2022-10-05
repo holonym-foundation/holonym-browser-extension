@@ -255,6 +255,34 @@ button:hover {
 .h3 {
   color: #fff;
 }
+
+h5 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-family: "Clover Semibold", sans-serif;
+  font-size: 21px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+a {
+  text-decoration: none;
+}
+
+.p-1 {
+  color: #01010c;
+}
+
+.p-1.white a {
+  color: #ffffff;
+  font-weight: 200;
+}
+
+.p-1.white.hover-animation:hover a {
+  color: #fdc094;
+  /* animation : hovereffect 10s ease-in-out; */
+}
+
 @font-face {
   font-family: "Clover Semibold";
   src: url("./fonts/CloverDisplay-SemiBold.otf") format("opentype");

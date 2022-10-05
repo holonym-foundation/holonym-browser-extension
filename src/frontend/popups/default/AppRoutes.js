@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import LandingPage from "../../components/pages/LandingPage";
+import About from "../../components/pages/About";
 import Credentials from "../../components/atoms/Credentials";
 import ResetAccount from "../../components/molecules/ResetAccount";
 import { sleep } from "../../../background/utils";
@@ -87,6 +88,14 @@ function AppRoutes() {
                   Proof Menu
                 </button>
               )}
+              <div style={{ margin: "20px" }}></div>
+              <button
+                type="submit"
+                onClick={() => navigate("/about", { replace: true })}
+                className="x-button center-block"
+              >
+                About
+              </button>
             </div>
           }
         />
@@ -126,7 +135,7 @@ function AppRoutes() {
               >
                 Generate PoKoPoML Proof
               </a> */}
-              <div style={{ marginTop: "10px" }}>
+              <div style={{ marginTop: "20px" }}>
                 <button
                   type="submit"
                   onClick={() => navigate("/home", { replace: true })}
@@ -138,6 +147,7 @@ function AppRoutes() {
             </div>
           }
         />
+        <Route path="/about" element={<About />} />
       </Routes>
     </>
   );
