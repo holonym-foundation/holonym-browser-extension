@@ -22,6 +22,13 @@
   "background": {
     "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://*/*"],
+      "run_at": "document_idle",
+      "js": ["./content.js"]
+    }
+  ],
   "permissions": ["storage"],
   "externally_connectable": {
     "matches": ["http://localhost:3002/*", "https://app.holonym.id/*"]

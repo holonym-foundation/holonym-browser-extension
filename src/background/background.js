@@ -108,6 +108,8 @@ function popupListener(request, sender, sendResponse) {
     holoStore
       .getLatestMessage()
       .then((encryptedMsg) => {
+        // TODO: Handle case where encryptedMsg == undefined
+        // This will be the case when the confirmation popup appears multiple times and the user confirms it in one popup. Upon confirmation, latest message is cleared, so any further attempts to confirm will result in an error
         return cryptoController.decryptWithPrivateKey(
           encryptedMsg.credentials,
           encryptedMsg.sharded
@@ -240,6 +242,7 @@ const allowedWebPageCommands = [
   "getHoloCredentials",
   "setHoloCredentials",
   "holoGetIsRegistered",
+  // TODO: Add holoGetIsLoggedIn
 ];
 
 // Listener function for messages from webpage
@@ -314,5 +317,35 @@ function webPageListener(request, sender, sendResponse) {
   }
 }
 
+// --------------------------------------------------------------
+// Add listeners
+// --------------------------------------------------------------
+
 chrome.runtime.onMessage.addListener(popupListener);
 chrome.runtime.onMessageExternal.addListener(webPageListener);
+
+// The following listener is included so that this script does not terminate after 5 min
+// Inspired by wOxxOm's answer here:
+// https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension
+const deletePortTimer = (port) => {
+  if (port._timer) {
+    clearTimeout(port._timer);
+    delete port._timer;
+  }
+};
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name !== "persistence") return;
+  port.onMessage.addListener((msg, port) => {
+    // console.log("received", msg, "from", port.sender);
+  });
+  port.onDisconnect.addListener(deletePortTimer);
+  // Reconnect
+  port._timer = setTimeout(
+    (port) => {
+      deletePortTimer(port);
+      port.disconnect();
+    },
+    250 * 1000, // Must be < 300 * 1000 ms
+    port
+  );
+});
