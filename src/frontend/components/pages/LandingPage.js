@@ -5,6 +5,7 @@ import ChangePassword from "../atoms/ChangePassword";
 
 function LandingPage({ onLoginSuccess }) {
   const [registered, setRegistered] = useState(false);
+  const [sendingMessages, setSendingMessages] = useState(true);
 
   useEffect(() => {
     function getIsRegistered() {
@@ -32,22 +33,25 @@ function LandingPage({ onLoginSuccess }) {
         const isLoggedIn = await getIsLoggedIn();
         if (isLoggedIn) onLoginSuccess();
       }
+      setSendingMessages(false);
     })();
   }, []);
 
   return (
     <>
-      <div>
-        {!registered ? (
-          <div style={{ marginTop: "30px" }}>
-            <SetPassword onAccountCreated={onLoginSuccess} />
-          </div>
-        ) : (
-          <div style={{ marginTop: "120px" }}>
-            <PasswordLogin onLoginSuccess={onLoginSuccess} />
-          </div>
-        )}
-      </div>
+      {!sendingMessages && (
+        <div>
+          {!registered ? (
+            <div style={{ marginTop: "30px" }}>
+              <SetPassword onAccountCreated={onLoginSuccess} />
+            </div>
+          ) : (
+            <div style={{ marginTop: "120px" }}>
+              <PasswordLogin onLoginSuccess={onLoginSuccess} />
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 }
