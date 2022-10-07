@@ -21,7 +21,7 @@ function SetPassword({ onAccountCreated }) {
         ) : (
           <InitializeAccount
             inputLabel="Set Password"
-            subLabel="We suggest that you write down your password and store it somewhere safe"
+            subLabel="Please write down your password and store it somewhere safe. If you lose the password, you may lose access to your Holo and any airdrops, votes, or other tools that use it"
             onInitializeSuccess={onInitializeSuccess}
           />
         )}

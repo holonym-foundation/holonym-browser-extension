@@ -79,7 +79,7 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
             </div>
           </div>
           <button className="x-button" style={{ margin: "10px" }} type="submit">
-            Submit
+            I backed up the password
           </button>
         </form>
       </div>
