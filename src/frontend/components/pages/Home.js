@@ -4,6 +4,7 @@ import Credentials from "../atoms/Credentials";
 import { sleep } from "../../../background/utils";
 
 const linkToStartVerification = process.env.LINK_TO_START_VERIFICATION;
+const frontendUrl = process.env.FRONTEND_URL;
 
 const WhiteLine = () => (
   <div style={{ marginTop: "5px", marginBottom: "5px" }}>
@@ -90,14 +91,14 @@ function Home() {
                 <div style={{ marginTop: "20px", marginBottom: "20px" }}>
                   <WhiteLine />
                 </div>
-                <button
-                  type="submit"
-                  onClick={() => navigate("/proof-menu", { replace: true })}
+                <a
+                  href={frontendUrl + "/prove"}
+                  target="_blank"
                   className="x-button center-block"
-                  style={{ width: "100%" }}
+                  style={{ textAlign: "center" }}
                 >
                   Proof Menu
-                </button>
+                </a>
               </div>
             )}
             <div style={{ marginTop: "20px", marginBottom: "20px" }}>

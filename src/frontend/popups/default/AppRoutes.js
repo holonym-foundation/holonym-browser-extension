@@ -6,8 +6,6 @@ import Home from "../../components/pages/Home";
 import ResetAccount from "../../components/molecules/ResetAccount";
 import { sleep } from "../../../background/utils";
 
-const linkToProofPage = process.env.LINK_TO_PROOF_PAGE;
-
 function AppRoutes() {
   const navigate = useNavigate();
 
@@ -31,49 +29,6 @@ function AppRoutes() {
             />
           }
         /> */}
-        <Route
-          path="/proof-menu"
-          element={
-            <div style={{ marginTop: "150px" }}>
-              <button
-                type="submit"
-                onClick={() =>
-                  navigate(linkToProofPage + "/lobby3", { replace: true })
-                }
-                className="x-button center-block"
-                style={{ width: "100%" }}
-              >
-                Generate Lobby3 Proofs
-              </button>
-              {/* <a
-                href={linkToProofPage + "/addLeaf-country"}
-                target="_blank"
-                style={{ marginTop: "10px" }}
-                className="center-block"
-              >
-                Generate addLeaf-country Proof
-              </a> */}
-              {/* <a
-                href={linkToProofPage + "/PoKoPoML-country"}
-                target="_blank"
-                style={{ marginTop: "10px" }}
-                className="center-block"
-              >
-                Generate PoKoPoML Proof
-              </a> */}
-              <div style={{ marginTop: "20px" }}>
-                <button
-                  type="submit"
-                  onClick={() => navigate("/home", { replace: true })}
-                  className="x-button center-block"
-                  style={{ width: "100%" }}
-                >
-                  Return To Credentials
-                </button>
-              </div>
-            </div>
-          }
-        />
         <Route path="/about" element={<About />} />
       </Routes>
     </>

@@ -8,14 +8,11 @@ import json from "@rollup/plugin-json";
 
 // TODO: Change 'dev' to 'production' before bundling for production
 const NODE_ENV = JSON.stringify(process.env.NODE_ENV);
-const linkToStartVerification =
+const linkToStartVerification = "'https://holonym.id/verify'";
+const frontendUrl =
   process.env.NODE_ENV == "dev"
-    ? "'http://localhost:3002/zk-id/verify'"
-    : "'https://app.holonym.id/zk-id/verify'";
-const linkToProofPage =
-  process.env.NODE_ENV == "dev"
-    ? "'http://localhost:3002/zk-id/proofs'"
-    : "'https://app.holonym.id/zk-id/proofs'";
+    ? "'http://localhost:3002'"
+    : "'https://app.holonym.id'";
 
 export default [
   // {
@@ -76,7 +73,7 @@ export default [
       replace({
         "process.env.NODE_ENV": NODE_ENV,
         "process.env.LINK_TO_START_VERIFICATION": linkToStartVerification,
-        "process.env.LINK_TO_PROOF_PAGE": linkToProofPage,
+        "process.env.FRONTEND_URL": frontendUrl,
         preventAssignment: true,
       }),
       babel({
