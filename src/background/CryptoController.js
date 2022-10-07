@@ -27,10 +27,6 @@ import { maxEncryptableLength } from "./constants";
  */
 
 class CryptoController {
-  constructor() {
-    this.setIsLoggedInInSession(false);
-  }
-
   /**
    * Create initial password and public-private keypair.
    * Should be called only once ever.
