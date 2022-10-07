@@ -224,29 +224,6 @@ describe("CryptoController", async () => {
     });
   });
 
-  describe("getIsLoggedIn", async () => {
-    it("Should return the value of the isLoggedIn property stored in chrome.storage.session", async () => {
-      let isLoggedInVal = false;
-      let retrievedIsLoggedIn = await serviceWorker.evaluate(async (isLoggedInVal) => {
-        const tempCryptoController = new CryptoController();
-        await new Promise((resolve) =>
-          chrome.storage.session.set({ isLoggedIn: isLoggedInVal }, resolve)
-        );
-        return await tempCryptoController.getIsLoggedIn();
-      }, isLoggedInVal);
-      expect(retrievedIsLoggedIn).to.equal(isLoggedInVal);
-      isLoggedInVal = true;
-      retrievedIsLoggedIn = await serviceWorker.evaluate(async (isLoggedInVal) => {
-        const tempCryptoController = new CryptoController();
-        await new Promise((resolve) =>
-          chrome.storage.session.set({ isLoggedIn: isLoggedInVal }, resolve)
-        );
-        return await tempCryptoController.getIsLoggedIn();
-      }, isLoggedInVal);
-      expect(retrievedIsLoggedIn).to.equal(isLoggedInVal);
-    });
-  });
-
   describe("getIsRegistered", async () => {
     it("Should return false if the user does not have a public key", async () => {
       const retrievedIsRegistered = await serviceWorker.evaluate(async () => {
@@ -268,6 +245,29 @@ describe("CryptoController", async () => {
         "publicKey"
       );
       expect(retrievedIsRegistered).to.equal(true);
+    });
+  });
+
+  describe("getIsLoggedIn", async () => {
+    it("Should return the value of the isLoggedIn property stored in chrome.storage.session", async () => {
+      let isLoggedInVal = false;
+      let retrievedIsLoggedIn = await serviceWorker.evaluate(async (isLoggedInVal) => {
+        const tempCryptoController = new CryptoController();
+        await new Promise((resolve) =>
+          chrome.storage.session.set({ isLoggedIn: isLoggedInVal }, resolve)
+        );
+        return await tempCryptoController.getIsLoggedIn();
+      }, isLoggedInVal);
+      expect(retrievedIsLoggedIn).to.equal(isLoggedInVal);
+      isLoggedInVal = true;
+      retrievedIsLoggedIn = await serviceWorker.evaluate(async (isLoggedInVal) => {
+        const tempCryptoController = new CryptoController();
+        await new Promise((resolve) =>
+          chrome.storage.session.set({ isLoggedIn: isLoggedInVal }, resolve)
+        );
+        return await tempCryptoController.getIsLoggedIn();
+      }, isLoggedInVal);
+      expect(retrievedIsLoggedIn).to.equal(isLoggedInVal);
     });
   });
 
