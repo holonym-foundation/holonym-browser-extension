@@ -100,20 +100,17 @@ function popupListener(request, sender, sendResponse) {
       .getIsLoggedIn()
       .then((loggedIn) => {
         if (!loggedIn) return;
-        // if (!loggedIn) sendResponse({ error: "Not logged in" });
         return holoStore.getCredentials();
       })
       .then((encryptedCreds) => {
         if (!encryptedCreds) return;
-        // if (!encryptedCreds) sendResponse({ error: "No encryptedCreds" });
-        cryptoController.decryptWithPrivateKey(
+        return cryptoController.decryptWithPrivateKey(
           encryptedCreds.credentials,
           encryptedCreds.sharded
         );
       })
       .then((decryptedCreds) => {
         if (!decryptedCreds) sendResponse({});
-        // if (!decryptedCreds) sendResponse({ error: "No decryptedCreds" });
         else sendResponse(JSON.parse(decryptedCreds));
       })
       .catch((err) => sendResponse({ error: err }));
@@ -311,7 +308,7 @@ function webPageListener(request, sender, sendResponse) {
       })
       .then((encryptedMsg) => {
         if (!encryptedMsg) return;
-        cryptoController.decryptWithPrivateKey(
+        return cryptoController.decryptWithPrivateKey(
           encryptedMsg.credentials,
           encryptedMsg.sharded
         );
