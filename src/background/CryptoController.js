@@ -27,16 +27,8 @@ import { maxEncryptableLength } from "./constants";
  */
 
 class CryptoController {
-  store;
-  isLoggedIn;
-
   constructor() {
-    this.store = {
-      password: undefined, // string
-      decryptedPrivateKey: undefined, // SubtleCrypto.JWK
-      // publicKey: undefined, // SubtleCrypto.JWK
-    };
-    this.isLoggedIn = false;
+    this.setIsLoggedInInSession(false);
   }
 
   /**
@@ -45,7 +37,7 @@ class CryptoController {
    */
   async initialize(password) {
     await this.createPassword(password);
-    this.isLoggedIn = true;
+    await this.setIsLoggedInInSession(true);
     await this.generateKeyPair();
   }
 
@@ -56,7 +48,7 @@ class CryptoController {
   async createPassword(password) {
     // Commenting out. User should be allowed to generate new account and erase old one.
     // if (await this.getPasswordHash()) return;
-    this.store.password = password;
+    await this.setPasswordInSession(password);
     const salt = crypto.randomUUID();
     await this.setPasswordSalt(salt);
     const passwordHash = await this.hashPassword(password, salt);
@@ -79,7 +71,7 @@ class CryptoController {
     const usage = ["encrypt", "decrypt"];
     const keyPair = await crypto.subtle.generateKey(algo, true, usage);
     const privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
-    this.store.decryptedPrivateKey = privateKey;
+    await this.setPrivateKeyInSession(privateKey);
     const publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const encryptedPrivateKey = await this.encryptWithPassword(privateKey);
     await this.setKeyPair(encryptedPrivateKey, publicKey);
@@ -94,25 +86,22 @@ class CryptoController {
     const passwordHash = await this.hashPassword(password, salt);
     const storedPasswordHash = await this.getPasswordHash();
     if (passwordHash != storedPasswordHash) return false;
-    this.isLoggedIn = true;
-    this.store.password = password;
+    await this.setIsLoggedInInSession(true);
+    await this.setPasswordInSession(password);
     const keyPair = await this.getKeyPair();
-    this.store.decryptedPrivateKey = await this.decryptWithPassword(
-      keyPair.encryptedPrivateKey
-    );
+    const privateKey = await this.decryptWithPassword(keyPair.encryptedPrivateKey);
+    await this.setPrivateKeyInSession(privateKey);
     return true;
   }
 
-  logout() {
-    this.store = {
-      password: undefined,
-      decryptedPrivateKey: undefined,
-    };
-    this.isLoggedIn = false;
+  async logout() {
+    await this.setIsLoggedInInSession(false);
+    await this.setPasswordInSession(undefined);
+    await this.setPrivateKeyInSession(undefined);
   }
 
-  getIsLoggedIn() {
-    return this.isLoggedIn;
+  async getIsLoggedIn() {
+    return await this.getIsLoggedInFromSession();
   }
 
   async getIsRegistered() {
@@ -163,6 +152,62 @@ class CryptoController {
     });
   }
 
+  // ----------------------------------------------------
+  // BEGIN chrome.storage.session getters and setters
+  // ----------------------------------------------------
+
+  // get/set private key
+  setPrivateKeyInSession(privateKey) {
+    return new Promise((resolve) => {
+      if (privateKey) {
+        chrome.storage.session.set({ privateKey: privateKey }, () => resolve(true));
+      } else {
+        chrome.storage.session.remove(["privateKey"], () => resolve(true));
+      }
+    });
+  }
+  getPrivateKeyFromSession() {
+    return new Promise((resolve) => {
+      chrome.storage.session.get(["privateKey"], (result) =>
+        resolve(result?.privateKey)
+      );
+    });
+  }
+
+  // get/set password
+  setPasswordInSession(password) {
+    return new Promise((resolve) => {
+      if (password) {
+        chrome.storage.session.set({ password: password }, () => resolve(true));
+      } else {
+        chrome.storage.session.remove(["password"], () => resolve(true));
+      }
+    });
+  }
+  getPasswordFromSession() {
+    return new Promise((resolve) => {
+      chrome.storage.session.get(["password"], (result) => resolve(result?.password));
+    });
+  }
+
+  // get/set isLoggedIn
+  setIsLoggedInInSession(isLoggedIn) {
+    return new Promise((resolve) => {
+      chrome.storage.session.set({ isLoggedIn: isLoggedIn }, () => resolve(true));
+    });
+  }
+  getIsLoggedInFromSession() {
+    return new Promise((resolve) => {
+      chrome.storage.session.get(["isLoggedIn"], (result) =>
+        resolve(result?.isLoggedIn)
+      );
+    });
+  }
+
+  // ----------------------------------------------------
+  // END chrome.storage.session getters and setters
+  // ----------------------------------------------------
+
   /**
    * @param {boolean} sharded Whether message is represented as encrypted shards.
    * @property {string|Array<string>} encryptedMessage If not sharded, this is a string
@@ -182,9 +227,10 @@ class CryptoController {
       publicExponent: new Uint8Array([1, 0, 1]),
       hash: "SHA-256",
     };
+    const privateKey = await this.getPrivateKeyFromSession();
     const privateKeyAsCryptoKey = await crypto.subtle.importKey(
       "jwk",
-      this.store.decryptedPrivateKey,
+      privateKey,
       algo,
       false,
       ["decrypt"]
@@ -252,16 +298,18 @@ class CryptoController {
    * @param {object} data
    */
   async encryptWithPassword(data) {
-    if (!this.isLoggedIn) return;
-    return await passworder.encrypt(this.store.password, data);
+    if (!(await this.getIsLoggedInFromSession())) return;
+    const password = await this.getPasswordFromSession();
+    return await passworder.encrypt(password, data);
   }
 
   /**
    * @param {string} data
    */
   async decryptWithPassword(data) {
-    if (!this.isLoggedIn) return;
-    return await passworder.decrypt(this.store.password, data);
+    if (!(await this.getIsLoggedInFromSession())) return;
+    const password = await this.getPasswordFromSession();
+    return await passworder.decrypt(password, data);
   }
 
   /**

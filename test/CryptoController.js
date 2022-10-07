@@ -225,18 +225,22 @@ describe("CryptoController", async () => {
   });
 
   describe("getIsLoggedIn", async () => {
-    it("Should return this.isLoggedIn", async () => {
+    it("Should return the value of the isLoggedIn property stored in chrome.storage.session", async () => {
       let isLoggedInVal = false;
       let retrievedIsLoggedIn = await serviceWorker.evaluate(async (isLoggedInVal) => {
         const tempCryptoController = new CryptoController();
-        tempCryptoController.isLoggedIn = isLoggedInVal;
+        await new Promise((resolve) =>
+          chrome.storage.session.set({ isLoggedIn: isLoggedInVal }, resolve)
+        );
         return await tempCryptoController.getIsLoggedIn();
       }, isLoggedInVal);
       expect(retrievedIsLoggedIn).to.equal(isLoggedInVal);
       isLoggedInVal = true;
       retrievedIsLoggedIn = await serviceWorker.evaluate(async (isLoggedInVal) => {
         const tempCryptoController = new CryptoController();
-        tempCryptoController.isLoggedIn = isLoggedInVal;
+        await new Promise((resolve) =>
+          chrome.storage.session.set({ isLoggedIn: isLoggedInVal }, resolve)
+        );
         return await tempCryptoController.getIsLoggedIn();
       }, isLoggedInVal);
       expect(retrievedIsLoggedIn).to.equal(isLoggedInVal);
@@ -459,8 +463,8 @@ describe("CryptoController", async () => {
       const testPassword = "test-password";
       const retrievedKeyPair = await serviceWorker.evaluate(async (password) => {
         const tempCryptoController = new CryptoController();
-        tempCryptoController.isLoggedIn = true; // Ensure user is logged in
-        tempCryptoController.store.password = password; // Ensure password is set
+        await tempCryptoController.setIsLoggedInInSession(true); // Ensure user is logged in
+        await tempCryptoController.setPasswordInSession(password); // Ensure password is set
         await tempCryptoController.generateKeyPair();
         return await tempCryptoController.getKeyPair();
       }, testPassword);
@@ -486,12 +490,12 @@ describe("CryptoController", async () => {
       const decryptedMessage = await serviceWorker.evaluate(
         async (encryptedPrivateKey, password, encryptedMessage) => {
           const tempCryptoController = new CryptoController();
-          tempCryptoController.isLoggedIn = true;
-          tempCryptoController.store.password = password;
+          await tempCryptoController.setIsLoggedInInSession(true); // Ensure user is logged in
+          await tempCryptoController.setPasswordInSession(password); // Ensure password is set
           const privateKey = await tempCryptoController.decryptWithPassword(
             encryptedPrivateKey
           );
-          tempCryptoController.store.decryptedPrivateKey = privateKey;
+          await tempCryptoController.setPrivateKeyInSession(privateKey);
           return await tempCryptoController.decryptWithPrivateKey(encryptedMessage);
         },
         retrievedKeyPair.encryptedPrivateKey,
@@ -508,28 +512,31 @@ describe("CryptoController", async () => {
       await serviceWorker.evaluate(async (password) => {
         const tempCryptoController = new CryptoController();
         await tempCryptoController.initialize(password);
-        tempCryptoController.isLoggedIn = false;
-        tempCryptoController.store.decryptedPrivateKey = undefined;
-        tempCryptoController.store.password = undefined;
+        await tempCryptoController.setIsLoggedInInSession(false);
+        await tempCryptoController.setPasswordInSession("");
+        await tempCryptoController.setPrivateKeyInSession({});
       }, testPassword);
       const retrievedPrivateKey = await serviceWorker.evaluate(async (password) => {
         const tempCryptoController = new CryptoController();
-        tempCryptoController.isLoggedIn = true;
-        tempCryptoController.store.password = password;
+        await tempCryptoController.setIsLoggedInInSession(true);
+        await tempCryptoController.setPasswordInSession(password);
         const keyPair = await tempCryptoController.getKeyPair();
         const privateKey = await tempCryptoController.decryptWithPassword(
           keyPair.encryptedPrivateKey
         );
-        tempCryptoController.store.password = undefined;
+        await tempCryptoController.setPasswordInSession(undefined);
         return privateKey;
       }, testPassword);
       const retrievedValues = await serviceWorker.evaluate(async (password) => {
         const tempCryptoController = new CryptoController();
         await tempCryptoController.login(password);
+        const loggedIn = await tempCryptoController.getIsLoggedInFromSession();
+        const storedPassword = await tempCryptoController.getPasswordFromSession();
+        const privateKey = await tempCryptoController.getPrivateKeyFromSession();
         return {
-          password: tempCryptoController.store.password,
-          decryptedPrivateKey: tempCryptoController.store.decryptedPrivateKey,
-          isLoggedIn: tempCryptoController.isLoggedIn,
+          password: storedPassword,
+          decryptedPrivateKey: privateKey,
+          isLoggedIn: loggedIn,
         };
       }, testPassword);
       expect(retrievedValues.password).to.equal(testPassword);
@@ -539,15 +546,18 @@ describe("CryptoController", async () => {
   });
 
   describe("logout", async () => {
-    it("Should set isLoggedIn to false, decryptedPrivateKey to undefined, and password to false", async () => {
+    it("Should set isLoggedIn to false, privateKey to undefined, and password to false", async () => {
       const testPassword = "this-is-the-password";
       const beforeValues = await serviceWorker.evaluate(async (password) => {
         const tempCryptoController = new CryptoController();
         await tempCryptoController.initialize(password);
+        const loggedIn = await tempCryptoController.getIsLoggedInFromSession();
+        const storedPassword = await tempCryptoController.getPasswordFromSession();
+        const privateKey = await tempCryptoController.getPrivateKeyFromSession();
         return {
-          password: tempCryptoController.store.password,
-          decryptedPrivateKey: tempCryptoController.store.decryptedPrivateKey,
-          isLoggedIn: tempCryptoController.isLoggedIn,
+          password: storedPassword,
+          decryptedPrivateKey: privateKey,
+          isLoggedIn: loggedIn,
         };
       }, testPassword);
       expect(beforeValues.password).to.not.equal(undefined);
@@ -556,10 +566,13 @@ describe("CryptoController", async () => {
       const afterValues = await serviceWorker.evaluate(async () => {
         const tempCryptoController = new CryptoController();
         await tempCryptoController.logout();
+        const loggedIn = await tempCryptoController.getIsLoggedInFromSession();
+        const storedPassword = await tempCryptoController.getPasswordFromSession();
+        const privateKey = await tempCryptoController.getPrivateKeyFromSession();
         return {
-          password: tempCryptoController.store.password,
-          decryptedPrivateKey: tempCryptoController.store.decryptedPrivateKey,
-          isLoggedIn: tempCryptoController.isLoggedIn,
+          password: storedPassword,
+          decryptedPrivateKey: privateKey,
+          isLoggedIn: loggedIn,
         };
       }, testPassword);
       expect(afterValues.password).to.equal(undefined);

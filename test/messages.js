@@ -23,7 +23,7 @@ const frontendUrl = "https://app.holonym.id";
  * NOTE: The sequence of the tests matters. Specifically, items stored in chrome storage
  * persist across tests. This includes password, latest message, and credentials.
  */
-describe("Message passing", async () => {
+describe.only("Message passing", async () => {
   let browser;
   let serviceWorker;
   let extensionId;
@@ -278,6 +278,8 @@ describe("Message passing", async () => {
         // Check stored credentials
         const payload4 = { command: "getHoloCredentials" };
         const creds = await sendMessage(confirmationPopup, extensionId, payload4);
+        console.log("creds");
+        console.log(creds);
         expect(creds.newSecret).to.not.equal(undefined);
         const credsSansNewSecret = Object.assign({}, creds);
         delete credsSansNewSecret.newSecret;

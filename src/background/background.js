@@ -67,55 +67,75 @@ function popupListener(request, sender, sendResponse) {
       .catch((err) => sendResponse({ error: err?.message }));
     return true; // <-- This is required in order to use sendResponse async
   } else if (command == "holoGetIsLoggedIn") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    sendResponse({ isLoggedIn: loggedIn });
-    return;
+    cryptoController
+      .getIsLoggedIn()
+      .then((loggedIn) => sendResponse({ isLoggedIn: loggedIn }));
+    return true;
   } else if (command == "getHoloLatestMessage") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    holoStore
-      .getLatestMessage()
+    cryptoController
+      .getIsLoggedIn()
+      .then((loggedIn) => {
+        if (!loggedIn) {
+          sendResponse({ message: {} });
+          return;
+        } else {
+          return holoStore.getLatestMessage();
+        }
+      })
       .then((encryptedMsg) => {
+        if (!encryptedMsg) return;
         return cryptoController.decryptWithPrivateKey(
           encryptedMsg.credentials,
           encryptedMsg.sharded
         );
       })
-      .then((decryptedMsg) =>
-        sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } })
-      )
+      .then((decryptedMsg) => {
+        if (!decryptedMsg) sendResponse({ message: {} });
+        sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } });
+      })
       .catch(() => sendResponse({ message: {} }));
     return true;
   } else if (command == "getHoloCredentials") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    holoStore
-      .getCredentials()
-      .then((encryptedCreds) =>
+    cryptoController
+      .getIsLoggedIn()
+      .then((loggedIn) => {
+        if (!loggedIn) return;
+        // if (!loggedIn) sendResponse({ error: "Not logged in" });
+        return holoStore.getCredentials();
+      })
+      .then((encryptedCreds) => {
+        if (!encryptedCreds) return;
+        // if (!encryptedCreds) sendResponse({ error: "No encryptedCreds" });
         cryptoController.decryptWithPrivateKey(
           encryptedCreds.credentials,
           encryptedCreds.sharded
-        )
-      )
-      .then((decryptedCreds) => sendResponse(JSON.parse(decryptedCreds)))
-      .catch((err) => sendResponse({}));
+        );
+      })
+      .then((decryptedCreds) => {
+        if (!decryptedCreds) sendResponse({});
+        // if (!decryptedCreds) sendResponse({ error: "No decryptedCreds" });
+        else sendResponse(JSON.parse(decryptedCreds));
+      })
+      .catch((err) => sendResponse({ error: err }));
     return true;
   } else if (command == "confirmCredentials") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
     confirmCredentials = true;
     let unencryptedCreds;
-    holoStore
-      .getLatestMessage()
+    cryptoController
+      .getIsLoggedIn()
+      .then((loggedIn) => {
+        if (!loggedIn) return;
+        else return holoStore.getLatestMessage();
+      })
       .then((encryptedMsg) => {
-        // TODO: Handle case where encryptedMsg == undefined
-        // This will be the case when the confirmation popup appears multiple times and the user confirms it in one popup. Upon confirmation, latest message is cleared, so any further attempts to confirm will result in an error
+        if (!encryptedMsg) return;
         return cryptoController.decryptWithPrivateKey(
           encryptedMsg.credentials,
           encryptedMsg.sharded
         );
       })
       .then((decryptedCreds) => {
+        if (!decryptedCreds) return;
         unencryptedCreds = JSON.parse(decryptedCreds);
         const newSecret = new Uint8Array(16);
         crypto.getRandomValues(newSecret); // Generate new secret
@@ -123,6 +143,7 @@ function popupListener(request, sender, sendResponse) {
         return cryptoController.encryptWithPublicKey(unencryptedCreds);
       })
       .then((encryptedMsg) => {
+        if (!encryptedMsg) return;
         const credentials = {
           unencryptedCreds: unencryptedCreds,
           encryptedCreds: {
@@ -133,15 +154,21 @@ function popupListener(request, sender, sendResponse) {
         return holoStore.setCredentials(credentials);
       })
       .then((setCredsSuccess) => {
-        // TODO: handle case where setCredsSuccess == false
+        if (!setCredsSuccess) return;
+        return holoStore.setLatestMessage("");
+      })
+      .then((setMsgSuccess) => sendResponse({}))
+      .catch((err) => sendResponse({ error: err }));
+    return true;
+  } else if (command == "denyCredentials") {
+    cryptoController
+      .getIsLoggedIn()
+      .then((loggedIn) => {
+        if (!loggedIn) return;
         return holoStore.setLatestMessage("");
       })
       .then((setMsgSuccess) => sendResponse({}));
     return true;
-  } else if (command == "denyCredentials") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    holoStore.setLatestMessage("");
   } else if (command == "holoChangePassword") {
     const oldPassword = request.oldPassword;
     const newPassword = request.newPassword;
@@ -276,17 +303,23 @@ function webPageListener(request, sender, sendResponse) {
         console.log(`confirmShare: ${confirmShare}`);
         if (!confirmShare) return;
         confirmShareCredentials = false; // reset
-        const loggedIn = cryptoController.getIsLoggedIn();
+        return cryptoController.getIsLoggedIn();
+      })
+      .then((loggedIn) => {
         if (!loggedIn) return;
         return holoStore.getCredentials();
       })
-      .then((encryptedMsg) =>
+      .then((encryptedMsg) => {
+        if (!encryptedMsg) return;
         cryptoController.decryptWithPrivateKey(
           encryptedMsg.credentials,
           encryptedMsg.sharded
-        )
-      )
-      .then((decryptedCreds) => sendResponse(JSON.parse(decryptedCreds)));
+        );
+      })
+      .then((decryptedCreds) => {
+        if (!decryptedCreds) sendResponse({});
+        else sendResponse(JSON.parse(decryptedCreds));
+      });
     return true;
   } else if (command == "setHoloCredentials") {
     async function waitForConfirmation() {
@@ -323,29 +356,3 @@ function webPageListener(request, sender, sendResponse) {
 
 chrome.runtime.onMessage.addListener(popupListener);
 chrome.runtime.onMessageExternal.addListener(webPageListener);
-
-// The following listener is included so that this script does not terminate after 5 min
-// Inspired by wOxxOm's answer here:
-// https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension
-const deletePortTimer = (port) => {
-  if (port._timer) {
-    clearTimeout(port._timer);
-    delete port._timer;
-  }
-};
-chrome.runtime.onConnect.addListener((port) => {
-  if (port.name !== "persistence") return;
-  port.onMessage.addListener((msg, port) => {
-    // console.log("received", msg, "from", port.sender);
-  });
-  port.onDisconnect.addListener(deletePortTimer);
-  // Reconnect
-  port._timer = setTimeout(
-    (port) => {
-      deletePortTimer(port);
-      port.disconnect();
-    },
-    250 * 1000, // Must be < 300 * 1000 ms
-    port
-  );
-});

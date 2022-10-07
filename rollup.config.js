@@ -18,21 +18,21 @@ const linkToProofPage =
     : "'https://app.holonym.id/zk-id/proofs'";
 
 export default [
-  {
-    // Content script
-    input: "./src/content/content.js",
-    output: {
-      file: "./dist/content.js",
-      format: "es",
-    },
-    plugins: [
-      resolve({
-        browser: true,
-        preferBuiltins: false,
-      }),
-      commonjs(),
-    ],
-  },
+  // {
+  //   // Content script
+  //   input: "./src/content/content.js",
+  //   output: {
+  //     file: "./dist/content.js",
+  //     format: "es",
+  //   },
+  //   plugins: [
+  //     resolve({
+  //       browser: true,
+  //       preferBuiltins: false,
+  //     }),
+  //     commonjs(),
+  //   ],
+  // },
   {
     // Background script
     input: "./src/background/background.js",
