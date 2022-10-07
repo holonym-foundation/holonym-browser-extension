@@ -264,7 +264,7 @@ const allowedOrigins = [
   "http://localhost:3002",
   "https://app.holonym.id",
   "https://holonym.io",
-  "https://main.d2pqgbrq5pb6nr.amplifyapp.com/",
+  "https://main.d2pqgbrq5pb6nr.amplifyapp.com",
 ];
 const allowedWebPageCommands = [
   "getHoloPublicKey",
