@@ -1423,8 +1423,10 @@ function PasswordLogin({
     id: "login-form",
     onSubmit: handleLogin
   }, /*#__PURE__*/React$1.createElement("div", {
-    className: "header-base"
-  }, /*#__PURE__*/React$1.createElement("label", null, "Enter Password")), /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("input", {
+    style: {
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React$1.createElement("h1", null, "Enter Password")), /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("input", {
     type: "password",
     name: "password",
     placeholder: "password",
@@ -1497,8 +1499,10 @@ function InitializeAccount({
     id: "initialize-account-form",
     autoComplete: "on"
   }, /*#__PURE__*/React$1.createElement("div", {
-    className: "header-base"
-  }, /*#__PURE__*/React$1.createElement("label", null, inputLabel || "Enter Password"), /*#__PURE__*/React$1.createElement("div", {
+    style: {
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React$1.createElement("h1", null, inputLabel || "Enter Password"), /*#__PURE__*/React$1.createElement("div", {
     className: "small-paragraph"
   }, subLabel && /*#__PURE__*/React$1.createElement("p", null, subLabel))), /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("input", {
     type: "password",
@@ -1535,7 +1539,7 @@ function InitializeAccount({
       margin: "10px"
     },
     type: "submit"
-  }, "Submit"))));
+  }, "I backed up the password"))));
 }
 
 function Success({
@@ -1547,14 +1551,14 @@ function Success({
     style: {
       textAlign: "center"
     }
-  }, /*#__PURE__*/React$1.createElement("h1", null, "Success!")), /*#__PURE__*/React$1.createElement("div", {
+  }, /*#__PURE__*/React$1.createElement("h1", null, "Success!"), message && /*#__PURE__*/React$1.createElement("p", null, message)), /*#__PURE__*/React$1.createElement("div", {
     style: {
       marginTop: "20px"
     }
   }, /*#__PURE__*/React$1.createElement("button", {
     type: "submit",
     onClick: onExit,
-    className: "x-button wide-button center-block"
+    className: "x-button center-block"
   }, exitButtonText || "Close")));
 }
 
@@ -1577,7 +1581,7 @@ function SetPassword({
     exitButtonText: "Exit"
   }) : /*#__PURE__*/React$1.createElement(InitializeAccount, {
     inputLabel: "Set Password",
-    subLabel: "We suggest that you write down your password and store it somewhere safe",
+    subLabel: "Please write down your password and store it somewhere safe. If you lose the password, you may lose access to your Holo and any airdrops, votes, or other tools that use it",
     onInitializeSuccess: onInitializeSuccess
   })));
 }
@@ -1586,6 +1590,7 @@ function LandingPage({
   onLoginSuccess
 }) {
   const [registered, setRegistered] = react.exports.useState(false);
+  const [sendingMessages, setSendingMessages] = react.exports.useState(true);
   react.exports.useEffect(() => {
     function getIsRegistered() {
       return new Promise(resolve => {
@@ -1619,56 +1624,23 @@ function LandingPage({
         const isLoggedIn = await getIsLoggedIn();
         if (isLoggedIn) onLoginSuccess();
       }
+
+      setSendingMessages(false);
     })();
   }, []);
-  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, !sendingMessages && /*#__PURE__*/React$1.createElement("div", null, !registered ? /*#__PURE__*/React$1.createElement("div", {
     style: {
-      marginTop: "150px"
+      marginTop: "30px"
     }
-  }, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
+  }, /*#__PURE__*/React$1.createElement(SetPassword, {
     onAccountCreated: onLoginSuccess
-  }) : /*#__PURE__*/React$1.createElement(PasswordLogin, {
+  })) : /*#__PURE__*/React$1.createElement("div", {
+    style: {
+      marginTop: "120px"
+    }
+  }, /*#__PURE__*/React$1.createElement(PasswordLogin, {
     onLoginSuccess: onLoginSuccess
-  })));
-}
-
-function Credentials({
-  credentials
-}) {
-  const [credsToDisplay, setCredsToDisplay] = react.exports.useState();
-  react.exports.useEffect(() => {
-    if (!credentials) return;
-    const allowedCredsNames = Object.keys(credentials).filter(name => {
-      if (name.toLowerCase().includes("signature")) return false;
-      if (name.toLowerCase().includes("secret")) return false;
-      if (name == "completedAt") return false;
-      return true;
-    });
-    const credsToDisplayTemp = Object.fromEntries(allowedCredsNames.map(name => [name, credentials[name]]));
-    setCredsToDisplay(credsToDisplayTemp);
-  }, [credentials]);
-  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, credsToDisplay && Object.keys(credsToDisplay).length > 0 && /*#__PURE__*/React$1.createElement("div", {
-    className: "holo-credentials-container"
-  }, Object.keys(credsToDisplay).map((credentialName, index) => {
-    let formattedCred = credentialName.replace(/([A-Z])/g, " $1");
-    formattedCred = formattedCred.charAt(0).toUpperCase() + formattedCred.slice(1);
-    return /*#__PURE__*/React$1.createElement("div", {
-      key: index,
-      style: {
-        display: "flex",
-        margin: "1.05rem"
-      }
-    }, /*#__PURE__*/React$1.createElement("span", {
-      style: {
-        flex: "35%"
-      },
-      className: "credential-name"
-    }, formattedCred), /*#__PURE__*/React$1.createElement("span", {
-      style: {
-        flex: "65%"
-      }
-    }, credsToDisplay[credentialName]));
-  })));
+  }))));
 }
 
 function ConfirmShareCredentials({
@@ -1683,16 +1655,14 @@ function ConfirmShareCredentials({
     }
   }, /*#__PURE__*/React$1.createElement("h1", null, "Share Credentials"), /*#__PURE__*/React$1.createElement("p", {
     className: "small-paragraph"
-  }, "Confirm that you would like to share the following credentials with this website.")), /*#__PURE__*/React$1.createElement(Credentials, {
-    credentials: credentials
-  }), /*#__PURE__*/React$1.createElement("div", {
+  }, "Confirm you would like to create a ZK verification without revealing your identity")), /*#__PURE__*/React$1.createElement("div", {
     style: {
       marginTop: "10px"
     }
   }, /*#__PURE__*/React$1.createElement("button", {
     type: "submit",
     onClick: onConfirmation,
-    className: "wide-button center-block"
+    className: "x-button center-block"
   }, "Confirm")));
 }
 

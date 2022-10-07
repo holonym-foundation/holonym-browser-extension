@@ -24017,25 +24017,13 @@ const maxEncryptableLength = 446;
  */
 
 class CryptoController {
-  store;
-  isLoggedIn;
-
-  constructor() {
-    this.store = {
-      password: undefined, // string
-      decryptedPrivateKey: undefined, // SubtleCrypto.JWK
-      // publicKey: undefined, // SubtleCrypto.JWK
-    };
-    this.isLoggedIn = false;
-  }
-
   /**
    * Create initial password and public-private keypair.
    * Should be called only once ever.
    */
   async initialize(password) {
     await this.createPassword(password);
-    this.isLoggedIn = true;
+    await this.setIsLoggedInInSession(true);
     await this.generateKeyPair();
   }
 
@@ -24046,7 +24034,7 @@ class CryptoController {
   async createPassword(password) {
     // Commenting out. User should be allowed to generate new account and erase old one.
     // if (await this.getPasswordHash()) return;
-    this.store.password = password;
+    await this.setPasswordInSession(password);
     const salt = crypto.randomUUID();
     await this.setPasswordSalt(salt);
     const passwordHash = await this.hashPassword(password, salt);
@@ -24069,7 +24057,7 @@ class CryptoController {
     const usage = ["encrypt", "decrypt"];
     const keyPair = await crypto.subtle.generateKey(algo, true, usage);
     const privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
-    this.store.decryptedPrivateKey = privateKey;
+    await this.setPrivateKeyInSession(privateKey);
     const publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const encryptedPrivateKey = await this.encryptWithPassword(privateKey);
     await this.setKeyPair(encryptedPrivateKey, publicKey);
@@ -24084,25 +24072,22 @@ class CryptoController {
     const passwordHash = await this.hashPassword(password, salt);
     const storedPasswordHash = await this.getPasswordHash();
     if (passwordHash != storedPasswordHash) return false;
-    this.isLoggedIn = true;
-    this.store.password = password;
+    await this.setIsLoggedInInSession(true);
+    await this.setPasswordInSession(password);
     const keyPair = await this.getKeyPair();
-    this.store.decryptedPrivateKey = await this.decryptWithPassword(
-      keyPair.encryptedPrivateKey
-    );
+    const privateKey = await this.decryptWithPassword(keyPair.encryptedPrivateKey);
+    await this.setPrivateKeyInSession(privateKey);
     return true;
   }
 
-  logout() {
-    this.store = {
-      password: undefined,
-      decryptedPrivateKey: undefined,
-    };
-    this.isLoggedIn = false;
+  async logout() {
+    await this.setIsLoggedInInSession(false);
+    await this.setPasswordInSession(undefined);
+    await this.setPrivateKeyInSession(undefined);
   }
 
-  getIsLoggedIn() {
-    return this.isLoggedIn;
+  async getIsLoggedIn() {
+    return await this.getIsLoggedInFromSession();
   }
 
   async getIsRegistered() {
@@ -24153,6 +24138,62 @@ class CryptoController {
     });
   }
 
+  // ----------------------------------------------------
+  // BEGIN chrome.storage.session getters and setters
+  // ----------------------------------------------------
+
+  // get/set private key
+  setPrivateKeyInSession(privateKey) {
+    return new Promise((resolve) => {
+      if (privateKey) {
+        chrome.storage.session.set({ privateKey: privateKey }, () => resolve(true));
+      } else {
+        chrome.storage.session.remove(["privateKey"], () => resolve(true));
+      }
+    });
+  }
+  getPrivateKeyFromSession() {
+    return new Promise((resolve) => {
+      chrome.storage.session.get(["privateKey"], (result) =>
+        resolve(result?.privateKey)
+      );
+    });
+  }
+
+  // get/set password
+  setPasswordInSession(password) {
+    return new Promise((resolve) => {
+      if (password) {
+        chrome.storage.session.set({ password: password }, () => resolve(true));
+      } else {
+        chrome.storage.session.remove(["password"], () => resolve(true));
+      }
+    });
+  }
+  getPasswordFromSession() {
+    return new Promise((resolve) => {
+      chrome.storage.session.get(["password"], (result) => resolve(result?.password));
+    });
+  }
+
+  // get/set isLoggedIn
+  setIsLoggedInInSession(isLoggedIn) {
+    return new Promise((resolve) => {
+      chrome.storage.session.set({ isLoggedIn: isLoggedIn }, () => resolve(true));
+    });
+  }
+  getIsLoggedInFromSession() {
+    return new Promise((resolve) => {
+      chrome.storage.session.get(["isLoggedIn"], (result) =>
+        resolve(result?.isLoggedIn)
+      );
+    });
+  }
+
+  // ----------------------------------------------------
+  // END chrome.storage.session getters and setters
+  // ----------------------------------------------------
+
   /**
    * @param {boolean} sharded Whether message is represented as encrypted shards.
    * @property {string|Array<string>} encryptedMessage If not sharded, this is a string
@@ -24172,9 +24213,10 @@ class CryptoController {
       publicExponent: new Uint8Array([1, 0, 1]),
       hash: "SHA-256",
     };
+    const privateKey = await this.getPrivateKeyFromSession();
     const privateKeyAsCryptoKey = await crypto.subtle.importKey(
       "jwk",
-      this.store.decryptedPrivateKey,
+      privateKey,
       algo,
       false,
       ["decrypt"]
@@ -24242,16 +24284,18 @@ class CryptoController {
    * @param {object} data
    */
   async encryptWithPassword(data) {
-    if (!this.isLoggedIn) return;
-    return await browserPassworder.encrypt(this.store.password, data);
+    if (!(await this.getIsLoggedInFromSession())) return;
+    const password = await this.getPasswordFromSession();
+    return await browserPassworder.encrypt(password, data);
   }
 
   /**
    * @param {string} data
    */
   async decryptWithPassword(data) {
-    if (!this.isLoggedIn) return;
-    return await browserPassworder.decrypt(this.store.password, data);
+    if (!(await this.getIsLoggedInFromSession())) return;
+    const password = await this.getPasswordFromSession();
+    return await browserPassworder.decrypt(password, data);
   }
 
   /**
@@ -24436,53 +24480,72 @@ function popupListener(request, sender, sendResponse) {
       .catch((err) => sendResponse({ error: err?.message }));
     return true; // <-- This is required in order to use sendResponse async
   } else if (command == "holoGetIsLoggedIn") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    sendResponse({ isLoggedIn: loggedIn });
-    return;
+    cryptoController
+      .getIsLoggedIn()
+      .then((loggedIn) => sendResponse({ isLoggedIn: loggedIn }));
+    return true;
   } else if (command == "getHoloLatestMessage") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    holoStore
-      .getLatestMessage()
+    cryptoController
+      .getIsLoggedIn()
+      .then((loggedIn) => {
+        if (!loggedIn) {
+          sendResponse({ message: {} });
+          return;
+        } else {
+          return holoStore.getLatestMessage();
+        }
+      })
       .then((encryptedMsg) => {
+        if (!encryptedMsg) return;
         return cryptoController.decryptWithPrivateKey(
           encryptedMsg.credentials,
           encryptedMsg.sharded
         );
       })
-      .then((decryptedMsg) =>
-        sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } })
-      )
+      .then((decryptedMsg) => {
+        if (!decryptedMsg) sendResponse({ message: {} });
+        sendResponse({ message: { credentials: JSON.parse(decryptedMsg) } });
+      })
       .catch(() => sendResponse({ message: {} }));
     return true;
   } else if (command == "getHoloCredentials") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    holoStore
-      .getCredentials()
-      .then((encryptedCreds) =>
-        cryptoController.decryptWithPrivateKey(
+    cryptoController
+      .getIsLoggedIn()
+      .then((loggedIn) => {
+        if (!loggedIn) return;
+        return holoStore.getCredentials();
+      })
+      .then((encryptedCreds) => {
+        if (!encryptedCreds) return;
+        return cryptoController.decryptWithPrivateKey(
           encryptedCreds.credentials,
           encryptedCreds.sharded
-        )
-      )
-      .then((decryptedCreds) => sendResponse(JSON.parse(decryptedCreds)))
-      .catch((err) => sendResponse({}));
+        );
+      })
+      .then((decryptedCreds) => {
+        if (!decryptedCreds) sendResponse({});
+        else sendResponse(JSON.parse(decryptedCreds));
+      })
+      .catch((err) => sendResponse({ error: err }));
     return true;
   } else if (command == "confirmCredentials") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
     confirmCredentials = true;
     let unencryptedCreds;
-    holoStore
-      .getLatestMessage()
+    cryptoController
+      .getIsLoggedIn()
+      .then((loggedIn) => {
+        if (!loggedIn) return;
+        else return holoStore.getLatestMessage();
+      })
       .then((encryptedMsg) => {
+        if (!encryptedMsg) return;
         return cryptoController.decryptWithPrivateKey(
           encryptedMsg.credentials,
           encryptedMsg.sharded
         );
       })
       .then((decryptedCreds) => {
+        if (!decryptedCreds) return;
         unencryptedCreds = JSON.parse(decryptedCreds);
         const newSecret = new Uint8Array(16);
         crypto.getRandomValues(newSecret); // Generate new secret
@@ -24490,6 +24553,7 @@ function popupListener(request, sender, sendResponse) {
         return cryptoController.encryptWithPublicKey(unencryptedCreds);
       })
       .then((encryptedMsg) => {
+        if (!encryptedMsg) return;
         const credentials = {
           unencryptedCreds: unencryptedCreds,
           encryptedCreds: {
@@ -24500,15 +24564,21 @@ function popupListener(request, sender, sendResponse) {
         return holoStore.setCredentials(credentials);
       })
       .then((setCredsSuccess) => {
-        // TODO: handle case where setCredsSuccess == false
+        if (!setCredsSuccess) return;
+        return holoStore.setLatestMessage("");
+      })
+      .then((setMsgSuccess) => sendResponse({}))
+      .catch((err) => sendResponse({ error: err }));
+    return true;
+  } else if (command == "denyCredentials") {
+    cryptoController
+      .getIsLoggedIn()
+      .then((loggedIn) => {
+        if (!loggedIn) return;
         return holoStore.setLatestMessage("");
       })
       .then((setMsgSuccess) => sendResponse({}));
     return true;
-  } else if (command == "denyCredentials") {
-    const loggedIn = cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
-    holoStore.setLatestMessage("");
   } else if (command == "holoChangePassword") {
     const oldPassword = request.oldPassword;
     const newPassword = request.newPassword;
@@ -24591,12 +24661,18 @@ function getPublicKey() {
   });
 }
 
-const allowedOrigins = ["http://localhost:3002", "https://app.holonym.id"];
+const allowedOrigins = [
+  "http://localhost:3002",
+  "https://app.holonym.id",
+  "https://holonym.io",
+  "https://main.d2pqgbrq5pb6nr.amplifyapp.com/",
+];
 const allowedWebPageCommands = [
   "getHoloPublicKey",
   "getHoloCredentials",
   "setHoloCredentials",
   "holoGetIsRegistered",
+  // TODO: Add holoGetIsLoggedIn
 ];
 
 // Listener function for messages from webpage
@@ -24630,17 +24706,23 @@ function webPageListener(request, sender, sendResponse) {
         console.log(`confirmShare: ${confirmShare}`);
         if (!confirmShare) return;
         confirmShareCredentials = false; // reset
-        const loggedIn = cryptoController.getIsLoggedIn();
+        return cryptoController.getIsLoggedIn();
+      })
+      .then((loggedIn) => {
         if (!loggedIn) return;
         return holoStore.getCredentials();
       })
-      .then((encryptedMsg) =>
-        cryptoController.decryptWithPrivateKey(
+      .then((encryptedMsg) => {
+        if (!encryptedMsg) return;
+        return cryptoController.decryptWithPrivateKey(
           encryptedMsg.credentials,
           encryptedMsg.sharded
-        )
-      )
-      .then((decryptedCreds) => sendResponse(JSON.parse(decryptedCreds)));
+        );
+      })
+      .then((decryptedCreds) => {
+        if (!decryptedCreds) sendResponse({});
+        else sendResponse(JSON.parse(decryptedCreds));
+      });
     return true;
   } else if (command == "setHoloCredentials") {
     async function waitForConfirmation() {
@@ -24670,6 +24752,10 @@ function webPageListener(request, sender, sendResponse) {
     return true;
   }
 }
+
+// --------------------------------------------------------------
+// Add listeners
+// --------------------------------------------------------------
 
 chrome.runtime.onMessage.addListener(popupListener);
 chrome.runtime.onMessageExternal.addListener(webPageListener);
