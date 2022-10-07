@@ -20,8 +20,8 @@ function PasswordLogin({ onLoginSuccess }) {
     <>
       <div style={{ textAlign: "center" }}>
         <form id="login-form" onSubmit={handleLogin}>
-          <div className="header-base">
-            <label>Enter Password</label>
+          <div style={{ textAlign: "center" }}>
+            <h1>Enter Password</h1>
           </div>
           <div>
             <input

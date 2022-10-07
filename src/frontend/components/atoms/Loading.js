@@ -4,9 +4,7 @@ function Loading({ loadingMessage }) {
   return (
     <>
       <div style={{ textAlign: "center" }}>
-        <h2 style={{ margin: "0px" }} className="header-base">
-          {loadingMessage || "Loading..."}
-        </h2>
+        <h1 style={{ margin: "0px" }}>{loadingMessage || "Loading..."}</h1>
       </div>
     </>
   );

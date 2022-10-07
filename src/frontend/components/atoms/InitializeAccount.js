@@ -46,8 +46,8 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
           id="initialize-account-form"
           autoComplete={"on"}
         >
-          <div className="header-base">
-            <label>{inputLabel || "Enter Password"}</label>
+          <div style={{ textAlign: "center" }}>
+            <h1>{inputLabel || "Enter Password"}</h1>
             <div className="small-paragraph">{subLabel && <p>{subLabel}</p>}</div>
           </div>
           <div>

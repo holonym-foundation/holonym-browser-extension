@@ -24,7 +24,7 @@ function ChangePassword({ onPasswordChange }) {
 
   return (
     <>
-      <h2 className="header-base">Change Password</h2>
+      <h1 style={{ textAlign: "center" }}>Change Password</h1>
       <div style={{ textAlign: "center" }}>
         <form id="change-password-form" onSubmit={handleChangePassword}>
           <div>
@@ -49,7 +49,9 @@ function ChangePassword({ onPasswordChange }) {
               className="text-field"
             />
           </div>
-          <button type="submit">Submit</button>
+          <button className="x-button" style={{ margin: "10px" }} type="submit">
+            Submit
+          </button>
         </form>
       </div>
     </>

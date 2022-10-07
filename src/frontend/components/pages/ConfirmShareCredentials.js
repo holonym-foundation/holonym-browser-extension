@@ -10,7 +10,8 @@ function ConfirmShareCredentials({ credentials, onConfirmation }) {
       >
         <h1>Share Credentials</h1>
         <p className="small-paragraph">
-          Confirm you would like to create a ZK verification without revealing your identity
+          Confirm you would like to create a ZK verification without revealing your
+          identity
         </p>
       </div>
       {/* <Credentials credentials={credentials} /> */}
@@ -18,7 +19,7 @@ function ConfirmShareCredentials({ credentials, onConfirmation }) {
         <button
           type="submit"
           onClick={onConfirmation}
-          className="x-button wide-button center-block"
+          className="x-button center-block"
         >
           Confirm
         </button>
