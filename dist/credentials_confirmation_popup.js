@@ -1391,15 +1391,19 @@ function createRoutesFromChildren(children) {
 
 var img = "data:image/png;base64,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";
 
-const HoloLogo = () => /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("img", {
+const HoloLogo = () => /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+  style: {
+    marginBottom: "20px"
+  }
+}, /*#__PURE__*/React$1.createElement("a", {
+  href: "https://holonym.id",
+  target: "_blank"
+}, /*#__PURE__*/React$1.createElement("img", {
   src: img,
   style: {
-    height: "25px",
-    marginLeft: "20px",
-    marginBottom: "20px",
-    marginTop: "10px"
+    height: "25px"
   }
-}), /*#__PURE__*/React$1.createElement("div", {
+}))), /*#__PURE__*/React$1.createElement("div", {
   style: {
     margin: "10px"
   }
@@ -1437,8 +1441,10 @@ function PasswordLogin({
     id: "login-form",
     onSubmit: handleLogin
   }, /*#__PURE__*/React$1.createElement("div", {
-    className: "header-base"
-  }, /*#__PURE__*/React$1.createElement("label", null, "Enter Password")), /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("input", {
+    style: {
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React$1.createElement("h1", null, "Enter Password")), /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("input", {
     type: "password",
     name: "password",
     placeholder: "password",
@@ -1511,8 +1517,10 @@ function InitializeAccount({
     id: "initialize-account-form",
     autoComplete: "on"
   }, /*#__PURE__*/React$1.createElement("div", {
-    className: "header-base"
-  }, /*#__PURE__*/React$1.createElement("label", null, inputLabel || "Enter Password"), /*#__PURE__*/React$1.createElement("div", {
+    style: {
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React$1.createElement("h1", null, inputLabel || "Enter Password"), /*#__PURE__*/React$1.createElement("div", {
     className: "small-paragraph"
   }, subLabel && /*#__PURE__*/React$1.createElement("p", null, subLabel))), /*#__PURE__*/React$1.createElement("div", null, /*#__PURE__*/React$1.createElement("input", {
     type: "password",
@@ -1549,7 +1557,7 @@ function InitializeAccount({
       margin: "10px"
     },
     type: "submit"
-  }, "Submit"))));
+  }, "I backed up the password"))));
 }
 
 function Success({
@@ -1561,14 +1569,14 @@ function Success({
     style: {
       textAlign: "center"
     }
-  }, /*#__PURE__*/React$1.createElement("h1", null, "Success!")), /*#__PURE__*/React$1.createElement("div", {
+  }, /*#__PURE__*/React$1.createElement("h1", null, "Success!"), message && /*#__PURE__*/React$1.createElement("p", null, message)), /*#__PURE__*/React$1.createElement("div", {
     style: {
       marginTop: "20px"
     }
   }, /*#__PURE__*/React$1.createElement("button", {
     type: "submit",
     onClick: onExit,
-    className: "x-button wide-button center-block"
+    className: "x-button center-block"
   }, exitButtonText || "Close")));
 }
 
@@ -1591,7 +1599,7 @@ function SetPassword({
     exitButtonText: "Exit"
   }) : /*#__PURE__*/React$1.createElement(InitializeAccount, {
     inputLabel: "Set Password",
-    subLabel: "We suggest that you write down your password and store it somewhere safe",
+    subLabel: "Please write down your password and store it somewhere safe. If you lose the password, you may lose access to your Holo and any airdrops, votes, or other tools that use it",
     onInitializeSuccess: onInitializeSuccess
   })));
 }
@@ -1600,6 +1608,7 @@ function LandingPage({
   onLoginSuccess
 }) {
   const [registered, setRegistered] = react.exports.useState(false);
+  const [sendingMessages, setSendingMessages] = react.exports.useState(true);
   react.exports.useEffect(() => {
     function getIsRegistered() {
       return new Promise(resolve => {
@@ -1633,17 +1642,23 @@ function LandingPage({
         const isLoggedIn = await getIsLoggedIn();
         if (isLoggedIn) onLoginSuccess();
       }
+
+      setSendingMessages(false);
     })();
   }, []);
-  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, /*#__PURE__*/React$1.createElement("div", {
+  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, !sendingMessages && /*#__PURE__*/React$1.createElement("div", null, !registered ? /*#__PURE__*/React$1.createElement("div", {
     style: {
-      marginTop: "150px"
+      marginTop: "30px"
     }
-  }, !registered ? /*#__PURE__*/React$1.createElement(SetPassword, {
+  }, /*#__PURE__*/React$1.createElement(SetPassword, {
     onAccountCreated: onLoginSuccess
-  }) : /*#__PURE__*/React$1.createElement(PasswordLogin, {
+  })) : /*#__PURE__*/React$1.createElement("div", {
+    style: {
+      marginTop: "120px"
+    }
+  }, /*#__PURE__*/React$1.createElement(PasswordLogin, {
     onLoginSuccess: onLoginSuccess
-  })));
+  }))));
 }
 
 function Credentials({
@@ -1704,7 +1719,7 @@ function ConfirmCredentials({
   }, /*#__PURE__*/React$1.createElement("button", {
     type: "submit",
     onClick: onConfirmation,
-    className: "wide-button center-block"
+    className: "x-button center-block"
   }, "Confirm"))));
 }
 
