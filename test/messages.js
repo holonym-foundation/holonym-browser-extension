@@ -71,7 +71,7 @@ describe("Message passing", async () => {
       it("Should return false when user is not logged in", async () => {
         const payload = { command: "holoGetIsLoggedIn" };
         const result = await sendMessage(defaultPopupPage, extensionId, payload);
-        expect(result.isLoggedIn).to.equal(false);
+        expect(!!result.isLoggedIn).to.equal(false);
       });
     });
 
