@@ -10,9 +10,9 @@ import {
   clearLatestMessage,
 } from "./utils/utils.js";
 
-// NOTE: frontendUrl must be either "https://app.holonym.id" or "http://localhost:3002"
+// NOTE: frontendUrl must be either "https://holonym.io" or "http://localhost:3002"
 // Use "http://localhost:3002" if testing without internet connection
-const frontendUrl = "https://app.holonym.id";
+const frontendUrl = "https://holonym.io";
 
 /**
  * The following tests are separates into "atomic" and "interactive" tests.

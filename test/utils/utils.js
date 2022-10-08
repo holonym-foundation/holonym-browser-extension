@@ -126,7 +126,7 @@ export async function login(popupPage, extensionId, password) {
 /**
  * Get public key, encrypt credentials, and send credentials to extension.
  * Spawns a confirmation popup.
- * @param {Puppeteer.Page} frontendPage e.g., the page at app.holonym.id
+ * @param {Puppeteer.Page} frontendPage e.g., the page at holonym.io
  * @param {string} extensionId
  */
 export async function sendEncryptedCredentials(frontendPage, extensionId, creds) {

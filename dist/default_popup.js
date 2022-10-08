@@ -1776,7 +1776,7 @@ function Credentials({
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const linkToStartVerification = 'https://holonym.id/verify';
-const frontendUrl = 'https://app.holonym.id';
+const frontendUrl = 'https://holonym.io';
 
 const WhiteLine = () => /*#__PURE__*/React$1.createElement("div", {
   style: {
