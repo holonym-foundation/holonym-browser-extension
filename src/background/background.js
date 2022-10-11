@@ -264,6 +264,7 @@ const allowedOrigins = [
   "http://localhost:3002", // For local holonym.io tests
   "http://localhost:8081", // For local holonym.id tests
   "https://app.holonym.id",
+  "https://holonym.id",
   "https://holonym.io",
   "https://main.d2pqgbrq5pb6nr.amplifyapp.com",
 ];
