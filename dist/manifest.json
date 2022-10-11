@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Holonym",
   "description": "Store info to generating zero knowledge proofs for your identity.",
-  "version": "0.0.0.13",
+  "version": "0.0.0.14",
   "action": {
     "default_title": "Holonym",
     "default_popup": "default_popup.html",
@@ -26,7 +26,9 @@
   "externally_connectable": {
     "matches": [
       "http://localhost:3002/*",
+      "http://localhost:8081/*",
       "https://app.holonym.id/*",
+      "https://holonym.id/*",
       "https://holonym.io/*",
       "https://main.d2pqgbrq5pb6nr.amplifyapp.com/*"
     ]
