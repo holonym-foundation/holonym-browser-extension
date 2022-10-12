@@ -23,7 +23,7 @@ const frontendUrl = "https://holonym.io";
  * NOTE: The sequence of the tests matters. Specifically, items stored in chrome storage
  * persist across tests. This includes password, latest message, and credentials.
  */
-describe("Message passing", async () => {
+describe.only("Message passing", async () => {
   let browser;
   let serviceWorker;
   let extensionId;
@@ -153,6 +153,14 @@ describe("Message passing", async () => {
     before(async () => {
       await frontendPage.goto(frontendUrl, { waitUntil: "networkidle0" });
       await frontendPage.bringToFront();
+    });
+
+    describe("holoGetIsInstalled", async () => {
+      it("Should return true", async () => {
+        const payload = { command: "holoGetIsInstalled" };
+        const result = await sendMessage(frontendPage, extensionId, payload);
+        expect(result).to.be.true;
+      });
     });
 
     describe("holoGetIsRegistered", async () => {

@@ -269,6 +269,7 @@ const allowedOrigins = [
   "https://main.d2pqgbrq5pb6nr.amplifyapp.com",
 ];
 const allowedWebPageCommands = [
+  "holoGetIsInstalled",
   "getHoloPublicKey",
   "getHoloCredentials",
   "setHoloCredentials",
@@ -290,7 +291,10 @@ function webPageListener(request, sender, sendResponse) {
     return;
   }
 
-  if (command == "getHoloPublicKey") {
+  if (command == "holoGetIsInstalled") {
+    sendResponse(true);
+    return true;
+  } else if (command == "getHoloPublicKey") {
     getPublicKey().then((publicKey) => sendResponse(publicKey));
     return true;
   } else if (command == "getHoloCredentials") {
