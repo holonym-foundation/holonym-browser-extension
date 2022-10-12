@@ -23,7 +23,7 @@ const frontendUrl = "https://holonym.io";
  * NOTE: The sequence of the tests matters. Specifically, items stored in chrome storage
  * persist across tests. This includes password, latest message, and credentials.
  */
-describe.only("Message passing", async () => {
+describe("Message passing", async () => {
   let browser;
   let serviceWorker;
   let extensionId;
