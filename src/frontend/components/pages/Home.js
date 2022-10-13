@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import classNames from "classnames";
+import ReactTooltip from "react-tooltip";
 import Credentials from "../atoms/Credentials";
 import { sleep } from "../../../background/utils";
 
@@ -70,7 +72,7 @@ function Home() {
                     style={{ border: "none", backgroundColor: "transparent" }}
                     target="_blank"
                   >
-                    Get your credentials
+                    Get credentials
                   </a>
                 </button>
               )}
@@ -86,11 +88,11 @@ function Home() {
         Reset Account
       </button> */}
           <div style={{ marginTop: "auto" }}>
-            {credentials && (
-              <div>
-                <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-                  <WhiteLine />
-                </div>
+            <div>
+              <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+                <WhiteLine />
+              </div>
+              {credentials ? (
                 <a
                   href={frontendUrl + "/prove"}
                   target="_blank"
@@ -99,8 +101,17 @@ function Home() {
                 >
                   Proof Menu
                 </a>
-              </div>
-            )}
+              ) : (
+                <a
+                  onClick={() => {}}
+                  data-tip="You must get credentials before generating proofs"
+                  className="x-button center-block not-allowed-base"
+                  style={{ textAlign: "center" }}
+                >
+                  Proof Menu
+                </a>
+              )}
+            </div>
             <div style={{ marginTop: "20px", marginBottom: "20px" }}>
               {/* <WhiteLine /> */}
             </div>
@@ -113,6 +124,7 @@ function Home() {
               About
             </button>
           </div>
+          <ReactTooltip place="top" className="toolip-base" />
         </div>
       )}
     </>
@@ -120,3 +132,5 @@ function Home() {
 }
 
 export default Home;
+
+// TODO: Create a Button component in atoms
