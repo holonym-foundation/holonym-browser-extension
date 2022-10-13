@@ -151,7 +151,7 @@ describe("Message passing", async () => {
 
   describe("Atomic messages from frontend to service worker", async () => {
     before(async () => {
-      await frontendPage.goto(frontendUrl, { waitUntil: "networkidle0" });
+      await frontendPage.goto(frontendUrl, { waitUntil: "domcontentloaded" });
       await frontendPage.bringToFront();
     });
 
