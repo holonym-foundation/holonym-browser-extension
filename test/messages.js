@@ -242,7 +242,7 @@ describe("Message passing", async () => {
         // Check that credentials are not stored as credentials
         const payload3 = { command: "getHoloCredentials" };
         const creds = await sendMessage(confirmationPopup, extensionId, payload3);
-        expect(creds).to.be.an("object").that.is.empty;
+        expect(creds).to.be.oneOf([undefined, null]);
         // Check that credentials are not stored as latest message
         const payload4 = { command: "getHoloLatestMessage" };
         const resp2 = await sendMessage(confirmationPopup, extensionId, payload4);

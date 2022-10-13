@@ -50,14 +50,14 @@ class PopupMessageHandler {
   static async getHoloCredentials(request) {
     try {
       const loggedIn = await cryptoController.getIsLoggedIn();
-      if (!loggedIn) return {};
+      if (!loggedIn) return;
       const encryptedCreds = await holoStore.getCredentials();
-      if (!encryptedCreds) return {};
+      if (!encryptedCreds) return;
       const decryptedCreds = await cryptoController.decryptWithPrivateKey(
         encryptedCreds.credentials,
         encryptedCreds.sharded
       );
-      if (!decryptedCreds) return {};
+      if (!decryptedCreds) return;
       return JSON.parse(decryptedCreds);
     } catch (err) {
       return { error: err };
