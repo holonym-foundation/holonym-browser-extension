@@ -64,15 +64,6 @@ class PopupMessageHandler {
     }
   }
 
-  setPasswordInSession(password) {
-    return;
-  }
-  getPasswordFromSession() {
-    return new Promise((resolve) => {
-      chrome.storage.session.get(["password"], (result) => resolve(result?.password));
-    });
-  }
-
   static async confirmCredentials(request) {
     try {
       // confirmCredentials = true;
