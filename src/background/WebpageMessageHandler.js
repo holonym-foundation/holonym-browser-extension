@@ -47,7 +47,7 @@ async function displayConfirmationPopup(type) {
     focused: true,
     height: 530,
     width: 400,
-    left: parseInt(leftPosition), // throws error: Expected integer, found number
+    left: parseInt(leftPosition),
     top: topPosition,
     incognito: false,
     setSelfAsOpener: false,
@@ -95,7 +95,7 @@ class WebpageMessageHandler {
       encryptedMsg.credentials,
       encryptedMsg.sharded
     );
-    if (!decryptedCreds) return {};
+    if (!decryptedCreds) return;
     return JSON.parse(decryptedCreds);
   }
 

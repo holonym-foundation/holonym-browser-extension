@@ -72,14 +72,14 @@ class PopupMessageHandler {
         chrome.storage.session.set({ confirmCredentials: true }, () => resolve(true));
       });
       const loggedIn = await cryptoController.getIsLoggedIn();
-      if (!loggedIn) return {};
+      if (!loggedIn) return;
       const latestMsg = await holoStore.getLatestMessage();
-      if (!latestMsg) return {};
+      if (!latestMsg) return;
       const decryptedCreds = await cryptoController.decryptWithPrivateKey(
         latestMsg.credentials,
         latestMsg.sharded
       );
-      if (!decryptedCreds) return {};
+      if (!decryptedCreds) return;
       const parsedDecryptedCreds = JSON.parse(decryptedCreds);
       const newSecret = new Uint8Array(16);
       crypto.getRandomValues(newSecret); // Generate new secret
@@ -87,7 +87,7 @@ class PopupMessageHandler {
       const encryptedMsg = await cryptoController.encryptWithPublicKey(
         parsedDecryptedCreds
       );
-      if (!encryptedMsg) return {};
+      if (!encryptedMsg) return;
       const credentials = {
         unencryptedCreds: parsedDecryptedCreds,
         encryptedCreds: {
@@ -96,7 +96,7 @@ class PopupMessageHandler {
         },
       };
       const setCredsSuccess = await holoStore.setCredentials(credentials);
-      if (!setCredsSuccess) return {};
+      if (!setCredsSuccess) return;
       return await holoStore.setLatestMessage("");
     } catch (err) {
       return { error: err };
