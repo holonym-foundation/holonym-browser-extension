@@ -96,7 +96,7 @@ function Home() {
                 <a
                   href={frontendUrl + "/prove"}
                   target="_blank"
-                  className="x-button center-block"
+                  className="x-button secondary center-block"
                   style={{ textAlign: "center" }}
                 >
                   Proof Menu
@@ -105,7 +105,7 @@ function Home() {
                 <a
                   onClick={() => {}}
                   data-tip="You must get credentials before generating proofs"
-                  className="x-button center-block not-allowed-base"
+                  className="x-button secondary center-block not-allowed-base"
                   style={{ textAlign: "center" }}
                 >
                   Proof Menu
