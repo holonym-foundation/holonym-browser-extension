@@ -211,7 +211,7 @@ class CryptoController {
    * of parts of the message that were individually encrypted; in this case, the
    * decrypted message can be recovered by decrypting each shard and concatenating
    * the result.
-   * @returns {string}
+   * @returns {Promise<string>}
    */
   async decryptWithPrivateKey(encryptedMessage, sharded) {
     if (!encryptedMessage) {
