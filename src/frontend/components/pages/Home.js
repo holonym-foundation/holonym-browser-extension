@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import classNames from "classnames";
 import ReactTooltip from "react-tooltip";
+import ArrowInBox from "../../img/share-box-fill.png";
 import Credentials from "../atoms/Credentials";
 import { sleep } from "../../../background/utils";
 
@@ -73,6 +74,16 @@ function Home() {
                     target="_blank"
                   >
                     Get credentials
+                    <img
+                      src={ArrowInBox}
+                      className="arrow-in-box"
+                      style={{
+                        position: "absolute",
+                        height: "18px",
+                        right: "65px",
+                        paddingTop: "1px",
+                      }}
+                    />
                   </a>
                 </button>
               )}
@@ -100,6 +111,16 @@ function Home() {
                   style={{ textAlign: "center" }}
                 >
                   Proof Menu
+                  <img
+                    src={ArrowInBox}
+                    className="arrow-in-box"
+                    style={{
+                      position: "absolute",
+                      height: "18px",
+                      right: "90px",
+                      paddingTop: "1px",
+                    }}
+                  />
                 </a>
               ) : (
                 <a
@@ -109,6 +130,16 @@ function Home() {
                   style={{ textAlign: "center" }}
                 >
                   Proof Menu
+                  <img
+                    src={ArrowInBox}
+                    // className="arrow-in-box"
+                    style={{
+                      position: "absolute",
+                      height: "18px",
+                      right: "90px",
+                      paddingTop: "1px",
+                    }}
+                  />
                 </a>
               )}
             </div>
