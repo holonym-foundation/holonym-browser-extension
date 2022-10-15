@@ -9,6 +9,7 @@
 import { ethers } from "ethers";
 import { CryptoController } from "./CryptoController";
 import { HoloStore } from "./HoloStore";
+import HoloCache from "./HoloCache";
 import { sleep } from "./utils";
 
 const cryptoController = new CryptoController();
@@ -34,11 +35,11 @@ class PopupMessageHandler {
     try {
       const loggedIn = await cryptoController.getIsLoggedIn();
       if (!loggedIn) return { message: {} };
-      const encryptedMsg = await holoStore.getLatestMessage();
-      if (!encryptedMsg) return { message: {} };
+      const encryptedStagedCreds = await holoStore.getStagedCredentials();
+      if (!encryptedStagedCreds) return { message: {} };
       const decryptedMsg = await cryptoController.decryptWithPrivateKey(
-        encryptedMsg.credentials,
-        encryptedMsg.sharded
+        encryptedStagedCreds.credentials,
+        encryptedStagedCreds.sharded
       );
       if (!decryptedMsg) return { message: {} };
       return { message: { credentials: JSON.parse(decryptedMsg) } };
@@ -66,18 +67,14 @@ class PopupMessageHandler {
 
   static async confirmCredentials(request) {
     try {
-      // confirmCredentials = true;
-      // TODO: Put this promise in a function in a file called HoloCache or something like that
-      await new Promise((resolve) => {
-        chrome.storage.session.set({ confirmCredentials: true }, () => resolve(true));
-      });
+      await HoloCache.setConfirmCredentials(true);
       const loggedIn = await cryptoController.getIsLoggedIn();
       if (!loggedIn) return;
-      const latestMsg = await holoStore.getLatestMessage();
-      if (!latestMsg) return;
+      const encryptedStagedCreds = await holoStore.getStagedCredentials();
+      if (!encryptedStagedCreds) return;
       const decryptedCreds = await cryptoController.decryptWithPrivateKey(
-        latestMsg.credentials,
-        latestMsg.sharded
+        encryptedStagedCreds.credentials,
+        encryptedStagedCreds.sharded
       );
       if (!decryptedCreds) return;
       const parsedDecryptedCreds = JSON.parse(decryptedCreds);
@@ -97,7 +94,7 @@ class PopupMessageHandler {
       };
       const setCredsSuccess = await holoStore.setCredentials(credentials);
       if (!setCredsSuccess) return;
-      return await holoStore.setLatestMessage("");
+      return await holoStore.setStagedCredentials("");
     } catch (err) {
       return { error: err };
     }
@@ -106,7 +103,7 @@ class PopupMessageHandler {
   static async denyCredentials(request) {
     const loggedIn = await cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
-    return holoStore.setLatestMessage("");
+    return holoStore.setStagedCredentials("");
   }
 
   static async holoChangePassword(request) {
@@ -132,33 +129,15 @@ class PopupMessageHandler {
   }
 
   static async confirmShareCredentials(request) {
-    // confirmShareCredentials = true;
-    // TODO: Put this promise in a function in a file called HoloCache or something like that
-    await new Promise((resolve) => {
-      chrome.storage.session.set({ confirmShareCredentials: true }, () =>
-        resolve(true)
-      );
-    });
+    await HoloCache.setConfirmShareCredentials(true);
   }
 
   static async closingHoloCredentialsConfirmationPopup(request) {
-    // credentialsConfirmationPopupIsOpen = false;
-    // TODO: Put this promise in a function in a file called HoloCache or something like that
-    await new Promise((resolve) => {
-      chrome.storage.session.set({ credentialsConfirmationPopupIsOpen: false }, () =>
-        resolve(true)
-      );
-    });
+    await HoloCache.setCredentialsConfirmationPopupIsOpen(false);
   }
 
   static async closingHoloShareCredsConfirmationPopup(request) {
-    // shareCredsConfirmationPopupIsOpen = false;
-    // TODO: Put this promise in a function in a file called HoloCache or something like that
-    await new Promise((resolve) => {
-      chrome.storage.session.set({ shareCredsConfirmationPopupIsOpen: false }, () =>
-        resolve(true)
-      );
-    });
+    await HoloCache.setShareCredsConfirmationPopupIsOpen(false);
   }
 }
 

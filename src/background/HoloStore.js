@@ -31,7 +31,7 @@ const requiredCredsKeys = [...credentialNames, "secret", "signature"];
 
 /**
  * HoloStore has two stores:
- * (1) "latestHoloMessage"--This stores the latest message sent to the user.
+ * (1) "stagedCredentials"--This stores the latest credentials sent to the user by a frontend.
  * (2) "holoCredentials"--This stores the user's encrypted credentials.
  *
  * Credentials should be stored in (1) before being stored in (2). The
@@ -39,20 +39,25 @@ const requiredCredsKeys = [...credentialNames, "secret", "signature"];
  * stored before the credentials can be stored in (1).
  */
 class HoloStore {
-  /**
-   * @param {*} message
-   * @returns True if successful, false otherwise.
-   */
-  setLatestMessage(message) {
-    return new Promise((resolve) => {
-      chrome.storage.local.set({ latestHoloMessage: message }, () => resolve(true));
-    });
-  }
-
   getLatestMessage() {
     return new Promise((resolve) => {
       chrome.storage.local.get(["latestHoloMessage"], (result) => {
         resolve(result?.latestHoloMessage);
+      });
+    });
+  }
+
+  setStagedCredentials(credentials) {
+    return new Promise((resolve) => {
+      chrome.storage.local.set({ stagedCredentials: credentials }, () =>
+        resolve(true)
+      );
+    });
+  }
+  getStagedCredentials() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(["stagedCredentials"], (result) => {
+        resolve(result?.stagedCredentials);
       });
     });
   }

@@ -109,13 +109,13 @@ class WebpageMessageHandler {
       }
       return confirmCredentials;
     }
-    const latestMessage = {
+    const credsToStage = {
       sharded: request.sharded,
       credentials: request.credentials,
     };
-    await holoStore.setLatestMessage(latestMessage);
+    await holoStore.setStagedCredentials(credsToStage);
     console.log("displaying confirmation popup");
-    displayConfirmationPopup("credentials"); // TODO: Import this function
+    displayConfirmationPopup("credentials");
     const confirm = await waitForConfirmation();
     await HoloCache.setConfirmCredentials(false); // reset
     return { success: confirm };

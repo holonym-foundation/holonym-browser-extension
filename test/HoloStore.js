@@ -19,51 +19,51 @@ describe("HoloStore", async () => {
     browser.close();
   });
 
-  describe("setLatestMessage", async () => {
-    it("Should set the latestHoloMessage property in chrome.storage.local", async () => {
-      const testMessage = "test-message1";
-      await serviceWorker.evaluate(async (testMessage) => {
+  describe("setStagedCredentials", async () => {
+    it("Should set the stagedCredentials property in chrome.storage.local", async () => {
+      const stagedCreds = "test-message1";
+      await serviceWorker.evaluate(async (stagedCreds) => {
         const tempHoloStore = new HoloStore();
-        await tempHoloStore.setLatestMessage(testMessage);
-      }, testMessage);
+        await tempHoloStore.setStagedCredentials(stagedCreds);
+      }, stagedCreds);
       await sleep(25);
-      const latestMessage = await serviceWorker.evaluate(() => {
+      const retrievedStagedCreds = await serviceWorker.evaluate(() => {
         return new Promise((resolve) => {
-          chrome.storage.local.get(["latestHoloMessage"], (result) => {
-            resolve(result?.latestHoloMessage);
+          chrome.storage.local.get(["stagedCredentials"], (result) => {
+            resolve(result?.stagedCredentials);
           });
         });
       });
-      expect(latestMessage).to.equal(testMessage);
+      expect(retrievedStagedCreds).to.equal(stagedCreds);
     });
   });
 
-  describe("getLatestMessage", async () => {
-    it("Should return a value equal to the value of the latestHoloMessage property in chrome.storage.local", async () => {
-      const testMessage = "test-message2";
+  describe("getStagedCredentials", async () => {
+    it("Should return a value equal to the value of the stagedCredentials property in chrome.storage.local", async () => {
+      const stagedCreds = "test-message2";
       await serviceWorker.evaluate(
-        (testMessage) => chrome.storage.local.set({ latestHoloMessage: testMessage }),
-        testMessage
+        (stagedCreds) => chrome.storage.local.set({ stagedCredentials: stagedCreds }),
+        stagedCreds
       );
       await sleep(25);
-      const latestMessage = await serviceWorker.evaluate(async () => {
+      const retrievedStagedCreds = await serviceWorker.evaluate(async () => {
         const tempHoloStore = new HoloStore();
-        return await tempHoloStore.getLatestMessage();
+        return await tempHoloStore.getStagedCredentials();
       });
       await sleep(25);
-      expect(latestMessage).to.equal(testMessage);
+      expect(retrievedStagedCreds).to.equal(stagedCreds);
     });
 
-    it("Should return the most recent value passed to setLatestMessage", async () => {
+    it("Should return the most recent value passed to setStagedCredentials", async () => {
       const testMessage = "test-message3";
       await serviceWorker.evaluate(async (testMessage) => {
         const tempHoloStore = new HoloStore();
-        await tempHoloStore.setLatestMessage(testMessage);
+        await tempHoloStore.setStagedCredentials(testMessage);
       }, testMessage);
       await sleep(25);
       const latestMessage = await serviceWorker.evaluate(async () => {
         const tempHoloStore = new HoloStore();
-        return await tempHoloStore.getLatestMessage();
+        return await tempHoloStore.getStagedCredentials();
       });
       await sleep(25);
       expect(latestMessage).to.equal(testMessage);
