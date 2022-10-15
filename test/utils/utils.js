@@ -159,8 +159,8 @@ export async function getPopupPage(browser, popupType) {
   }
 }
 
-export async function clearLatestMessage(serviceWorker) {
+export async function clearStagedCredentials(serviceWorker) {
   await serviceWorker.evaluate(() => {
-    chrome.storage.local.set({ latestHoloMessage: "" });
+    chrome.storage.local.set({ stagedCredentials: "" });
   });
 }

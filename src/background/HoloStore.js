@@ -39,14 +39,6 @@ const requiredCredsKeys = [...credentialNames, "secret", "signature"];
  * stored before the credentials can be stored in (1).
  */
 class HoloStore {
-  getLatestMessage() {
-    return new Promise((resolve) => {
-      chrome.storage.local.get(["latestHoloMessage"], (result) => {
-        resolve(result?.latestHoloMessage);
-      });
-    });
-  }
-
   setStagedCredentials(credentials) {
     return new Promise((resolve) => {
       chrome.storage.local.set({ stagedCredentials: credentials }, () =>

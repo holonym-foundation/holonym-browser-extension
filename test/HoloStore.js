@@ -55,18 +55,18 @@ describe("HoloStore", async () => {
     });
 
     it("Should return the most recent value passed to setStagedCredentials", async () => {
-      const testMessage = "test-message3";
-      await serviceWorker.evaluate(async (testMessage) => {
+      const stagedCreds = "test-message3";
+      await serviceWorker.evaluate(async (stagedCreds) => {
         const tempHoloStore = new HoloStore();
-        await tempHoloStore.setStagedCredentials(testMessage);
-      }, testMessage);
+        await tempHoloStore.setStagedCredentials(stagedCreds);
+      }, stagedCreds);
       await sleep(25);
-      const latestMessage = await serviceWorker.evaluate(async () => {
+      const retrievedStagedCreds = await serviceWorker.evaluate(async () => {
         const tempHoloStore = new HoloStore();
         return await tempHoloStore.getStagedCredentials();
       });
       await sleep(25);
-      expect(latestMessage).to.equal(testMessage);
+      expect(retrievedStagedCreds).to.equal(stagedCreds);
     });
   });
 
@@ -82,14 +82,14 @@ describe("HoloStore", async () => {
       }, credentials);
       await sleep(25);
       expect(retVal).to.equal(true);
-      const latestMessage = await serviceWorker.evaluate(() => {
+      const retrievedCreds = await serviceWorker.evaluate(() => {
         return new Promise((resolve) => {
           chrome.storage.local.get(["holoCredentials"], (result) => {
             resolve(result?.holoCredentials);
           });
         });
       });
-      expect(latestMessage).to.equal(credentials.encryptedCreds);
+      expect(retrievedCreds).to.equal(credentials.encryptedCreds);
     });
     // TODO: Expect to throw when invalid credentials
   });

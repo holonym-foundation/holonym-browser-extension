@@ -7,7 +7,7 @@ import {
   login,
   sendEncryptedCredentials,
   getPopupPage,
-  clearLatestMessage,
+  clearStagedCredentials,
 } from "./utils/utils.js";
 
 // NOTE: frontendUrl must be either "https://holonym.io" or "http://localhost:3002"
@@ -206,7 +206,7 @@ describe("Message passing", async () => {
 
       // TODO: More test cases with invalid credentials
 
-      it("Unencrypted credentials sent by frontend should not be returned by getHoloLatestMessage", async () => {
+      it("Unencrypted credentials sent by frontend should not be returned by getStagedCredentials", async () => {
         sendMessage(frontendPage, extensionId, {
           command: "setHoloCredentials",
           credentials: testCreds,
@@ -217,10 +217,10 @@ describe("Message passing", async () => {
         expect(loginResult.success).to.equal(true);
         await sleep(50);
         // Get latest message
-        const payload1 = { command: "getHoloLatestMessage" };
+        const payload1 = { command: "getStagedCredentials" };
         const resp1 = await sendMessage(confirmationPopup, extensionId, payload1);
         expect(resp1.message).to.be.empty;
-        await clearLatestMessage(serviceWorker);
+        await clearStagedCredentials(serviceWorker);
         await sleep(50);
       });
 
@@ -232,7 +232,7 @@ describe("Message passing", async () => {
         expect(loginResult.success).to.equal(true);
         await sleep(50);
         // Get latest message
-        const payload1 = { command: "getHoloLatestMessage" };
+        const payload1 = { command: "getStagedCredentials" };
         const resp1 = await sendMessage(confirmationPopup, extensionId, payload1);
         expect(resp1.message.credentials).to.deep.equal(testCreds);
         // Deny credentials
@@ -244,7 +244,7 @@ describe("Message passing", async () => {
         const creds = await sendMessage(confirmationPopup, extensionId, payload3);
         expect(creds).to.be.oneOf([undefined, null]);
         // Check that credentials are not stored as latest message
-        const payload4 = { command: "getHoloLatestMessage" };
+        const payload4 = { command: "getStagedCredentials" };
         const resp2 = await sendMessage(confirmationPopup, extensionId, payload4);
         expect(resp2.message).to.be.empty;
       });
@@ -257,13 +257,13 @@ describe("Message passing", async () => {
         expect(loginResult.success).to.equal(true);
         await sleep(50);
         // Get latest message
-        const payload1 = { command: "getHoloLatestMessage" };
+        const payload1 = { command: "getStagedCredentials" };
         const latestMsg = await sendMessage(confirmationPopup, extensionId, payload1);
         expect(latestMsg.message.credentials).to.deep.equal(testCreds);
-        await clearLatestMessage(serviceWorker);
+        await clearStagedCredentials(serviceWorker);
         await sleep(50);
         // Check that latest message is empty
-        const payload4 = { command: "getHoloLatestMessage" };
+        const payload4 = { command: "getStagedCredentials" };
         const resp2 = await sendMessage(confirmationPopup, extensionId, payload4);
         expect(resp2.message).to.be.empty;
       });
@@ -276,7 +276,7 @@ describe("Message passing", async () => {
         expect(loginResult.success).to.equal(true);
         await sleep(50);
         // Get latest message
-        const payload2 = { command: "getHoloLatestMessage" };
+        const payload2 = { command: "getStagedCredentials" };
         const resp = await sendMessage(confirmationPopup, extensionId, payload2);
         expect(resp.message.credentials).to.deep.equal(testCreds);
         // Confirm credentials

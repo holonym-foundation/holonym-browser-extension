@@ -15,16 +15,16 @@ function AppRoutes() {
   const navigate = useNavigate();
 
   async function handleLoginSuccess() {
-    const latestMessage = await requestLatestMessage();
-    if (latestMessage.credentials) {
-      setCredentials(latestMessage.credentials);
+    const stagedCredentials = await requestStagedCredentials();
+    if (stagedCredentials.credentials) {
+      setCredentials(stagedCredentials.credentials);
       navigate("/confirm-credentials", { replace: true });
     }
   }
 
-  function requestLatestMessage() {
+  function requestStagedCredentials() {
     return new Promise((resolve) => {
-      const message = { command: "getHoloLatestMessage" };
+      const message = { command: "getStagedCredentials" };
       const callback = (resp) => resolve(resp.message);
       chrome.runtime.sendMessage(message, callback);
     });

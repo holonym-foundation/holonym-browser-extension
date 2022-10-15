@@ -31,7 +31,7 @@ class PopupMessageHandler {
     return { isLoggedIn: loggedIn };
   }
 
-  static async getHoloLatestMessage(request) {
+  static async getStagedCredentials(request) {
     try {
       const loggedIn = await cryptoController.getIsLoggedIn();
       if (!loggedIn) return { message: {} };

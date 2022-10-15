@@ -30,7 +30,7 @@ let popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
   "holoGetIsLoggedIn",
-  "getHoloLatestMessage",
+  "getStagedCredentials",
   "getHoloCredentials",
   "confirmCredentials",
   "denyCredentials",
