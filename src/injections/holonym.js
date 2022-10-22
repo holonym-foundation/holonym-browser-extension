@@ -104,7 +104,7 @@ async function setHoloCredentials(credentials) {
 window.holonym = {
   // holoGetIsInstalled: holoGetIsInstalled,
   // holoGetIsRegistered: holoGetIsRegistered,
-  // hasHolo: async () => (await holoGetIsRegistered())?.isRegistered,
+  // hasHolo: async () => {}, // TODO: return a bool that indicates whether the user has credentials
   // getHoloPublicKey: getHoloPublicKey,
   // getHoloCredentials: getHoloCredentials,
   // setHoloCredentials: setHoloCredentials,

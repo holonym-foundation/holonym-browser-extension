@@ -72,6 +72,7 @@ const allowedWebPageCommands = [
   "getHoloCredentials",
   "setHoloCredentials",
   "holoGetIsRegistered",
+  "holoGetHasCredentials",
   // TODO: Add holoGetIsLoggedIn
 ];
 

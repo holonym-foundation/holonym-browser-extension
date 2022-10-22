@@ -125,6 +125,11 @@ class WebpageMessageHandler {
     const isRegistered = await cryptoController.getIsRegistered();
     return { isRegistered: isRegistered };
   }
+
+  static async holoGetHasCredentials(request) {
+    const creds = await holoStore.getCredentials();
+    return !!creds;
+  }
 }
 
 export default WebpageMessageHandler;
