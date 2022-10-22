@@ -1728,20 +1728,20 @@ function AppRoutes() {
   const navigate = useNavigate();
 
   async function handleLoginSuccess() {
-    const latestMessage = await requestLatestMessage();
+    const stagedCredentials = await requestStagedCredentials();
 
-    if (latestMessage.credentials) {
-      setCredentials(latestMessage.credentials);
+    if (stagedCredentials.credentials) {
+      setCredentials(stagedCredentials.credentials);
       navigate("/confirm-credentials", {
         replace: true
       });
     }
   }
 
-  function requestLatestMessage() {
+  function requestStagedCredentials() {
     return new Promise(resolve => {
       const message = {
-        command: "getHoloLatestMessage"
+        command: "getStagedCredentials"
       };
 
       const callback = resp => resolve(resp.message);

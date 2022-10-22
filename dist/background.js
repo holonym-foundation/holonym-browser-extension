@@ -24352,7 +24352,7 @@ class CryptoController {
 
 /**
  * HoloStore has two stores:
- * (1) "latestHoloMessage"--This stores the latest message sent to the user.
+ * (1) "stagedCredentials"--This stores the latest credentials sent to the user by a frontend.
  * (2) "holoCredentials"--This stores the user's encrypted credentials.
  *
  * Credentials should be stored in (1) before being stored in (2). The
@@ -24360,20 +24360,17 @@ class CryptoController {
  * stored before the credentials can be stored in (1).
  */
 class HoloStore {
-  /**
-   * @param {*} message
-   * @returns True if successful, false otherwise.
-   */
-  setLatestMessage(message) {
+  setStagedCredentials(credentials) {
     return new Promise((resolve) => {
-      chrome.storage.local.set({ latestHoloMessage: message }, () => resolve(true));
+      chrome.storage.local.set({ stagedCredentials: credentials }, () =>
+        resolve(true)
+      );
     });
   }
-
-  getLatestMessage() {
+  getStagedCredentials() {
     return new Promise((resolve) => {
-      chrome.storage.local.get(["latestHoloMessage"], (result) => {
-        resolve(result?.latestHoloMessage);
+      chrome.storage.local.get(["stagedCredentials"], (result) => {
+        resolve(result?.stagedCredentials);
       });
     });
   }
@@ -24421,167 +24418,6 @@ class HoloStore {
   }
 }
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-/**
- * Message handlers handle messages.
- *
- * The public functions of these classes should be treated as if they can be called
- * directly by the frontend or popup: Do not add a function that could expose user
- * data to the wrong party.
- */
-
-const cryptoController$1 = new CryptoController();
-const holoStore$1 = new HoloStore();
-
-class PopupMessageHandler {
-  static async holoPopupLogin(request) {
-    const password = request.password;
-    try {
-      const success = await cryptoController$1.login(password);
-      return { success: success };
-    } catch (err) {
-      return { error: err?.message };
-    }
-  }
-
-  static async holoGetIsLoggedIn(request) {
-    const loggedIn = await cryptoController$1.getIsLoggedIn();
-    return { isLoggedIn: loggedIn };
-  }
-
-  static async getHoloLatestMessage(request) {
-    try {
-      const loggedIn = await cryptoController$1.getIsLoggedIn();
-      if (!loggedIn) return { message: {} };
-      const encryptedMsg = await holoStore$1.getLatestMessage();
-      if (!encryptedMsg) return { message: {} };
-      const decryptedMsg = await cryptoController$1.decryptWithPrivateKey(
-        encryptedMsg.credentials,
-        encryptedMsg.sharded
-      );
-      if (!decryptedMsg) return { message: {} };
-      return { message: { credentials: JSON.parse(decryptedMsg) } };
-    } catch (err) {
-      return { message: {} };
-    }
-  }
-
-  static async getHoloCredentials(request) {
-    try {
-      const loggedIn = await cryptoController$1.getIsLoggedIn();
-      if (!loggedIn) return;
-      const encryptedCreds = await holoStore$1.getCredentials();
-      if (!encryptedCreds) return;
-      const decryptedCreds = await cryptoController$1.decryptWithPrivateKey(
-        encryptedCreds.credentials,
-        encryptedCreds.sharded
-      );
-      if (!decryptedCreds) return;
-      return JSON.parse(decryptedCreds);
-    } catch (err) {
-      return { error: err };
-    }
-  }
-
-  static async confirmCredentials(request) {
-    try {
-      // confirmCredentials = true;
-      // TODO: Put this promise in a function in a file called HoloCache or something like that
-      await new Promise((resolve) => {
-        chrome.storage.session.set({ confirmCredentials: true }, () => resolve(true));
-      });
-      const loggedIn = await cryptoController$1.getIsLoggedIn();
-      if (!loggedIn) return;
-      const latestMsg = await holoStore$1.getLatestMessage();
-      if (!latestMsg) return;
-      const decryptedCreds = await cryptoController$1.decryptWithPrivateKey(
-        latestMsg.credentials,
-        latestMsg.sharded
-      );
-      if (!decryptedCreds) return;
-      const parsedDecryptedCreds = JSON.parse(decryptedCreds);
-      const newSecret = new Uint8Array(16);
-      crypto.getRandomValues(newSecret); // Generate new secret
-      parsedDecryptedCreds.newSecret = BigNumber.from(newSecret).toHexString();
-      const encryptedMsg = await cryptoController$1.encryptWithPublicKey(
-        parsedDecryptedCreds
-      );
-      if (!encryptedMsg) return;
-      const credentials = {
-        unencryptedCreds: parsedDecryptedCreds,
-        encryptedCreds: {
-          credentials: encryptedMsg.encryptedMessage,
-          sharded: encryptedMsg.sharded,
-        },
-      };
-      const setCredsSuccess = await holoStore$1.setCredentials(credentials);
-      if (!setCredsSuccess) return;
-      return await holoStore$1.setLatestMessage("");
-    } catch (err) {
-      return { error: err };
-    }
-  }
-
-  static async denyCredentials(request) {
-    const loggedIn = await cryptoController$1.getIsLoggedIn();
-    if (!loggedIn) return;
-    return holoStore$1.setLatestMessage("");
-  }
-
-  static async holoChangePassword(request) {
-    const oldPassword = request.oldPassword;
-    const newPassword = request.newPassword;
-    const changePwSuccess = await cryptoController$1.changePassword(
-      oldPassword,
-      newPassword
-    );
-    return { success: changePwSuccess };
-  }
-
-  static async holoInitializeAccount(request) {
-    const password = request.password;
-    // TODO: initialize() doesn't return anything
-    const success = await cryptoController$1.initialize(password);
-    return { success: success };
-  }
-
-  static async holoGetIsRegistered(request) {
-    const isRegistered = await cryptoController$1.getIsRegistered();
-    return { isRegistered: isRegistered };
-  }
-
-  static async confirmShareCredentials(request) {
-    // confirmShareCredentials = true;
-    // TODO: Put this promise in a function in a file called HoloCache or something like that
-    await new Promise((resolve) => {
-      chrome.storage.session.set({ confirmShareCredentials: true }, () =>
-        resolve(true)
-      );
-    });
-  }
-
-  static async closingHoloCredentialsConfirmationPopup(request) {
-    // credentialsConfirmationPopupIsOpen = false;
-    // TODO: Put this promise in a function in a file called HoloCache or something like that
-    await new Promise((resolve) => {
-      chrome.storage.session.set({ credentialsConfirmationPopupIsOpen: false }, () =>
-        resolve(true)
-      );
-    });
-  }
-
-  static async closingHoloShareCredsConfirmationPopup(request) {
-    // shareCredsConfirmationPopupIsOpen = false;
-    // TODO: Put this promise in a function in a file called HoloCache or something like that
-    await new Promise((resolve) => {
-      chrome.storage.session.set({ shareCredsConfirmationPopupIsOpen: false }, () =>
-        resolve(true)
-      );
-    });
-  }
-}
-
 async function setChromeStorageSessionItem(value) {
   return new Promise((resolve) => {
     chrome.storage.session.set(value, () => resolve(true));
@@ -24623,6 +24459,145 @@ class HoloCache {
   }
   static getShareCredsConfirmationPopupIsOpen() {
     return getChromeStorageSessionItem("shareCredsConfirmationPopupIsOpen");
+  }
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Message handlers handle messages.
+ *
+ * The public functions of these classes should be treated as if they can be called
+ * directly by the frontend or popup: Do not add a function that could expose user
+ * data to the wrong party.
+ */
+
+const cryptoController$1 = new CryptoController();
+const holoStore$1 = new HoloStore();
+
+class PopupMessageHandler {
+  static async holoPopupLogin(request) {
+    const password = request.password;
+    try {
+      const success = await cryptoController$1.login(password);
+      return { success: success };
+    } catch (err) {
+      return { error: err?.message };
+    }
+  }
+
+  static async holoGetIsLoggedIn(request) {
+    const loggedIn = await cryptoController$1.getIsLoggedIn();
+    return { isLoggedIn: loggedIn };
+  }
+
+  static async getStagedCredentials(request) {
+    try {
+      const loggedIn = await cryptoController$1.getIsLoggedIn();
+      if (!loggedIn) return { message: {} };
+      const encryptedStagedCreds = await holoStore$1.getStagedCredentials();
+      if (!encryptedStagedCreds) return { message: {} };
+      const decryptedMsg = await cryptoController$1.decryptWithPrivateKey(
+        encryptedStagedCreds.credentials,
+        encryptedStagedCreds.sharded
+      );
+      if (!decryptedMsg) return { message: {} };
+      return { message: { credentials: JSON.parse(decryptedMsg) } };
+    } catch (err) {
+      return { message: {} };
+    }
+  }
+
+  static async getHoloCredentials(request) {
+    try {
+      const loggedIn = await cryptoController$1.getIsLoggedIn();
+      if (!loggedIn) return;
+      const encryptedCreds = await holoStore$1.getCredentials();
+      if (!encryptedCreds) return;
+      const decryptedCreds = await cryptoController$1.decryptWithPrivateKey(
+        encryptedCreds.credentials,
+        encryptedCreds.sharded
+      );
+      if (!decryptedCreds) return;
+      return JSON.parse(decryptedCreds);
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  static async confirmCredentials(request) {
+    try {
+      await HoloCache.setConfirmCredentials(true);
+      const loggedIn = await cryptoController$1.getIsLoggedIn();
+      if (!loggedIn) return;
+      const encryptedStagedCreds = await holoStore$1.getStagedCredentials();
+      if (!encryptedStagedCreds) return;
+      const decryptedCreds = await cryptoController$1.decryptWithPrivateKey(
+        encryptedStagedCreds.credentials,
+        encryptedStagedCreds.sharded
+      );
+      if (!decryptedCreds) return;
+      const parsedDecryptedCreds = JSON.parse(decryptedCreds);
+      const newSecret = new Uint8Array(16);
+      crypto.getRandomValues(newSecret); // Generate new secret
+      parsedDecryptedCreds.newSecret = BigNumber.from(newSecret).toHexString();
+      const encryptedMsg = await cryptoController$1.encryptWithPublicKey(
+        parsedDecryptedCreds
+      );
+      if (!encryptedMsg) return;
+      const credentials = {
+        unencryptedCreds: parsedDecryptedCreds,
+        encryptedCreds: {
+          credentials: encryptedMsg.encryptedMessage,
+          sharded: encryptedMsg.sharded,
+        },
+      };
+      const setCredsSuccess = await holoStore$1.setCredentials(credentials);
+      if (!setCredsSuccess) return;
+      return await holoStore$1.setStagedCredentials("");
+    } catch (err) {
+      return { error: err };
+    }
+  }
+
+  static async denyCredentials(request) {
+    const loggedIn = await cryptoController$1.getIsLoggedIn();
+    if (!loggedIn) return;
+    return holoStore$1.setStagedCredentials("");
+  }
+
+  static async holoChangePassword(request) {
+    const oldPassword = request.oldPassword;
+    const newPassword = request.newPassword;
+    const changePwSuccess = await cryptoController$1.changePassword(
+      oldPassword,
+      newPassword
+    );
+    return { success: changePwSuccess };
+  }
+
+  static async holoInitializeAccount(request) {
+    const password = request.password;
+    // TODO: initialize() doesn't return anything
+    const success = await cryptoController$1.initialize(password);
+    return { success: success };
+  }
+
+  static async holoGetIsRegistered(request) {
+    const isRegistered = await cryptoController$1.getIsRegistered();
+    return { isRegistered: isRegistered };
+  }
+
+  static async confirmShareCredentials(request) {
+    await HoloCache.setConfirmShareCredentials(true);
+  }
+
+  static async closingHoloCredentialsConfirmationPopup(request) {
+    await HoloCache.setCredentialsConfirmationPopupIsOpen(false);
+  }
+
+  static async closingHoloShareCredsConfirmationPopup(request) {
+    await HoloCache.setShareCredsConfirmationPopupIsOpen(false);
   }
 }
 
@@ -24732,13 +24707,13 @@ class WebpageMessageHandler {
       }
       return confirmCredentials;
     }
-    const latestMessage = {
+    const credsToStage = {
       sharded: request.sharded,
       credentials: request.credentials,
     };
-    await holoStore.setLatestMessage(latestMessage);
+    await holoStore.setStagedCredentials(credsToStage);
     console.log("displaying confirmation popup");
-    displayConfirmationPopup("credentials"); // TODO: Import this function
+    displayConfirmationPopup("credentials");
     const confirm = await waitForConfirmation();
     await HoloCache.setConfirmCredentials(false); // reset
     return { success: confirm };
@@ -24780,7 +24755,7 @@ let popupOrigin = `chrome-extension://${extensionId}`;
 const allowedPopupCommands = [
   "holoPopupLogin",
   "holoGetIsLoggedIn",
-  "getHoloLatestMessage",
+  "getStagedCredentials",
   "getHoloCredentials",
   "confirmCredentials",
   "denyCredentials",
