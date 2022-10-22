@@ -11,6 +11,19 @@ const linkToStartVerification = "'https://holonym.id/verify'";
 const frontendUrl =
   process.env.NODE_ENV == "dev" ? "'http://localhost:3002'" : "'https://holonym.io'";
 
+let extensionId = "'obhgknpelgngeabaclepndihajndjjnb'";
+switch (process.env.NODE_ENV) {
+  case "dev":
+    extensionId = "'cilbidmppfndfhjafdlngkaabddoofea'";
+    break;
+  case "caleb":
+    extensionId = "'cilbidmppfndfhjafdlngkaabddoofea'";
+    break;
+  case "nanak":
+    extensionId = "'lgmhnpjmdlgddnjchckodphblmacnhdo'";
+    break;
+}
+
 export default [
   // {
   //   // Content script
@@ -27,6 +40,40 @@ export default [
   //     commonjs(),
   //   ],
   // },
+  {
+    // Content script used to inject holonym.js
+    input: "./src/content/inject.js",
+    output: {
+      file: "./dist/inject.js",
+      format: "es",
+    },
+    plugins: [
+      resolve({
+        browser: true,
+        preferBuiltins: false,
+      }),
+      commonjs(),
+    ],
+  },
+  {
+    // Script used to inject holonym object into window object
+    input: "./src/injections/holonym.js",
+    output: {
+      file: "./dist/holonym.js",
+      format: "es",
+    },
+    plugins: [
+      resolve({
+        browser: true,
+        preferBuiltins: false,
+      }),
+      replace({
+        "process.env.EXTENSION_ID": extensionId,
+        preventAssignment: true,
+      }),
+      commonjs(),
+    ],
+  },
   {
     // Background script
     input: "./src/background/background.js",
