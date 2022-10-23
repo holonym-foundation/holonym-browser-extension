@@ -53,18 +53,33 @@ The recommended encryption procedure is the following.
 
 ### Credential object schema
 
-        {
+The extension can store any credentials that follow two constraints:
+
+- Credentials must be an object with no nestings. The value that is encrypted and sent to the extension should not, when decrypted, be a string or number. It must be an object and must not contain other objects.
+- It must include an `issuer` attribute, and `issuer` must be of type `string`. This is important because credentials are sorted by issuer.
+
+The following is an example of a valid credentials object sent to the extension.
+
+    {
+        birthdate: "",
+        completedAt: "",
+        countryCode: "",
+        secret: "",
+        serverSignature: "",
+        subdivision: "",
+        issuer: "0x0000000000000000000000000000000000000000"
+    }
+
+The following is an example of how those credentials are stored within the extension. The credentials object will look like this for the rest of its lifetime, so both the webpage frontend and other parts of the extension should expect an object with this kind of shape when they request credentials. Note that there can be any number of issuer-credentials pairings.
+
+    {
+        "0x0000000000000000000000000000000000000000": {
             birthdate: "",
-            city: "",
             completedAt: "",
             countryCode: "",
-            firstName: "",
-            lastName: "",
-            middleInitial: "",
-            postalCode: "",
             secret: "",
             serverSignature: "",
-            streetAddr1: "",
-            streetAddr2: "",
             subdivision: "",
+            issuer: ""
         }
+    }
