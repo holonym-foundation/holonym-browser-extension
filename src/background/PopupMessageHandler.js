@@ -73,16 +73,11 @@ class PopupMessageHandler {
   // TODO: Ensure frontend (for calls to setCredentials and to getCredentials),
   // popup frontend, and all other parts of code are compatible with these changes
   static async confirmCredentials(request) {
-    console.log("entered confirmCredentials");
     try {
       await HoloCache.setConfirmCredentials(true);
       const loggedIn = await cryptoController.getIsLoggedIn();
       if (!loggedIn) return;
       const parsedDecryptedStagedCreds = await getAndDecryptStagedCredentials();
-      console.log(
-        "confirmCredentials: parsedDecryptedStagedCreds before new secret..."
-      );
-      console.log(parsedDecryptedStagedCreds);
       parsedDecryptedStagedCreds.newSecret = generateSecret();
       const issuer = parsedDecryptedStagedCreds.issuer;
       if (!issuer) throw new Error("No issuer found in credentials");
@@ -91,13 +86,7 @@ class PopupMessageHandler {
           `issuer is type ${typeof issuer}. issuer must be type "string"`
         );
       }
-      console.log(
-        "confirmCredentials: parsedDecryptedStagedCreds after new secret..."
-      );
-      console.log(parsedDecryptedStagedCreds);
       const updatedCreds = { [issuer]: parsedDecryptedStagedCreds };
-      console.log("confirmCredentials: updatedCreds...");
-      console.log(updatedCreds);
       const encryptedCurrentCreds = await holoStore.getCredentials();
       // Add current creds to updated creds if current creds exist
       if (encryptedCurrentCreds) {
