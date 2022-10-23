@@ -4,7 +4,35 @@
 
 /**
  * @typedef {Object} DecryptedCredentials
- * (See requiredCredsKeys below for properties.)
+ * An object containing credentials sorted by issuers, similar to the following object.
+ * {
+ *  [issuer1]: {
+ *    [credentialName1]: <credential1>
+ *    [credentialName2]: <credential2>
+ *    secret: <secret>
+ *    signature: <signature>
+ *    ...
+ *  },
+ *  [issuer2]: {
+ *    [credentialName1]: <credential1>
+ *    [credentialName2]: <credential2>
+ *    secret: <secret>
+ *    signature: <signature>
+ *    ...
+ *  }
+ * }
+ */
+
+/**
+ * @typedef {Object} StagedCredentials
+ * An object containing credentials from an issuer, similar to the following object.
+ * {
+ *   [credentialName1]: <credential1>
+ *   [credentialName2]: <credential2>
+ *   secret: <secret>
+ *   signature: <signature>
+ *   ...
+ * }
  */
 
 /**
@@ -55,13 +83,12 @@ class HoloStore {
   }
 
   /**
-   * Validates unencrypted unencryptedCreds. If unencryptedCreds are valid,
-   * encryptedCreds are stored.
+   * Sets holoCredentials to credentials.encryptedCreds if unencryptedCreds are valid.
    * @param {FullCredentials} credentials (See typedef)
    * @returns True if the given credentials get stored, false otherwise.
    */
   setCredentials(credentials) {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       if (!this.validateCredentials(credentials)) {
         // TODO: Display error message to user
         console.log(`HoloStore: Not storing credentials`);

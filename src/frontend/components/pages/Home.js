@@ -89,7 +89,7 @@ function Home() {
               )}
             </div>
             <h1 style={{ textAlign: "center" }}>Credentials</h1>
-            <Credentials credentials={credentials} />
+            <Credentials sortedCreds={credentials} />
           </div>
           {/* <button
         type="submit"

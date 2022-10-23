@@ -17,7 +17,9 @@ function AppRoutes() {
   async function handleLoginSuccess() {
     const stagedCredentials = await requestStagedCredentials();
     if (stagedCredentials.credentials) {
-      setCredentials(stagedCredentials.credentials);
+      const issuer = stagedCredentials.credentials.issuer || "Unknown issuer";
+      const sortedCreds = { [issuer]: stagedCredentials.credentials };
+      setCredentials(sortedCreds);
       navigate("/confirm-credentials", { replace: true });
     }
   }

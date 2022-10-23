@@ -10,10 +10,25 @@ import { ethers } from "ethers";
 import { CryptoController } from "./CryptoController";
 import { HoloStore } from "./HoloStore";
 import HoloCache from "./HoloCache";
-import { sleep } from "./utils";
+import { sleep, generateSecret } from "./utils";
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
+
+async function decryptAndParseCredentials(credentials) {
+  const decryptedStagedCreds = await cryptoController.decryptWithPrivateKey(
+    credentials.credentials,
+    credentials.sharded
+  );
+  if (!decryptedStagedCreds) return;
+  return JSON.parse(decryptedStagedCreds);
+}
+
+async function getAndDecryptStagedCredentials() {
+  const encryptedStagedCreds = await holoStore.getStagedCredentials();
+  if (!encryptedStagedCreds) return;
+  return await decryptAndParseCredentials(encryptedStagedCreds);
+}
 
 class PopupMessageHandler {
   static async holoPopupLogin(request) {
@@ -35,14 +50,9 @@ class PopupMessageHandler {
     try {
       const loggedIn = await cryptoController.getIsLoggedIn();
       if (!loggedIn) return { message: {} };
-      const encryptedStagedCreds = await holoStore.getStagedCredentials();
-      if (!encryptedStagedCreds) return { message: {} };
-      const decryptedMsg = await cryptoController.decryptWithPrivateKey(
-        encryptedStagedCreds.credentials,
-        encryptedStagedCreds.sharded
-      );
-      if (!decryptedMsg) return { message: {} };
-      return { message: { credentials: JSON.parse(decryptedMsg) } };
+      const decryptedStagedCreds = await getAndDecryptStagedCredentials();
+      if (!decryptedStagedCreds) return { message: {} };
+      return { message: { credentials: decryptedStagedCreds } };
     } catch (err) {
       return { message: {} };
     }
@@ -54,45 +64,68 @@ class PopupMessageHandler {
       if (!loggedIn) return;
       const encryptedCreds = await holoStore.getCredentials();
       if (!encryptedCreds) return;
-      const decryptedCreds = await cryptoController.decryptWithPrivateKey(
-        encryptedCreds.credentials,
-        encryptedCreds.sharded
-      );
-      if (!decryptedCreds) return;
-      return JSON.parse(decryptedCreds);
+      return await decryptAndParseCredentials(encryptedCreds);
     } catch (err) {
       return { error: err };
     }
   }
 
+  // TODO: Ensure frontend (for calls to setCredentials and to getCredentials),
+  // popup frontend, and all other parts of code are compatible with these changes
   static async confirmCredentials(request) {
+    console.log("entered confirmCredentials");
     try {
       await HoloCache.setConfirmCredentials(true);
       const loggedIn = await cryptoController.getIsLoggedIn();
       if (!loggedIn) return;
-      const encryptedStagedCreds = await holoStore.getStagedCredentials();
-      if (!encryptedStagedCreds) return;
-      const decryptedCreds = await cryptoController.decryptWithPrivateKey(
-        encryptedStagedCreds.credentials,
-        encryptedStagedCreds.sharded
+      const parsedDecryptedStagedCreds = await getAndDecryptStagedCredentials();
+      console.log(
+        "confirmCredentials: parsedDecryptedStagedCreds before new secret..."
       );
-      if (!decryptedCreds) return;
-      const parsedDecryptedCreds = JSON.parse(decryptedCreds);
-      const newSecret = new Uint8Array(16);
-      crypto.getRandomValues(newSecret); // Generate new secret
-      parsedDecryptedCreds.newSecret = ethers.BigNumber.from(newSecret).toHexString();
-      const encryptedMsg = await cryptoController.encryptWithPublicKey(
-        parsedDecryptedCreds
+      console.log(parsedDecryptedStagedCreds);
+      parsedDecryptedStagedCreds.newSecret = generateSecret();
+      const issuer = parsedDecryptedStagedCreds.issuer;
+      if (!issuer) throw new Error("No issuer found in credentials");
+      if (typeof issuer != "string") {
+        throw new Error(
+          `issuer is type ${typeof issuer}. issuer must be type "string"`
+        );
+      }
+      console.log(
+        "confirmCredentials: parsedDecryptedStagedCreds after new secret..."
       );
-      if (!encryptedMsg) return;
-      const credentials = {
-        unencryptedCreds: parsedDecryptedCreds,
+      console.log(parsedDecryptedStagedCreds);
+      const updatedCreds = { [issuer]: parsedDecryptedStagedCreds };
+      console.log("confirmCredentials: updatedCreds...");
+      console.log(updatedCreds);
+      const encryptedCurrentCreds = await holoStore.getCredentials();
+      // Add current creds to updated creds if current creds exist
+      if (encryptedCurrentCreds) {
+        const decryptedCurrentCreds = await decryptAndParseCredentials(
+          encryptedCurrentCreds
+        );
+        // TODO: Remove these deletes after the team has gotten their new credentials
+        delete decryptedCurrentCreds["birthdate"];
+        delete decryptedCurrentCreds["completedAt"];
+        delete decryptedCurrentCreds["countryCode"];
+        delete decryptedCurrentCreds["newSecret"];
+        delete decryptedCurrentCreds["secret"];
+        delete decryptedCurrentCreds["signature"];
+        delete decryptedCurrentCreds["subdivision"];
+        Object.assign(updatedCreds, { ...decryptedCurrentCreds, ...updatedCreds });
+      }
+
+      const encryptedUpdatedCreds = await cryptoController.encryptWithPublicKey(
+        updatedCreds
+      );
+      if (!encryptedUpdatedCreds) return;
+      const setCredsSuccess = await holoStore.setCredentials({
+        unencryptedCreds: updatedCreds,
         encryptedCreds: {
-          credentials: encryptedMsg.encryptedMessage,
-          sharded: encryptedMsg.sharded,
+          credentials: encryptedUpdatedCreds.encryptedMessage,
+          sharded: encryptedUpdatedCreds.sharded,
         },
-      };
-      const setCredsSuccess = await holoStore.setCredentials(credentials);
+      });
       if (!setCredsSuccess) return;
       return await holoStore.setStagedCredentials("");
     } catch (err) {

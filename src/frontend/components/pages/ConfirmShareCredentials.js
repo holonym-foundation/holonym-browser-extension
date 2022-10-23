@@ -14,7 +14,7 @@ function ConfirmShareCredentials({ credentials, onConfirmation }) {
           identity
         </p>
       </div>
-      {/* <Credentials credentials={credentials} /> */}
+      {/* <Credentials sortedCreds={credentials} /> */}
       <div style={{ marginTop: "10px" }}>
         <button
           type="submit"

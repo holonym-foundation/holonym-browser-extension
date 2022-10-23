@@ -8,7 +8,7 @@ function ConfirmCredentials({ credentials, onConfirmation }) {
         <div style={{ textAlign: "center" }}>
           <h1>Is This You?</h1>
         </div>
-        <Credentials credentials={credentials} />
+        <Credentials sortedCreds={credentials} />
         {/* <p>we don't store or save your information</p> */}
         <div style={{ marginTop: "10px" }}>
           <button
