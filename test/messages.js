@@ -188,6 +188,7 @@ describe("Message passing", async () => {
       secret: "0x4704a39e96c1753b525d8734a37685b8",
       signature:
         "0x07138e4c38e8d8541920a087641017f4d32dcf1d100e94db46d1fd67fa59edf23ab7514a2b9cdc613d7264485764e79aa01d243dfba0b87171675f5219aae7651c",
+      issuer: "0x0000000000000000000000000000000000000000",
       birthdate: "1950-01-01",
       completedAt: "2022-09-13",
       countryCode: 2,
@@ -286,10 +287,10 @@ describe("Message passing", async () => {
         // Check stored credentials
         const payload4 = { command: "getHoloCredentials" };
         const creds = await sendMessage(confirmationPopup, extensionId, payload4);
-        expect(creds.newSecret).to.not.equal(undefined);
+        expect(creds[testCreds.issuer].newSecret).to.not.equal(undefined);
         const credsSansNewSecret = Object.assign({}, creds);
-        delete credsSansNewSecret.newSecret;
-        expect(credsSansNewSecret).to.deep.equal(testCreds);
+        delete credsSansNewSecret[testCreds.issuer].newSecret;
+        expect(credsSansNewSecret[testCreds.issuer]).to.deep.equal(testCreds);
       });
     });
 
@@ -309,8 +310,8 @@ describe("Message passing", async () => {
           .then((creds) => {
             // This expect depends on the confirmShareCredentials message (see below)
             const credsSansNewSecret = Object.assign({}, creds);
-            delete credsSansNewSecret.newSecret;
-            expect(credsSansNewSecret).to.deep.equal(testCreds);
+            delete credsSansNewSecret[testCreds.issuer].newSecret;
+            expect(credsSansNewSecret[testCreds.issuer]).to.deep.equal(testCreds);
             receivedResponse = true;
           })
           .catch((err) => {
