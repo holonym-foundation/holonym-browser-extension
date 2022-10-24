@@ -33,7 +33,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * @param {string} command The command to wait for (e.g., "getHoloPublicKey")
  */
 async function waitForResponse(command) {
-  const timeout = new Date().getTime() + 180 * 1000;
+  // timeout is 2s, not longer, because the actual response might be undefined
+  const timeout = new Date().getTime() + 2000;
   let resp = inbox[command];
   while (new Date().getTime() <= timeout && !resp) {
     await sleep(50);
