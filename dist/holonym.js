@@ -1,9 +1,8 @@
 // Inject holonym object into window object
 
 window.holonym = {
-  // holoGetIsInstalled: holoGetIsInstalled,
-  // holoGetIsRegistered: holoGetIsRegistered,
+  // holoGetIsRegistered: holoGetIsRegistered, // i.e., getHasPublicKey
+  // hasHolo: async () => {}, // TODO: return a bool that indicates whether the user has credentials
   // getHoloPublicKey: getHoloPublicKey,
-  // getHoloCredentials: getHoloCredentials,
-  // setHoloCredentials: setHoloCredentials,
+  // holoGetHasCredentials: holoGetHasCredentials
 };

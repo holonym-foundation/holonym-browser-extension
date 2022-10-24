@@ -1661,43 +1661,87 @@ function LandingPage({
   }))));
 }
 
-function Credentials({
+// { issuer1: { cred1: 'cred1', cred2: 'cred2' }, issuer2: { cred1: 'cred1' }, }
+// and "creds" refer to creds with an object with the shape like this:
+// { cred1: 'cred1', cred2: 'cred2' }
+
+function getUserFacingNestedCreds(credentials) {
+  const allowedCredsNames = Object.keys(credentials).filter(name => {
+    if (name.toLowerCase().includes("signature")) return false;
+    if (name.toLowerCase().includes("secret")) return false;
+    if (name.toLowerCase().includes("issuer")) return false;
+    if (name == "completedAt") return false;
+    return true;
+  });
+  const credsToDisplayTemp = Object.fromEntries(allowedCredsNames.map(name => {
+    let formattedCredName = name.replace(/([A-Z])/g, " $1");
+    formattedCredName = formattedCredName.charAt(0).toUpperCase() + formattedCredName.slice(1);
+    return [formattedCredName, credentials[name]];
+  }));
+  return credsToDisplayTemp;
+} // A single credential line
+
+
+function SingleCredential({
+  name,
+  credential
+}) {
+  return /*#__PURE__*/React$1.createElement("div", {
+    style: {
+      display: "flex",
+      marginTop: "1.05rem",
+      marginBottom: "1.05rem"
+    }
+  }, /*#__PURE__*/React$1.createElement("span", {
+    style: {
+      flex: "35%"
+    },
+    className: "credential-name"
+  }, name), /*#__PURE__*/React$1.createElement("span", {
+    style: {
+      flex: "65%"
+    }
+  }, credential));
+} // A list of credentials from a single issuer
+
+
+function CredentialsFromIssuer({
+  issuer,
   credentials
+}) {
+  return /*#__PURE__*/React$1.createElement("div", {
+    style: {
+      marginLeft: "1.05rem",
+      marginRight: "1.05rem"
+    }
+  }, Object.keys(credentials).map((credentialName, index) => /*#__PURE__*/React$1.createElement(SingleCredential, {
+    key: index,
+    name: credentialName,
+    credential: credentials[credentialName]
+  })));
+}
+
+function Credentials({
+  sortedCreds
 }) {
   const [credsToDisplay, setCredsToDisplay] = react.exports.useState();
   react.exports.useEffect(() => {
-    if (!credentials) return;
-    const allowedCredsNames = Object.keys(credentials).filter(name => {
-      if (name.toLowerCase().includes("signature")) return false;
-      if (name.toLowerCase().includes("secret")) return false;
-      if (name == "completedAt") return false;
-      return true;
-    });
-    const credsToDisplayTemp = Object.fromEntries(allowedCredsNames.map(name => [name, credentials[name]]));
+    if (!sortedCreds) return;
+    const credsToDisplayTemp = {};
+
+    for (const issuer of Object.keys(sortedCreds)) {
+      credsToDisplayTemp[issuer] = getUserFacingNestedCreds(sortedCreds[issuer]);
+    }
+
     setCredsToDisplay(credsToDisplayTemp);
-  }, [credentials]);
-  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, credsToDisplay && Object.keys(credsToDisplay).length > 0 && /*#__PURE__*/React$1.createElement("div", {
+  }, [sortedCreds]);
+  return /*#__PURE__*/React$1.createElement(React$1.Fragment, null, credsToDisplay && Object.keys(credsToDisplay)?.length > 0 && /*#__PURE__*/React$1.createElement("div", {
     className: "holo-credentials-container"
-  }, Object.keys(credsToDisplay).map((credentialName, index) => {
-    let formattedCred = credentialName.replace(/([A-Z])/g, " $1");
-    formattedCred = formattedCred.charAt(0).toUpperCase() + formattedCred.slice(1);
-    return /*#__PURE__*/React$1.createElement("div", {
-      key: index,
-      style: {
-        display: "flex",
-        margin: "1.05rem"
-      }
-    }, /*#__PURE__*/React$1.createElement("span", {
-      style: {
-        flex: "35%"
-      },
-      className: "credential-name"
-    }, formattedCred), /*#__PURE__*/React$1.createElement("span", {
-      style: {
-        flex: "65%"
-      }
-    }, credsToDisplay[credentialName]));
-  })));
+  }, Object.keys(credsToDisplay).map((issuerName, index) => /*#__PURE__*/React$1.createElement(CredentialsFromIssuer, {
+    key: index,
+    issuer: issuerName,
+    credentials: credsToDisplay[issuerName]
+  }))));
 }
 
 function ConfirmCredentials({
@@ -1711,7 +1755,7 @@ function ConfirmCredentials({
       textAlign: "center"
     }
   }, /*#__PURE__*/React$1.createElement("h1", null, "Is This You?")), /*#__PURE__*/React$1.createElement(Credentials, {
-    credentials: credentials
+    sortedCreds: credentials
   }), /*#__PURE__*/React$1.createElement("div", {
     style: {
       marginTop: "10px"
@@ -1731,7 +1775,11 @@ function AppRoutes() {
     const stagedCredentials = await requestStagedCredentials();
 
     if (stagedCredentials.credentials) {
-      setCredentials(stagedCredentials.credentials);
+      const issuer = stagedCredentials.credentials.issuer || "Unknown issuer";
+      const sortedCreds = {
+        [issuer]: stagedCredentials.credentials
+      };
+      setCredentials(sortedCreds);
       navigate("/confirm-credentials", {
         replace: true
       });
