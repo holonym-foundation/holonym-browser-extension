@@ -11,7 +11,7 @@ const linkToStartVerification = "'https://holonym.id/verify'";
 const frontendUrl =
   process.env.NODE_ENV == "dev" ? "'http://localhost:3002'" : "'https://holonym.io'";
 
-let extensionId = "'obhgknpelgngeabaclepndihajndjjnb'";
+let extensionId = "'obhgknpelgngeabaclepndihajndjjnb'"; // Extension owned by extension@holonym.id
 switch (process.env.NODE_ENV) {
   case "dev":
     extensionId = "'cilbidmppfndfhjafdlngkaabddoofea'";
@@ -25,21 +25,25 @@ switch (process.env.NODE_ENV) {
 }
 
 export default [
-  // {
-  //   // Content script
-  //   input: "./src/content/content.js",
-  //   output: {
-  //     file: "./dist/content.js",
-  //     format: "es",
-  //   },
-  //   plugins: [
-  //     resolve({
-  //       browser: true,
-  //       preferBuiltins: false,
-  //     }),
-  //     commonjs(),
-  //   ],
-  // },
+  {
+    // Content script
+    input: "./src/content/content.js",
+    output: {
+      file: "./dist/content.js",
+      format: "es",
+    },
+    plugins: [
+      resolve({
+        browser: true,
+        preferBuiltins: false,
+      }),
+      replace({
+        "process.env.EXTENSION_ID": extensionId,
+        preventAssignment: true,
+      }),
+      commonjs(),
+    ],
+  },
   {
     // Content script used to inject holonym.js
     input: "./src/content/inject.js",
@@ -57,7 +61,7 @@ export default [
   },
   {
     // Script used to inject holonym object into window object
-    input: "./src/injections/holonym.js",
+    input: "./src/content/holonym.js",
     output: {
       file: "./dist/holonym.js",
       format: "es",
@@ -91,6 +95,7 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        "process.env.EXTENSION_ID": extensionId,
         'require("stream");': 'require("readable-stream");',
         preventAssignment: true,
       }),

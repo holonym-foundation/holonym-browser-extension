@@ -5,7 +5,7 @@ import LandingPage from "../../components/pages/LandingPage";
 import ConfirmShareCredentials from "../../components/pages/ConfirmShareCredentials";
 import Success from "../../components/atoms/Success";
 import Loading from "../../components/atoms/Loading";
-import { sleep } from "../../../background/utils";
+import { sleep } from "../../../@shared/utils";
 
 function AppRoutes() {
   const navigate = useNavigate();

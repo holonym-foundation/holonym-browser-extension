@@ -1,6 +1,9 @@
 /**
- * This background script handles messages from both the webpage and
- * the confirmation popup.
+ * NOTE: Before messages are sent to this handler, they should be authenticated,
+ * since this class is used by both the background script and content script. Only
+ * messages sent directly to the background script should be able to call privileged
+ * endpoints. See constants.js for privileged commands.
+ * TODO: Perhaps separate this into a TrustedWebpageMessageHandler and an UntrustedWebpageMessageHandler
  */
 import { ethers } from "ethers";
 import { CryptoController } from "./CryptoController";
