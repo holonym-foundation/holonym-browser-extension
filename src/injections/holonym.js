@@ -1,111 +1,59 @@
 // Inject holonym object into window object
 
 const extensionId = process.env.EXTENSION_ID;
+const extensionOrigin = `chrome-extension://${extensionId}`;
 
-// Max length of encrypt-able string using RSA-OAEP with SHA256 where
-// modulusLength == 4096: 446 characters.
-const maxEncryptableLength = 446;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
- * @param {SubtleCrypto.JWK} publicKey
- * @param {string} message
- * @returns {Promise<string>} Encrypted message
+ * @param {string} command The command to wait for (e.g., "getHoloPublicKey")
  */
-async function encryptShard(publicKey, message) {
-  const algo = {
-    name: "RSA-OAEP",
-    modulusLength: 4096,
-    publicExponent: new Uint8Array([1, 0, 1]),
-    hash: "SHA-256",
-  };
-  let args = ["jwk", publicKey, algo, false, ["encrypt"]];
-  const pubKeyAsCryptoKey = await window.crypto.subtle.importKey(...args);
-  const encoder = new TextEncoder();
-  const encodedMessage = encoder.encode(message);
-  args = ["RSA-OAEP", pubKeyAsCryptoKey, encodedMessage];
-  const encryptedMessage = await window.crypto.subtle.encrypt(...args);
-  return JSON.stringify(Array.from(new Uint8Array(encryptedMessage)));
+async function waitForResponse(message) {
+  // TODO: Implement
+  // async function waitForConfirmation() {
+  //   const timeout = new Date().getTime() + 180 * 1000;
+  //   let confirmShare = await HoloCache.getConfirmShareCredentials();
+  //   while (new Date().getTime() <= timeout && !confirmShare) {
+  //     await sleep(50);
+  //     confirmShare = await HoloCache.getConfirmShareCredentials();
+  //   }
+  //   return confirmShare;
+  // }
+  // return JSON.parse(response)
 }
 
-async function encryptForExtension(message) {
-  const encryptionKey = await getHoloPublicKey();
-  const stringifiedMsg = JSON.stringify(message);
-  const usingSharding = stringifiedMsg.length > maxEncryptableLength;
-  let encryptedMessage; // array<string> if sharding, string if not sharding
-  if (usingSharding) {
-    encryptedMessage = [];
-    for (let i = 0; i < stringifiedMsg.length; i += maxEncryptableLength) {
-      const shard = stringifiedMsg.substring(i, i + maxEncryptableLength);
-      const encryptedShard = await encryptShard(encryptionKey, shard);
-      encryptedMessage.push(encryptedShard);
-    }
-  } else {
-    encryptedMessage = await encrypt(encryptionKey, stringifiedMsg);
-  }
-  return { encryptedMessage: encryptedMessage, sharded: usingSharding };
+/**
+ * @param {object} message E.g., { command: "getHoloPublicKey" }
+ * @returns
+ */
+async function sendMessageToContentScript(message) {
+  window.postMessage(JSON.stringify(message), extensionOrigin);
+  return await waitForResponse();
 }
 
 // ----------------------------------------------------
 // BEGIN "endpoint" functions
 // ----------------------------------------------------
 
-async function holoGetIsInstalled() {
-  return new Promise((resolve) => {
-    const message = { command: "holoGetIsInstalled" };
-    chrome.runtime.sendMessage(extensionId, message, (resp) => {
-      resolve(resp);
-    });
-  });
-}
-
 async function holoGetIsRegistered() {
-  return new Promise((resolve) => {
-    const payload = {
-      command: "holoGetIsRegistered",
-    };
-    const callback = (resp) => resolve(resp);
-    // const callback = (resp) => resolve(resp.isRegistered); // code in frontend
-    chrome.runtime.sendMessage(extensionId, payload, callback);
-  });
+  const message = { command: "holoGetIsRegistered" };
+  const resp = await sendMessageToContentScript(message);
+  return resp?.isRegistered;
 }
 
 async function getHoloPublicKey() {
-  return new Promise((resolve) => {
-    const message = { command: "getHoloPublicKey" };
-    chrome.runtime.sendMessage(extensionId, message, (resp) => {
-      resolve(resp);
-    });
-  });
+  const message = { command: "getHoloPublicKey" };
+  return await sendMessageToContentScript(message);
 }
 
-async function getHoloCredentials() {
-  return new Promise((resolve) => {
-    const message = { command: "getHoloCredentials" };
-    chrome.runtime.sendMessage(extensionId, message, (resp) => {
-      resolve(resp);
-    });
-  });
-}
-
-async function setHoloCredentials(credentials) {
-  return new Promise(async (resolve) => {
-    const { encryptedMessage, sharded } = await encryptForExtension(credentials);
-    const payload = {
-      command: "setHoloCredentials",
-      sharded: sharded,
-      credentials: encryptedMessage,
-    };
-    const callback = (resp) => resolve(resp);
-    // const callback = (resp) => resolve(resp?.success); // code in frontend
-    chrome.runtime.sendMessage(extensionId, payload, callback);
-  });
+async function holoGetHasCredentials() {
+  const message = { command: "holoGetHasCredentials" };
+  return await sendMessageToContentScript(message);
 }
 
 window.holonym = {
-  // holoGetIsInstalled: holoGetIsInstalled,
-  // holoGetIsRegistered: holoGetIsRegistered,
+  // holoGetIsRegistered: holoGetIsRegistered, // i.e., getHasPublicKey
   // hasHolo: async () => {}, // TODO: return a bool that indicates whether the user has credentials
   // getHoloPublicKey: getHoloPublicKey,
-  // getHoloCredentials: getHoloCredentials,
-  // setHoloCredentials: setHoloCredentials,
+  // holoGetHasCredentials: holoGetHasCredentials
 };
