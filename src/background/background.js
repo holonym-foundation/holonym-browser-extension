@@ -2,8 +2,13 @@
  * This background script handles messages from both the webpage and
  * the confirmation popup.
  */
+import {
+  trustedOrigins,
+  basicWebPageCommands,
+  privilegedWebPageCommands,
+} from "../@shared/constants";
 import PopupMessageHandler from "./PopupMessageHandler";
-import WebpageMessageHandler from "./WebpageMessageHandler";
+import WebpageMessageHandler from "../@shared/WebpageMessageHandler";
 
 // --------------------------------------------------------------
 // Functions for listening to messages from popups
@@ -12,18 +17,7 @@ import WebpageMessageHandler from "./WebpageMessageHandler";
 // https://chrome.google.com/webstore/detail/holonym/oehcghhbelloglknnpdgoeammglelgna
 // let extensionId = "oehcghhbelloglknnpdgoeammglelgna";
 // https://chrome.google.com/webstore/detail/holonym/obhgknpelgngeabaclepndihajndjjnb
-let extensionId = "obhgknpelgngeabaclepndihajndjjnb"; // Extension owned by extension@holonym.id
-switch (process.env.NODE_ENV) {
-  case "dev":
-    extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
-    break;
-  case "caleb":
-    extensionId = "cilbidmppfndfhjafdlngkaabddoofea";
-    break;
-  case "nanak":
-    extensionId = "lgmhnpjmdlgddnjchckodphblmacnhdo";
-    break;
-}
+let extensionId = process.env.EXTENSION_ID;
 console.log("extension ID should be ", extensionId);
 let popupOrigin = `chrome-extension://${extensionId}`;
 
@@ -58,27 +52,11 @@ function popupListener(request, sender, sendResponse) {
 // Functions for listening to messages from webpage
 // --------------------------------------------------------------
 
-const allowedOrigins = [
-  "http://localhost:3002", // For local holonym.io tests
-  "http://localhost:8081", // For local holonym.id tests
-  "https://app.holonym.id",
-  "https://holonym.id",
-  "https://holonym.io",
-  "https://main.d2pqgbrq5pb6nr.amplifyapp.com",
-];
-const allowedWebPageCommands = [
-  "holoGetIsInstalled",
-  "getHoloPublicKey",
-  "getHoloCredentials",
-  "setHoloCredentials",
-  "holoGetIsRegistered",
-  "holoGetHasCredentials",
-  // TODO: Add holoGetIsLoggedIn
-];
+const allowedWebPageCommands = [...basicWebPageCommands, ...privilegedWebPageCommands];
 
 function webPageListener(request, sender, sendResponse) {
   const potentialOrigin = sender.origin || sender.url;
-  if (!allowedOrigins.includes(potentialOrigin)) {
+  if (!trustedOrigins.includes(potentialOrigin)) {
     throw new Error("Disallowed origin attempting to access or modify HoloStore.");
   }
   if (!allowedWebPageCommands.includes(request.command)) {

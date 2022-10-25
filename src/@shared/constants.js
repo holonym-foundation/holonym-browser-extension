@@ -1,3 +1,25 @@
+export const extensionId = process.env.EXTENSION_ID;
+export const extensionOrigin = `chrome-extension://${extensionId}`;
+export const holoCommandEventName = "holo-command";
+export const holoRespEventName = "holo-resp";
+export const trustedOrigins = [
+  "http://localhost:3002", // For local holonym.io tests
+  "http://localhost:8081", // For local holonym.id tests
+  "https://app.holonym.id",
+  "https://holonym.id",
+  "https://holonym.io",
+  "https://main.d2pqgbrq5pb6nr.amplifyapp.com",
+];
+
+export const basicWebPageCommands = [
+  "holoGetIsInstalled",
+  "getHoloPublicKey",
+  "holoGetIsRegistered",
+  "holoGetHasCredentials",
+  // TODO: Add holoGetIsLoggedIn
+];
+export const privilegedWebPageCommands = ["getHoloCredentials", "setHoloCredentials"];
+
 export const serverAddress = "0x8281316aC1D51c94f2DE77575301cEF615aDea84";
 
 export const stateAbbreviations = {

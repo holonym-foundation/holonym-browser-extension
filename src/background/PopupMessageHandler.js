@@ -6,11 +6,11 @@
  * data to the wrong party.
  */
 
-import { ethers } from "ethers";
-import { CryptoController } from "./CryptoController";
-import { HoloStore } from "./HoloStore";
-import HoloCache from "./HoloCache";
-import { sleep, generateSecret } from "./utils";
+// import { ethers } from "ethers";
+import { CryptoController } from "../@shared/CryptoController";
+import { HoloStore } from "../@shared/HoloStore";
+import HoloCache from "../@shared/HoloCache";
+import { generateSecret } from "../@shared/utils";
 
 const cryptoController = new CryptoController();
 const holoStore = new HoloStore();

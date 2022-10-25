@@ -4,7 +4,7 @@ import classNames from "classnames";
 import ReactTooltip from "react-tooltip";
 import ArrowInBox from "../../img/share-box-fill.png";
 import Credentials from "../atoms/Credentials";
-import { sleep } from "../../../background/utils";
+import { sleep } from "../../../@shared/utils";
 
 const linkToStartVerification = process.env.LINK_TO_START_VERIFICATION;
 const frontendUrl = process.env.FRONTEND_URL;

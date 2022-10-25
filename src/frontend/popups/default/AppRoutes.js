@@ -4,7 +4,6 @@ import LandingPage from "../../components/pages/LandingPage";
 import About from "../../components/pages/About";
 import Home from "../../components/pages/Home";
 import ResetAccount from "../../components/molecules/ResetAccount";
-import { sleep } from "../../../background/utils";
 
 function AppRoutes() {
   const navigate = useNavigate();

@@ -37,7 +37,7 @@
     {
       "matches": ["http://localhost:3002/*", "http://localhost:8081/*", "https://*/*"],
       "run_at": "document_start",
-      "js": ["inject.js"]
+      "js": ["content.js", "inject.js"]
     }
   ],
   "web_accessible_resources": [
