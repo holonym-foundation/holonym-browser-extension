@@ -7,7 +7,7 @@ import { wasm } from "@rollup/plugin-wasm";
 import json from "@rollup/plugin-json";
 
 const NODE_ENV = JSON.stringify(process.env.NODE_ENV);
-const linkToStartVerification = "'https://holonym.id/verify'";
+const linkToStartVerification = "'https://app.holonym.id/mint'";
 const frontendUrl =
   process.env.NODE_ENV == "dev" ? "'http://localhost:3002'" : "'https://holonym.io'";
 
