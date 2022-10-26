@@ -94,13 +94,6 @@ class PopupMessageHandler {
           encryptedCurrentCreds
         );
         // TODO: Remove these deletes after the team has gotten their new credentials
-        delete decryptedCurrentCreds["birthdate"];
-        delete decryptedCurrentCreds["completedAt"];
-        delete decryptedCurrentCreds["countryCode"];
-        delete decryptedCurrentCreds["newSecret"];
-        delete decryptedCurrentCreds["secret"];
-        delete decryptedCurrentCreds["signature"];
-        delete decryptedCurrentCreds["subdivision"];
         Object.assign(updatedCreds, { ...decryptedCurrentCreds, ...updatedCreds });
       }
 
