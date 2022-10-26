@@ -23,7 +23,7 @@ const frontendUrl = "https://holonym.io";
  * NOTE: The sequence of the tests matters. Specifically, items stored in chrome storage
  * persist across tests. This includes password, latest message, and credentials.
  */
-describe("Message passing", async () => {
+describe.only("Message passing", async () => {
   let browser;
   let serviceWorker;
   let extensionId;
@@ -194,6 +194,26 @@ describe("Message passing", async () => {
       countryCode: 2,
       subdivision: "NY",
     };
+
+    describe("Frontend prompts user to set password", async () => {
+      let setPasswordPopup;
+
+      afterEach(async () => {
+        if (setPasswordPopup) await setPasswordPopup.close();
+        await sleep(50);
+      });
+
+      // TODO: More tests for holoPromptSetPassword
+
+      it("Response from holoPromptSetPassword should be true when user has already set password", async () => {
+        const resp = await sendMessage(frontendPage, extensionId, {
+          command: "holoPromptSetPassword",
+        });
+        await sleep(100);
+        expect(resp).to.be.an("object");
+        expect(resp?.success).to.equal(true);
+      });
+    });
 
     describe("Frontend sends credentials to extension", async () => {
       let confirmationPopup;

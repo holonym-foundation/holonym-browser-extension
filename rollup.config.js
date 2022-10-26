@@ -168,7 +168,32 @@ export default [
       format: "es",
     },
     plugins: [
-      // json(), // needed for MetaMask
+      image(),
+      resolve({
+        browser: true,
+        preferBuiltins: false,
+      }),
+      replace({
+        "process.env.NODE_ENV": NODE_ENV,
+        'require("stream");': 'require("readable-stream");',
+        preventAssignment: true,
+      }),
+      babel({
+        presets: ["@babel/preset-react"],
+        babelHelpers: "bundled",
+        exclude: "node_modules/**",
+      }),
+      commonjs(),
+    ],
+  },
+  {
+    // Script for login prompt popup
+    input: "./src/frontend/popups/set-password/index.js",
+    output: {
+      file: "./dist/set_password_popup.js",
+      format: "es",
+    },
+    plugins: [
       image(),
       resolve({
         browser: true,

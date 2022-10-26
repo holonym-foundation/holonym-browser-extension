@@ -15,9 +15,9 @@ const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 
 /**
- * @param {string} type Either "credentials" or "share-creds"; the desired popup type
+ * @param {string} type "credentials" | "share-creds" | "set-password"; the desired popup type
  */
-async function displayConfirmationPopup(type) {
+async function displayPopup(type) {
   let url = "";
   if (type == "credentials") {
     // if (await HoloCache.getCredentialsConfirmationPopupIsOpen()) return;
@@ -29,6 +29,8 @@ async function displayConfirmationPopup(type) {
     // if (await HoloCache.getShareCredsConfirmationPopupIsOpen()) return;
     await HoloCache.setShareCredsConfirmationPopupIsOpen(true);
     url = "share_creds_confirmation_popup.html";
+  } else if (type == "set-password") {
+    url = "set_password_popup.html";
   }
 
   // Get info needed to position popup at the top right of the currently focused window
@@ -85,7 +87,7 @@ class WebpageMessageHandler {
       }
       return confirmShare;
     }
-    displayConfirmationPopup("share-creds");
+    displayPopup("share-creds");
     const confirmShare = await waitForConfirmation();
     console.log(`confirmShare: ${confirmShare}`);
     if (!confirmShare) return;
@@ -118,10 +120,26 @@ class WebpageMessageHandler {
     };
     await holoStore.setStagedCredentials(credsToStage);
     console.log("displaying confirmation popup");
-    displayConfirmationPopup("credentials");
+    displayPopup("credentials");
     const confirm = await waitForConfirmation();
     await HoloCache.setConfirmCredentials(false); // reset
     return { success: confirm };
+  }
+
+  static async holoPromptSetPassword(request) {
+    async function waitForPasswordSet() {
+      const timeout = new Date().getTime() + 300 * 1000;
+      let publicKey = await cryptoController.getPublicKey();
+      while (new Date().getTime() <= timeout && !publicKey) {
+        await sleep(50);
+        publicKey = await cryptoController.getPublicKey();
+      }
+      return !!publicKey;
+    }
+    console.log("displaying set-password popup");
+    displayPopup("set-password");
+    const userSetPassword = await waitForPasswordSet();
+    return { success: userSetPassword };
   }
 
   static async holoGetIsRegistered(request) {
