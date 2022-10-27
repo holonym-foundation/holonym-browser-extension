@@ -136,10 +136,13 @@ class WebpageMessageHandler {
       }
       return !!publicKey;
     }
+    // User has already set password
+    if (await cryptoController.getPublicKey()) return { userSetPassword: true };
+    // User has not yet set password
     console.log("displaying set-password popup");
     displayPopup("set-password");
     const userSetPassword = await waitForPasswordSet();
-    return { success: userSetPassword };
+    return { userSetPassword: userSetPassword };
   }
 
   static async holoGetIsRegistered(request) {

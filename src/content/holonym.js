@@ -6,6 +6,7 @@ import {
   extensionOrigin,
   holoCommandEventName,
   holoRespEventName,
+  trustedOrigins,
 } from "../@shared/constants";
 
 // ----------------------------------
@@ -56,7 +57,7 @@ async function sendMessageToContentScript(message) {
 }
 
 // ----------------------------------------------------
-// "endpoint" functions
+// Unprivileged "endpoint" functions
 // ----------------------------------------------------
 
 async function holoGetIsRegistered() {
@@ -75,14 +76,27 @@ async function holoGetHasCredentials() {
   return await sendMessageToContentScript(message);
 }
 
+// ----------------------------------------------------
+// Privileged "endpoint" functions
+// ----------------------------------------------------
+
+async function promptSetPassword() {
+  return new Promise((resolve) => {
+    const payload = {
+      command: "holoPromptSetPassword",
+    };
+    const callback = (resp) => resolve(resp);
+    chrome.runtime.sendMessage(extensionId, payload, callback);
+  });
+}
+
 window.holonym = {
+  // Unprivileged functions
   holoGetIsRegistered: holoGetIsRegistered, // TODO: Rename to "holoGetHasPublicKey"
   getHoloPublicKey: getHoloPublicKey,
+  hasPassword: holoGetIsRegistered, // alias for "holoGetIsRegistered"
   holoGetHasCredentials: holoGetHasCredentials,
-  hasHolo: holoGetHasCredentials, // "hasHolo" is an alias for "holoGetHasCredentials"
+  hasHolo: holoGetHasCredentials, // alias for "holoGetHasCredentials"
+  // Privileged functions
+  promptSetPassword: promptSetPassword,
 };
-
-// TODO:
-// -window.holonym.hasPassword (if it's easy to implement)
-// -window.holonym
-// -window.holonym.askUserToRegister(), or some way of showing the registration prompt
