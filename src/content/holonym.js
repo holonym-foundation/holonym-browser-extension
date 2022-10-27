@@ -81,3 +81,8 @@ window.holonym = {
   holoGetHasCredentials: holoGetHasCredentials,
   hasHolo: holoGetHasCredentials, // "hasHolo" is an alias for "holoGetHasCredentials"
 };
+
+// TODO:
+// -window.holonym.hasPassword (if it's easy to implement)
+// -window.holonym
+// -window.holonym.askUserToRegister(), or some way of showing the registration prompt

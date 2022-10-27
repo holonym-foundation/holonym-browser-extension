@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const links = [
   {
     text: "Holonym Website",
-    destination: "https://holonym.id",
+    destination: process.env.FRONTEND_URL,
   },
   {
     text: "Documentation",

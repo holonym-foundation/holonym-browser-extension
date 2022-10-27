@@ -7,7 +7,7 @@ import { wasm } from "@rollup/plugin-wasm";
 import json from "@rollup/plugin-json";
 
 const NODE_ENV = JSON.stringify(process.env.NODE_ENV);
-const linkToStartVerification = "'https://app.holonym.id/mint'";
+const linkToStartVerification = "'https://app.holonym.io/mint'";
 const frontendUrl =
   process.env.NODE_ENV == "dev" ? "'http://localhost:3002'" : "'https://holonym.io'";
 
@@ -149,6 +149,7 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        "process.env.FRONTEND_URL": frontendUrl,
         'require("stream");': 'require("readable-stream");',
         preventAssignment: true,
       }),
@@ -175,6 +176,7 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        "process.env.FRONTEND_URL": frontendUrl,
         'require("stream");': 'require("readable-stream");',
         preventAssignment: true,
       }),
@@ -201,6 +203,7 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        "process.env.FRONTEND_URL": frontendUrl,
         'require("stream");': 'require("readable-stream");',
         preventAssignment: true,
       }),

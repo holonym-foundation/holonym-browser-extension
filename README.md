@@ -4,13 +4,12 @@
 
 This extension store credentials that can be used to generate zk proofs about aspects of one's identity.
 
-Holonym website: https://holonym.id/
+Holonym website: https://holonym.io/
 
 ## Requirements
 
 - Node ^16.14.2
 - Rollup (used for general bundling)
-- Browserify (used to handle the use of `process` in metamask extension package)
 
 ## Storage scheme
 
