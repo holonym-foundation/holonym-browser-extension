@@ -223,6 +223,19 @@ class WebpageMessageHandler {
     const success = await holoStore.setSubmittedProofs(encryptedProofs);
     return { success: success };
   }
+
+  static async holoGetSubmittedProofs(request) {
+    const loggedIn = await cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
+    const encryptedProofMetadata = await holoStore.getSubmittedProofs();
+    if (!encryptedProofMetadata) return;
+    return JSON.parse(
+      await cryptoController.decryptWithPrivateKey(
+        encryptedProofMetadata.encryptedMessage,
+        encryptedProofMetadata.sharded
+      )
+    );
+  }
 }
 
 export default WebpageMessageHandler;

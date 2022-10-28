@@ -124,6 +124,16 @@ async function addSubmittedProof(issuer, proofTxMetadata) {
   });
 }
 
+async function getSubmittedProofs() {
+  return new Promise((resolve) => {
+    const payload = {
+      command: "holoGetSubmittedProofs",
+    };
+    const callback = (resp) => resolve(resp);
+    chrome.runtime.sendMessage(extensionId, payload, callback);
+  });
+}
+
 window.holonym = {
   // Unprivileged functions
   holoGetIsRegistered: holoGetIsRegistered, // TODO: Rename to "holoGetHasPublicKey"
@@ -136,4 +146,5 @@ window.holonym = {
   addLeafMetadata: addLeafMetadata,
   getLeafMetadata: getLeafMetadata,
   addSubmittedProof: addSubmittedProof,
+  getSubmittedProofs: getSubmittedProofs,
 };

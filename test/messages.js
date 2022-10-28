@@ -23,7 +23,7 @@ const frontendUrl = "https://holonym.io";
  * NOTE: The sequence of the tests matters. Specifically, items stored in chrome storage
  * persist across tests. This includes password, latest message, and credentials.
  */
-describe.only("Message passing", async () => {
+describe("Message passing", async () => {
   let browser;
   let serviceWorker;
   let extensionId;
@@ -254,6 +254,29 @@ describe.only("Message passing", async () => {
         const result = await sendMessage(frontendPage, extensionId, payload);
         expect(result).to.be.an("object");
         expect(result.success).to.equal(false);
+      });
+    });
+
+    describe("holoGetSubmittedProofs", async () => {
+      it("Should return stored proof metadata when user is logged in", async () => {
+        // Add proof metadata
+        const proofTxMetadata = {
+          blockNumber: 10,
+          txHash: "0x1111000000000000000000000000000000000001",
+        };
+        const payload1 = {
+          command: "holoAddSubmittedProof",
+          issuer: "0x0000000000000000000000000000000000000000",
+          proofTxMetadata: proofTxMetadata,
+        };
+        const result1 = await sendMessage(frontendPage, extensionId, payload1);
+        expect(result1).to.be.an("object");
+        expect(result1.success).to.equal(true);
+        // Get proof metadata
+        const payload2 = { command: "holoGetSubmittedProofs" };
+        const result2 = await sendMessage(frontendPage, extensionId, payload2);
+        expect(result2).to.be.an("object");
+        expect(result2[payload1.issuer]).to.deep.equal(proofTxMetadata);
       });
     });
   });
