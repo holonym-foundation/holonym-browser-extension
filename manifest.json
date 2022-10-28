@@ -27,7 +27,9 @@
     "matches": [
       "http://localhost:3002/*",
       "http://localhost:8081/*",
+      "https://staging.holonym.io/*",
       "https://app.holonym.id/*",
+      "https://app.holonym.io/*",
       "https://holonym.id/*",
       "https://holonym.io/*",
       "https://main.d2pqgbrq5pb6nr.amplifyapp.com/*"
