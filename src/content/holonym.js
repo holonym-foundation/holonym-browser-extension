@@ -102,6 +102,16 @@ async function addLeafMetadata(issuer, leafTxMetadata) {
   });
 }
 
+async function getLeafMetadata() {
+  return new Promise((resolve) => {
+    const payload = {
+      command: "holoGetLeafTxMetadata",
+    };
+    const callback = (resp) => resolve(resp);
+    chrome.runtime.sendMessage(extensionId, payload, callback);
+  });
+}
+
 async function addSubmittedProof(issuer, proofTxMetadata) {
   return new Promise((resolve) => {
     const payload = {
@@ -124,5 +134,6 @@ window.holonym = {
   // Privileged functions
   promptSetPassword: promptSetPassword,
   addLeafMetadata: addLeafMetadata,
+  getLeafMetadata: getLeafMetadata,
   addSubmittedProof: addSubmittedProof,
 };

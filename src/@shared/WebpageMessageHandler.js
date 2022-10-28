@@ -182,6 +182,19 @@ class WebpageMessageHandler {
     return { success: success };
   }
 
+  static async holoGetLeafTxMetadata(request) {
+    const loggedIn = await cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
+    const encryptedLeaves = await holoStore.getLeaves();
+    if (!encryptedLeaves) return;
+    return JSON.parse(
+      await cryptoController.decryptWithPrivateKey(
+        encryptedLeaves.encryptedMessage,
+        encryptedLeaves.sharded
+      )
+    );
+  }
+
   static async holoAddSubmittedProof(request) {
     const loggedIn = await cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
