@@ -154,6 +154,35 @@ class WebpageMessageHandler {
     const creds = await holoStore.getCredentials();
     return !!creds;
   }
+
+  static async holoAddLeafTxMetadata(request) {
+    const loggedIn = await cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
+    if (!request.issuer || !request.leafTxMetadata) return;
+    if (!request.leafTxMetadata.blockNumber || !request.leafTxMetadata.txHash) return;
+
+    const updatedLeaves = { [request.issuer]: request.leafTxMetadata };
+    const encryptedCurrentLeaves = await holoStore.getLeaves();
+    if (encryptedCurrentLeaves) {
+      const decryptedCurrentLeaves = JSON.parse(
+        await cryptoController.decryptWithPrivateKey(
+          encryptedCurrentLeaves.encryptedMessage,
+          encryptedCurrentLeaves.sharded
+        )
+      );
+      Object.assign(updatedLeaves, {
+        ...decryptedCurrentLeaves,
+        ...updatedLeaves,
+      });
+    }
+    const encryptedLeaves = await cryptoController.encryptWithPublicKey(updatedLeaves);
+    const success = await holoStore.setLeaves(encryptedLeaves);
+    return { success: success };
+  }
+
+  // TODO: holoAddSubmittedProof
+  // Use from HoloStore: SubmittedProofs type
+  // -- ENDPOINT: holoAddSubmittedProof
 }
 
 export default WebpageMessageHandler;

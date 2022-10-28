@@ -90,6 +90,18 @@ async function promptSetPassword() {
   });
 }
 
+async function addLeafMetadata(issuer, leafTxMetadata) {
+  return new Promise((resolve) => {
+    const payload = {
+      command: "holoAddLeafTxMetadata",
+      issuer: issuer,
+      leafTxMetadata: leafTxMetadata,
+    };
+    const callback = (resp) => resolve(resp);
+    chrome.runtime.sendMessage(extensionId, payload, callback);
+  });
+}
+
 window.holonym = {
   // Unprivileged functions
   holoGetIsRegistered: holoGetIsRegistered, // TODO: Rename to "holoGetHasPublicKey"
@@ -99,4 +111,5 @@ window.holonym = {
   hasHolo: holoGetHasCredentials, // alias for "holoGetHasCredentials"
   // Privileged functions
   promptSetPassword: promptSetPassword,
+  addLeafMetadata: addLeafMetadata,
 };

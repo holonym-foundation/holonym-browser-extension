@@ -3,7 +3,7 @@
  */
 
 /**
- * @typedef {Object} DecryptedCredentials
+ * @typedef {object} DecryptedCredentials
  * An object containing credentials sorted by issuers, similar to the following object.
  * {
  *  [issuer1]: {
@@ -24,7 +24,7 @@
  */
 
 /**
- * @typedef {Object} StagedCredentials
+ * @typedef {object} StagedCredentials
  * An object containing credentials from an issuer, similar to the following object.
  * {
  *   [credentialName1]: <credential1>
@@ -39,7 +39,7 @@
  * (Also defined in CryptoController.)
  * An encrypted message sent to the extension and stored by HoloStore as
  * 'latestHoloMessage'. The unencrypted message must be a string.
- * @typedef {Object} EncryptedCredentials
+ * @typedef {object} EncryptedCredentials
  * @property {boolean} sharded Whether message is represented as encrypted shards.
  * @property {string|Array<string>} credentials If not sharded, this is a string
  * representation of the encrypted message. If sharded, it is an array consisting
@@ -49,9 +49,26 @@
  */
 
 /**
- * @typedef {Object} FullCredentials
+ * @typedef {object} FullCredentials
  * @property {EncryptedCredentials} encryptedCreds
  * @property {DecryptedCredentials} [unencryptedCreds] Used for validation
+ */
+
+/**
+ * @typedef {object} TransactionMetadata
+ * @property {number} blockNumber Block height at which the leaf was added
+ * @property {string} txHash
+ */
+
+/**
+ * @typedef {object} Leaves An object where each key is an issuer
+ * (e.g., '0x0000000000000000000000000000000000000000') and where each value is
+ * a TransactionMetadata object.
+ */
+
+/**
+ * @typedef {object} SubmittedProofs An object where each key is a proof type
+ * and where each value is a TransactionMetadata object.
  */
 
 const credentialNames = ["countryCode", "subdivision", "completedAt", "birthdate"];
@@ -119,6 +136,46 @@ class HoloStore {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(["holoCredentials"], (creds) => {
         resolve(creds?.holoCredentials);
+      });
+    });
+  }
+
+  /**
+   * @param {import('./CryptoController').Ciphertext} leaves Should be of type Leaves when decrypted
+   */
+  setLeaves(leaves) {
+    return new Promise(async (resolve) => {
+      chrome.storage.local.set({ holoLeaves: leaves }, () => {
+        console.log(`HoloStore: Storing new leaves`);
+        resolve(true);
+      });
+    });
+  }
+
+  getLeaves() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(["holoLeaves"], (result) => {
+        resolve(result?.holoLeaves);
+      });
+    });
+  }
+
+  /**
+   * @param {import('./CryptoController').Ciphertext} submittedProofs Should be of type SubmittedProofs when decrypted
+   */
+  setSubmittedProofs(submittedProofs) {
+    return new Promise(async (resolve) => {
+      chrome.storage.local.set({ holoSubmittedProofs: submittedProofs }, () => {
+        console.log(`HoloStore: Storing new submittedProofs`);
+        resolve(true);
+      });
+    });
+  }
+
+  getSubmittedProofs() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(["holoSubmittedProofs"], (result) => {
+        resolve(result?.holoSubmittedProofs);
       });
     });
   }

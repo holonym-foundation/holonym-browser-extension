@@ -26,6 +26,13 @@ import { maxEncryptableLength } from "./constants";
  * the result.
  */
 
+/**
+ * Generic type for a message encrypted with the encryptWithPublicKey function.
+ * @typedef {object} Ciphertext
+ * @property {boolean} sharded
+ * @property {string|Array<string>} encryptedMessage
+ */
+
 class CryptoController {
   /**
    * Create initial password and public-private keypair.
@@ -271,6 +278,7 @@ class CryptoController {
 
   /**
    * @param {Object} message
+   * @returns {Promise<Ciphertext>}
    */
   async encryptWithPublicKey(message) {
     const encryptionKey = await this.getPublicKey();
