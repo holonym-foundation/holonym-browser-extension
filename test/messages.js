@@ -181,6 +181,81 @@ describe.only("Message passing", async () => {
         expect(encryptedMessage).to.be.a("string");
       });
     });
+
+    describe("holoAddLeafTxMetadata", async () => {
+      it("Should return {success: true} when input is valid and user is logged in", async () => {
+        const leafTxMetadata = {
+          blockNumber: 1,
+          txHash: "0x0000000000000000000000000000000000000001",
+        };
+        const payload = {
+          command: "holoAddLeafTxMetadata",
+          issuer: "0x0000000000000000000000000000000000000000",
+          leafTxMetadata: leafTxMetadata,
+        };
+        const result = await sendMessage(frontendPage, extensionId, payload);
+        expect(result).to.be.an("object");
+        expect(result.success).to.equal(true);
+      });
+
+      it("Should return {success: false} when input is invalid and user is logged in", async () => {
+        const payload = {
+          command: "holoAddLeafTxMetadata",
+        };
+        const result = await sendMessage(frontendPage, extensionId, payload);
+        expect(result).to.be.an("object");
+        expect(result.success).to.equal(false);
+      });
+    });
+
+    describe("holoGetLeafTxMetadata", async () => {
+      it("Should return stored leaf metadata when user is logged in", async () => {
+        // Add leaf metadata
+        const leafTxMetadata = {
+          blockNumber: 1,
+          txHash: "0x0000000000000000000000000000000000000001",
+        };
+        const payload1 = {
+          command: "holoAddLeafTxMetadata",
+          issuer: "0x0000000000000000000000000000000000000000",
+          leafTxMetadata: leafTxMetadata,
+        };
+        const result1 = await sendMessage(frontendPage, extensionId, payload1);
+        expect(result1).to.be.an("object");
+        expect(result1.success).to.equal(true);
+        // Get leaf metadata
+        const payload2 = { command: "holoGetLeafTxMetadata" };
+        const result2 = await sendMessage(frontendPage, extensionId, payload2);
+        expect(result2).to.be.an("object");
+        expect(result2[payload1.issuer]).to.deep.equal(leafTxMetadata);
+      });
+    });
+
+    describe("holoAddSubmittedProof", async () => {
+      it("Should return {success: true} when input is valid and user is logged in", async () => {
+        const proofTxMetadata = {
+          blockNumber: 10,
+          txHash: "0x1111000000000000000000000000000000000001",
+        };
+        const payload = {
+          command: "holoAddSubmittedProof",
+          issuer: "0x0000000000000000000000000000000000000000",
+          proofTxMetadata: proofTxMetadata,
+        };
+        const result = await sendMessage(frontendPage, extensionId, payload);
+        expect(result).to.be.an("object");
+        expect(result.success).to.equal(true);
+      });
+
+      it("Should return {success: false} when input is invalid and user is logged in", async () => {
+        const payload = {
+          command: "holoAddLeafTxMetadata",
+        };
+        const result = await sendMessage(frontendPage, extensionId, payload);
+        expect(result).to.be.an("object");
+        expect(result.success).to.equal(false);
+      });
+    });
   });
 
   describe("Interactive messages", async () => {
@@ -211,7 +286,7 @@ describe.only("Message passing", async () => {
         });
         await sleep(100);
         expect(resp).to.be.an("object");
-        expect(resp?.success).to.equal(true);
+        expect(resp?.userSetPassword).to.equal(true);
       });
     });
 
@@ -272,7 +347,7 @@ describe.only("Message passing", async () => {
 
       it("Latest message in extension should contain the encrypted credentials sent by frontend", async () => {
         sendEncryptedCredentials(frontendPage, extensionId, testCreds);
-        await sleep(100);
+        await sleep(200);
         confirmationPopup = await getPopupPage(browser, "credentials_confirmation");
         const loginResult = await login(confirmationPopup, extensionId, validPassword);
         expect(loginResult.success).to.equal(true);

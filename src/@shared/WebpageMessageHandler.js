@@ -157,11 +157,13 @@ class WebpageMessageHandler {
 
   static async holoAddLeafTxMetadata(request) {
     const loggedIn = await cryptoController.getIsLoggedIn();
-    if (!loggedIn) return;
+    if (!loggedIn) return { success: false, error: "User is not logged in" };
     const issuer = request.issuer;
     const leafTxMetadata = request.leafTxMetadata;
-    if (!issuer || !leafTxMetadata) return;
-    if (!leafTxMetadata.blockNumber || !leafTxMetadata.txHash) return;
+    if (!issuer || !leafTxMetadata)
+      return { success: false, error: "!issuer || !leafTxMetadata" };
+    if (!leafTxMetadata.blockNumber || !leafTxMetadata.txHash)
+      return { success: false, error: "!blockNumber || !txHash" };
 
     const updatedLeaves = { [issuer]: leafTxMetadata };
     const encryptedCurrentLeaves = await holoStore.getLeaves();
