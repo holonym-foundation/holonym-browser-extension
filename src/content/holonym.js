@@ -102,7 +102,7 @@ async function addLeafMetadata(issuer, leafTxMetadata) {
   });
 }
 
-async function addSubmittedProofMetadata(issuer, proofTxMetadata) {
+async function addSubmittedProof(issuer, proofTxMetadata) {
   return new Promise((resolve) => {
     const payload = {
       command: "holoAddSubmittedProof",
@@ -124,5 +124,5 @@ window.holonym = {
   // Privileged functions
   promptSetPassword: promptSetPassword,
   addLeafMetadata: addLeafMetadata,
-  addSubmittedProofMetadata: addSubmittedProofMetadata,
+  addSubmittedProof: addSubmittedProof,
 };
