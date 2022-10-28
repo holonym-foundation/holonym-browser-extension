@@ -7,7 +7,7 @@ import { wasm } from "@rollup/plugin-wasm";
 import json from "@rollup/plugin-json";
 
 const NODE_ENV = JSON.stringify(process.env.NODE_ENV);
-const linkToStartVerification = "'https://holonym.id/verify'";
+const linkToStartVerification = "'https://app.holonym.io/mint'";
 const frontendUrl =
   process.env.NODE_ENV == "dev" ? "'http://localhost:3002'" : "'https://holonym.io'";
 
@@ -149,6 +149,7 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        "process.env.FRONTEND_URL": frontendUrl,
         'require("stream");': 'require("readable-stream");',
         preventAssignment: true,
       }),
@@ -168,7 +169,6 @@ export default [
       format: "es",
     },
     plugins: [
-      // json(), // needed for MetaMask
       image(),
       resolve({
         browser: true,
@@ -176,6 +176,34 @@ export default [
       }),
       replace({
         "process.env.NODE_ENV": NODE_ENV,
+        "process.env.FRONTEND_URL": frontendUrl,
+        'require("stream");': 'require("readable-stream");',
+        preventAssignment: true,
+      }),
+      babel({
+        presets: ["@babel/preset-react"],
+        babelHelpers: "bundled",
+        exclude: "node_modules/**",
+      }),
+      commonjs(),
+    ],
+  },
+  {
+    // Script for login prompt popup
+    input: "./src/frontend/popups/set-password/index.js",
+    output: {
+      file: "./dist/set_password_popup.js",
+      format: "es",
+    },
+    plugins: [
+      image(),
+      resolve({
+        browser: true,
+        preferBuiltins: false,
+      }),
+      replace({
+        "process.env.NODE_ENV": NODE_ENV,
+        "process.env.FRONTEND_URL": frontendUrl,
         'require("stream");': 'require("readable-stream");',
         preventAssignment: true,
       }),

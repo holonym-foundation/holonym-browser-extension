@@ -5,9 +5,10 @@ export const holoRespEventName = "holo-resp";
 export const trustedOrigins = [
   "http://localhost:3002", // For local holonym.io tests
   "http://localhost:8081", // For local holonym.id tests
-  "https://app.holonym.id",
   "https://holonym.id",
+  "https://app.holonym.id",
   "https://holonym.io",
+  "https://app.holonym.io",
   "https://main.d2pqgbrq5pb6nr.amplifyapp.com",
 ];
 
@@ -18,7 +19,11 @@ export const basicWebPageCommands = [
   "holoGetHasCredentials",
   // TODO: Add holoGetIsLoggedIn
 ];
-export const privilegedWebPageCommands = ["getHoloCredentials", "setHoloCredentials"];
+export const privilegedWebPageCommands = [
+  "getHoloCredentials",
+  "setHoloCredentials",
+  "holoPromptSetPassword",
+];
 
 export const serverAddress = "0x8281316aC1D51c94f2DE77575301cEF615aDea84";
 
