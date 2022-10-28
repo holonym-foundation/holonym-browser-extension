@@ -102,6 +102,18 @@ async function addLeafMetadata(issuer, leafTxMetadata) {
   });
 }
 
+async function addSubmittedProofMetadata(issuer, proofTxMetadata) {
+  return new Promise((resolve) => {
+    const payload = {
+      command: "holoAddSubmittedProof",
+      issuer: issuer,
+      proofTxMetadata: proofTxMetadata,
+    };
+    const callback = (resp) => resolve(resp);
+    chrome.runtime.sendMessage(extensionId, payload, callback);
+  });
+}
+
 window.holonym = {
   // Unprivileged functions
   holoGetIsRegistered: holoGetIsRegistered, // TODO: Rename to "holoGetHasPublicKey"
@@ -112,4 +124,5 @@ window.holonym = {
   // Privileged functions
   promptSetPassword: promptSetPassword,
   addLeafMetadata: addLeafMetadata,
+  addSubmittedProofMetadata: addSubmittedProofMetadata,
 };

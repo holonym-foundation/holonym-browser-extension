@@ -158,10 +158,12 @@ class WebpageMessageHandler {
   static async holoAddLeafTxMetadata(request) {
     const loggedIn = await cryptoController.getIsLoggedIn();
     if (!loggedIn) return;
-    if (!request.issuer || !request.leafTxMetadata) return;
-    if (!request.leafTxMetadata.blockNumber || !request.leafTxMetadata.txHash) return;
+    const issuer = request.issuer;
+    const leafTxMetadata = request.leafTxMetadata;
+    if (!issuer || !leafTxMetadata) return;
+    if (!leafTxMetadata.blockNumber || !leafTxMetadata.txHash) return;
 
-    const updatedLeaves = { [request.issuer]: request.leafTxMetadata };
+    const updatedLeaves = { [issuer]: leafTxMetadata };
     const encryptedCurrentLeaves = await holoStore.getLeaves();
     if (encryptedCurrentLeaves) {
       const decryptedCurrentLeaves = JSON.parse(
@@ -180,9 +182,32 @@ class WebpageMessageHandler {
     return { success: success };
   }
 
-  // TODO: holoAddSubmittedProof
-  // Use from HoloStore: SubmittedProofs type
-  // -- ENDPOINT: holoAddSubmittedProof
+  static async holoAddSubmittedProof(request) {
+    const loggedIn = await cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
+    const issuer = request.issuer;
+    const proofTxMetadata = request.proofTxMetadata;
+    if (!issuer || !proofTxMetadata) return;
+    if (!proofTxMetadata.blockNumber || !proofTxMetadata.txHash) return;
+
+    const updatedProofs = { [issuer]: proofTxMetadata };
+    const encryptedCurrentProofs = await holoStore.getSubmittedProofs();
+    if (encryptedCurrentProofs) {
+      const decryptedCurrentProofs = JSON.parse(
+        await cryptoController.decryptWithPrivateKey(
+          encryptedCurrentProofs.encryptedMessage,
+          encryptedCurrentProofs.sharded
+        )
+      );
+      Object.assign(updatedProofs, {
+        ...decryptedCurrentProofs,
+        ...updatedProofs,
+      });
+    }
+    const encryptedProofs = await cryptoController.encryptWithPublicKey(updatedProofs);
+    const success = await holoStore.setSubmittedProofs(encryptedProofs);
+    return { success: success };
+  }
 }
 
 export default WebpageMessageHandler;

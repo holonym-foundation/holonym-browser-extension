@@ -23,6 +23,7 @@ export const privilegedWebPageCommands = [
   "getHoloCredentials",
   "setHoloCredentials",
   "holoAddLeafTxMetadata",
+  "holoAddSubmittedProof",
   "holoPromptSetPassword",
 ];
 
