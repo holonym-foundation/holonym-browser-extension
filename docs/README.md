@@ -9,7 +9,7 @@ Auxiliary purposes include:
 - Storing metadata about leaves users have added to the Privacy Pool or proofs users have generated.
 - Giving webpages access to metadata (e.g., whether the user has already set their extension password) that allows webpages to provide better UX while users interact with the extension.
 
-## Architecture components
+## Components
 
 The extension consists of both a _backend_ and a set of _popups_. The extension also interacts with two types of external webpages: _privileged webpages_ and _unprivileged webpages_.
 
