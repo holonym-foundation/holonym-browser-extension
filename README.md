@@ -2,7 +2,9 @@
 
 This extension stores credentials that can be used to generate zk proofs about aspects of one's identity.
 
-Holonym website: https://holonym.io/
+Download the extension here: [https://chrome.google.com/webstore/detail/holonym/obhgknpelgngeabaclepndihajndjjnb](https://chrome.google.com/webstore/detail/holonym/obhgknpelgngeabaclepndihajndjjnb).
+
+Holonym website: [https://holonym.io/](https://holonym.io/).
 
 ## Requirements
 
