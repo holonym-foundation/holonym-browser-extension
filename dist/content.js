@@ -24027,6 +24027,13 @@ function generateSalt (byteCount = 32) {
  * the result.
  */
 
+/**
+ * Generic type for a message encrypted with the encryptWithPublicKey function.
+ * @typedef {object} Ciphertext
+ * @property {boolean} sharded
+ * @property {string|Array<string>} encryptedMessage
+ */
+
 class CryptoController {
   /**
    * Create initial password and public-private keypair.
@@ -24272,6 +24279,7 @@ class CryptoController {
 
   /**
    * @param {Object} message
+   * @returns {Promise<Ciphertext>}
    */
   async encryptWithPublicKey(message) {
     const encryptionKey = await this.getPublicKey();
@@ -24426,6 +24434,46 @@ class HoloStore {
       });
     });
   }
+
+  /**
+   * @param {import('./CryptoController').Ciphertext} leaves Should be of type Leaves when decrypted
+   */
+  setLeaves(leaves) {
+    return new Promise(async (resolve) => {
+      chrome.storage.local.set({ holoLeaves: leaves }, () => {
+        console.log(`HoloStore: Storing new leaves`);
+        resolve(true);
+      });
+    });
+  }
+
+  getLeaves() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(["holoLeaves"], (result) => {
+        resolve(result?.holoLeaves);
+      });
+    });
+  }
+
+  /**
+   * @param {import('./CryptoController').Ciphertext} submittedProofs Should be of type SubmittedProofs when decrypted
+   */
+  setSubmittedProofs(submittedProofs) {
+    return new Promise(async (resolve) => {
+      chrome.storage.local.set({ holoSubmittedProofs: submittedProofs }, () => {
+        console.log(`HoloStore: Storing new submittedProofs`);
+        resolve(true);
+      });
+    });
+  }
+
+  getSubmittedProofs() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(["holoSubmittedProofs"], (result) => {
+        resolve(result?.holoSubmittedProofs);
+      });
+    });
+  }
 }
 
 async function setChromeStorageSessionItem(value) {
@@ -24486,9 +24534,9 @@ const cryptoController = new CryptoController();
 const holoStore = new HoloStore();
 
 /**
- * @param {string} type Either "credentials" or "share-creds"; the desired popup type
+ * @param {string} type "credentials" | "share-creds" | "set-password"; the desired popup type
  */
-async function displayConfirmationPopup(type) {
+async function displayPopup(type) {
   let url = "";
   if (type == "credentials") {
     // if (await HoloCache.getCredentialsConfirmationPopupIsOpen()) return;
@@ -24500,6 +24548,8 @@ async function displayConfirmationPopup(type) {
     // if (await HoloCache.getShareCredsConfirmationPopupIsOpen()) return;
     await HoloCache.setShareCredsConfirmationPopupIsOpen(true);
     url = "share_creds_confirmation_popup.html";
+  } else if (type == "set-password") {
+    url = "set_password_popup.html";
   }
 
   // Get info needed to position popup at the top right of the currently focused window
@@ -24556,7 +24606,7 @@ class WebpageMessageHandler {
       }
       return confirmShare;
     }
-    displayConfirmationPopup("share-creds");
+    displayPopup("share-creds");
     const confirmShare = await waitForConfirmation();
     console.log(`confirmShare: ${confirmShare}`);
     if (!confirmShare) return;
@@ -24589,10 +24639,29 @@ class WebpageMessageHandler {
     };
     await holoStore.setStagedCredentials(credsToStage);
     console.log("displaying confirmation popup");
-    displayConfirmationPopup("credentials");
+    displayPopup("credentials");
     const confirm = await waitForConfirmation();
     await HoloCache.setConfirmCredentials(false); // reset
     return { success: confirm };
+  }
+
+  static async holoPromptSetPassword(request) {
+    async function waitForPasswordSet() {
+      const timeout = new Date().getTime() + 300 * 1000;
+      let publicKey = await cryptoController.getPublicKey();
+      while (new Date().getTime() <= timeout && !publicKey) {
+        await sleep(50);
+        publicKey = await cryptoController.getPublicKey();
+      }
+      return !!publicKey;
+    }
+    // User has already set password
+    if (await cryptoController.getPublicKey()) return { userSetPassword: true };
+    // User has not yet set password
+    console.log("displaying set-password popup");
+    displayPopup("set-password");
+    const userSetPassword = await waitForPasswordSet();
+    return { userSetPassword: userSetPassword };
   }
 
   static async holoGetIsRegistered(request) {
@@ -24603,6 +24672,88 @@ class WebpageMessageHandler {
   static async holoGetHasCredentials(request) {
     const creds = await holoStore.getCredentials();
     return !!creds;
+  }
+
+  static async holoAddLeafTxMetadata(request) {
+    const loggedIn = await cryptoController.getIsLoggedIn();
+    if (!loggedIn) return { success: false, error: "User is not logged in" };
+    const issuer = request.issuer;
+    const leafTxMetadata = request.leafTxMetadata;
+    if (!issuer || !leafTxMetadata)
+      return { success: false, error: "!issuer || !leafTxMetadata" };
+    if (!leafTxMetadata.blockNumber || !leafTxMetadata.txHash)
+      return { success: false, error: "!blockNumber || !txHash" };
+
+    const updatedLeaves = { [issuer]: leafTxMetadata };
+    const encryptedCurrentLeaves = await holoStore.getLeaves();
+    if (encryptedCurrentLeaves) {
+      const decryptedCurrentLeaves = JSON.parse(
+        await cryptoController.decryptWithPrivateKey(
+          encryptedCurrentLeaves.encryptedMessage,
+          encryptedCurrentLeaves.sharded
+        )
+      );
+      Object.assign(updatedLeaves, {
+        ...decryptedCurrentLeaves,
+        ...updatedLeaves,
+      });
+    }
+    const encryptedLeaves = await cryptoController.encryptWithPublicKey(updatedLeaves);
+    const success = await holoStore.setLeaves(encryptedLeaves);
+    return { success: success };
+  }
+
+  static async holoGetLeafTxMetadata(request) {
+    const loggedIn = await cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
+    const encryptedLeaves = await holoStore.getLeaves();
+    if (!encryptedLeaves) return;
+    return JSON.parse(
+      await cryptoController.decryptWithPrivateKey(
+        encryptedLeaves.encryptedMessage,
+        encryptedLeaves.sharded
+      )
+    );
+  }
+
+  static async holoAddSubmittedProof(request) {
+    const loggedIn = await cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
+    const issuer = request.issuer;
+    const proofTxMetadata = request.proofTxMetadata;
+    if (!issuer || !proofTxMetadata) return;
+    if (!proofTxMetadata.blockNumber || !proofTxMetadata.txHash) return;
+
+    const updatedProofs = { [issuer]: proofTxMetadata };
+    const encryptedCurrentProofs = await holoStore.getSubmittedProofs();
+    if (encryptedCurrentProofs) {
+      const decryptedCurrentProofs = JSON.parse(
+        await cryptoController.decryptWithPrivateKey(
+          encryptedCurrentProofs.encryptedMessage,
+          encryptedCurrentProofs.sharded
+        )
+      );
+      Object.assign(updatedProofs, {
+        ...decryptedCurrentProofs,
+        ...updatedProofs,
+      });
+    }
+    const encryptedProofs = await cryptoController.encryptWithPublicKey(updatedProofs);
+    const success = await holoStore.setSubmittedProofs(encryptedProofs);
+    return { success: success };
+  }
+
+  static async holoGetSubmittedProofs(request) {
+    const loggedIn = await cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
+    const encryptedProofMetadata = await holoStore.getSubmittedProofs();
+    if (!encryptedProofMetadata) return;
+    return JSON.parse(
+      await cryptoController.decryptWithPrivateKey(
+        encryptedProofMetadata.encryptedMessage,
+        encryptedProofMetadata.sharded
+      )
+    );
   }
 }
 
