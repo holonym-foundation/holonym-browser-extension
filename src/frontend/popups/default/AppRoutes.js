@@ -5,6 +5,19 @@ import About from "../../components/pages/About";
 import Home from "../../components/pages/Home";
 import ResetAccount from "../../components/molecules/ResetAccount";
 
+import Leaves from "../../components/atoms/Leaves";
+
+const leavesMetadata = {
+  "0x0000000000000000000000000000000000000000": {
+    blockNumber: 0,
+    txHash: 123,
+  },
+  "0x0000000000000000000000000000000000000001": {
+    blockNumber: 1,
+    txHash: 456,
+  },
+};
+
 function AppRoutes() {
   const navigate = useNavigate();
 
@@ -19,6 +32,10 @@ function AppRoutes() {
           path="/"
           element={<LandingPage onLoginSuccess={handleLoginSuccess} />}
         />
+
+        {/* For testing... */}
+        {/* <Route path="/" element={<Leaves leafTxMetadata={leavesMetadata} />} /> */}
+
         <Route path="/home" element={<Home />} />
         {/* <Route
           path="/reset-account"
