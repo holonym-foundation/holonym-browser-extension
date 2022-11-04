@@ -34,6 +34,7 @@ const allowedPopupCommands = [
   "confirmShareCredentials",
   "closingHoloCredentialsConfirmationPopup",
   "closingHoloShareCredsConfirmationPopup",
+  "holoGetLeafTxMetadata",
 ];
 
 function popupListener(request, sender, sendResponse) {

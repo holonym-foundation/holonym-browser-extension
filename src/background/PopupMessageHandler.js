@@ -154,6 +154,19 @@ class PopupMessageHandler {
   static async closingHoloShareCredsConfirmationPopup(request) {
     await HoloCache.setShareCredsConfirmationPopupIsOpen(false);
   }
+
+  static async holoGetLeafTxMetadata(request) {
+    const loggedIn = await cryptoController.getIsLoggedIn();
+    if (!loggedIn) return;
+    const encryptedLeaves = await holoStore.getLeaves();
+    if (!encryptedLeaves) return;
+    return JSON.parse(
+      await cryptoController.decryptWithPrivateKey(
+        encryptedLeaves.encryptedMessage,
+        encryptedLeaves.sharded
+      )
+    );
+  }
 }
 
 export default PopupMessageHandler;

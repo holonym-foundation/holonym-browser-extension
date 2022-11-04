@@ -147,6 +147,42 @@ describe("Message passing", async () => {
         expect(result2.success).to.equal(true);
       });
     });
+
+    describe("holoGetLeafTxMetadata", async () => {
+      it("Should return null if no leaves have been added", async () => {
+        const payload = {
+          command: "holoGetLeafTxMetadata",
+        };
+        const result = await sendMessage(defaultPopupPage, extensionId, payload);
+        expect(result).to.equal(null);
+      });
+
+      it("Should return leaves if leaves have been added", async () => {
+        const leavesMetadata = {
+          "0x0000000000000000000000000000000000000000": {
+            blockNumber: 0,
+            txHash: 123,
+          },
+          "0x0000000000000000000000000000000000000001": {
+            blockNumber: 1,
+            txHash: 456,
+          },
+        };
+        const returnVal = await serviceWorker.evaluate(async (leavesMetadata) => {
+          const encryptedLeaves = await cryptoController.encryptWithPublicKey(
+            leavesMetadata
+          );
+          return await holoStore.setLeaves(encryptedLeaves);
+        }, leavesMetadata);
+        expect(returnVal).to.equal(true);
+        await sleep(50);
+        const payload = {
+          command: "holoGetLeafTxMetadata",
+        };
+        const result = await sendMessage(defaultPopupPage, extensionId, payload);
+        expect(result).to.not.equal(undefined);
+      });
+    });
   });
 
   describe("Atomic messages from frontend to service worker", async () => {
