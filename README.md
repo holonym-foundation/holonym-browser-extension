@@ -9,6 +9,10 @@ Holonym website: https://holonym.io/
 - Node ^16.14.2
 - Rollup (used for general bundling)
 
+## Contributing
+
+NOTE: Please do not include the dist/ folder in any commits. This folder is included in version control so that we can take snapshots of each version published to the Chrome Web Store. Changes to this folder only need to be committed immediately before a new version of this extension is submitted to Chrome for review.
+
 ### Credential object schema
 
 The extension can store any credentials that follow two constraints:
