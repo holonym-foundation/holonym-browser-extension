@@ -57,7 +57,7 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               className="text-field"
             />
             <input
@@ -66,7 +66,7 @@ function InitializeAccount({ inputLabel, subLabel, onInitializeSuccess }) {
               value={passwordConf}
               onChange={(e) => setPasswordConf(e.target.value)}
               placeholder="confirm password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               className="text-field"
             />
           </div>
