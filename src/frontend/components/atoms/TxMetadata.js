@@ -11,16 +11,17 @@ function Row({ name, value }) {
   );
 }
 
-// TODO: Replace "issuer" prop with "header" and "headerName" props so that this component
-// can be used for ProofTxMetadata as well
-
 // Component for displaying a single TransactionMetadata object (see tyepdef in HoloStore)
-export default function TxMetadata({ issuer, txMetadata }) {
+export default function TxMetadata({ headerName, headerValue, txMetadata }) {
   return (
     <div
       style={{ marginTop: "1.05rem", marginLeft: "1.05rem", marginRight: "1.05rem" }}
     >
-      {issuer ? <p style={{ fontSize: "0.6rem" }}>Issuer: {issuer}</p> : null}
+      {headerName && headerValue ? (
+        <p style={{ fontSize: "0.6rem" }}>
+          {headerName}: {headerValue}
+        </p>
+      ) : null}
       {Object.keys(txMetadata).map((fieldName, index) => (
         <Row key={index} name={fieldName} value={txMetadata[fieldName]} />
       ))}

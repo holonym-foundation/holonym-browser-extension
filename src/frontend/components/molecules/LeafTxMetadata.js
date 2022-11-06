@@ -41,7 +41,8 @@ function Leaves({ leafTxMetadata }) {
             <div>
               <TxMetadata
                 key={index}
-                issuer={issuerName}
+                headerName="Issuer"
+                headerValue={issuerName}
                 txMetadata={leavesToDisplay[issuerName]}
               />
               {index != Object.keys(leavesToDisplay).length - 1 ? (
