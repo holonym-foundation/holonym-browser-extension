@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import classNames from "classnames";
-import ReactTooltip from "react-tooltip";
 import ArrowInBox from "../../img/share-box-fill.png";
 import InfoIcon from "../atoms/InfoIcon";
 import HorizontalLine from "../atoms/HorizontalLine";
@@ -62,6 +61,10 @@ function LeafTxs() {
     // setLeafTxMetadata(leavesMetadata); // For testing
   }, []);
 
+  const headerClasses = classNames({
+    "four-tenths-opacity": !!tooltipShowing,
+  });
+
   return (
     <>
       <div
@@ -73,16 +76,9 @@ function LeafTxs() {
       >
         <div>
           <div style={{ textAlign: "center" }}>
-            {/* TODO: Use classes (and classnames package) for dynamic styles here */}
-            {tooltipShowing ? (
-              <h1 style={{ display: "inline-block", opacity: 0.4 }}>
-                Leaf Transactions
-              </h1>
-            ) : (
-              <h1 style={{ display: "inline-block", opacity: 1 }}>
-                Leaf Transactions
-              </h1>
-            )}
+            <h1 style={{ display: "inline-block" }} className={headerClasses}>
+              Leaf Transactions
+            </h1>
             <InfoIcon
               tooltipMessage={infoMessage}
               afterTooltipShow={(event) => setTooltipShowing(true)}

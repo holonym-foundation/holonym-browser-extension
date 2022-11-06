@@ -293,6 +293,10 @@ button:hover {
   opacity: 0.4;
 }
 
+.four-tenths-opacity {
+  opacity: 0.4;
+}
+
 .x-button.secondary.not-allowed-base:hover {
   border-style: solid;
   border-width: 1px;
