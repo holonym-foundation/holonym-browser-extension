@@ -28,7 +28,8 @@ content scripts--Doing so would overwrite the styles in the webpage.
 .popup-container {
   min-width: 350px;
   max-width: 90vw;
-  height: 500px;
+  height: 570px;
+  max-height: 570px;
   padding-top: 1vh;
   padding-bottom: 1vh;
   margin-left: auto;

@@ -7,7 +7,7 @@ import AppRoutes from "./AppRoutes";
 function App() {
   return (
     <>
-      <div style={{ margin: "5px" }}>
+      <div style={{ padding: "5px" }}>
         <OuterContainer>
           <HoloLogo />
           <MemoryRouter>
