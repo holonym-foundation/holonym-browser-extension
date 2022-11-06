@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import classNames from "classnames";
 import ReactTooltip from "react-tooltip";
 import ArrowInBox from "../../img/share-box-fill.png";
+import InfoIcon from "../atoms/InfoIcon";
 import HorizontalLine from "../atoms/HorizontalLine";
 import LeafTxMetadata from "../molecules/LeafTxMetadata";
 import { sleep } from "../../../@shared/utils";
@@ -24,8 +25,12 @@ const leavesMetadata = {
   },
 };
 
+const infoMessage =
+  "This page shows transaction metadata for transactions you have submitted that add your credentials to the Privacy Pool";
+
 function LeafTxs() {
   const [leafTxMetadata, setLeafTxMetadata] = useState();
+  const [tooltipShowing, setTooltipShowing] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,13 +72,23 @@ function LeafTxs() {
         }}
       >
         <div>
-          {/* <div style={{ marginTop: "15px", marginBottom: "15px" }}>
-          </div> */}
-          <h1 style={{ textAlign: "center" }}>Leaf Transactions</h1>
-          <p style={{ marginLeft: "1.05rem" }}>
-            This page shows transaction metadata for transactions you have submitted to
-            add your credentials to the Privacy Pool
-          </p>
+          <div style={{ textAlign: "center" }}>
+            {/* TODO: Use classes (and classnames package) for dynamic styles here */}
+            {tooltipShowing ? (
+              <h1 style={{ display: "inline-block", opacity: 0.4 }}>
+                Leaf Transactions
+              </h1>
+            ) : (
+              <h1 style={{ display: "inline-block", opacity: 1 }}>
+                Leaf Transactions
+              </h1>
+            )}
+            <InfoIcon
+              tooltipMessage={infoMessage}
+              afterTooltipShow={(event) => setTooltipShowing(true)}
+              afterTooltipHide={(event) => setTooltipShowing(false)}
+            />
+          </div>
           <LeafTxMetadata leafTxMetadata={leafTxMetadata} />
         </div>
         <button
@@ -84,13 +99,6 @@ function LeafTxs() {
         >
           Return To Credentials
         </button>
-        {/* <div style={{ marginTop: "auto" }}>
-          <div>
-            <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-              <HorizontalLine />
-            </div>
-          </div>
-        </div> */}
       </div>
     </>
   );
