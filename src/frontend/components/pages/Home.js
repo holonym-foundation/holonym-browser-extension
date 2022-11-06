@@ -4,16 +4,11 @@ import classNames from "classnames";
 import ReactTooltip from "react-tooltip";
 import ArrowInBox from "../../img/share-box-fill.png";
 import Credentials from "../atoms/Credentials";
+import HorizontalLine from "../atoms/HorizontalLine";
 import { sleep } from "../../../@shared/utils";
 
 const linkToStartVerification = process.env.LINK_TO_START_VERIFICATION;
 const frontendUrl = process.env.FRONTEND_URL;
-
-const WhiteLine = () => (
-  <div style={{ marginTop: "5px", marginBottom: "5px" }}>
-    <hr style={{ borderColor: "#fff" }} />
-  </div>
-);
 
 function Home() {
   const [credentials, setCredentials] = useState();
@@ -96,7 +91,7 @@ function Home() {
         <div style={{ marginTop: "auto" }}>
           <div>
             <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-              <WhiteLine />
+              <HorizontalLine />
             </div>
             {credentials ? (
               <a
@@ -138,9 +133,18 @@ function Home() {
               </a>
             )}
           </div>
-          <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-            {/* <WhiteLine /> */}
-          </div>
+
+          <div style={{ marginTop: "20px", marginBottom: "20px" }}></div>
+          <button
+            type="submit"
+            onClick={() => navigate("/leaf-txs", { replace: true })}
+            className="x-button center-block"
+            style={{ width: "100%" }}
+          >
+            Leaf Transactions
+          </button>
+
+          <div style={{ marginTop: "20px", marginBottom: "20px" }}></div>
           <button
             type="submit"
             onClick={() => navigate("/about", { replace: true })}

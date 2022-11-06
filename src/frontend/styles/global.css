@@ -75,10 +75,12 @@ button:hover {
   font-size: 0.7rem;
 }
 
+/* TODO: Rename to two-d-table-container */
 .holo-credentials-container {
   font-size: 14px;
 }
 
+/* TODO: Rename to two-d-table-key-name */
 .credential-name {
   color: #fdc094;
 }

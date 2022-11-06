@@ -3,20 +3,8 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import LandingPage from "../../components/pages/LandingPage";
 import About from "../../components/pages/About";
 import Home from "../../components/pages/Home";
+import LeafTxs from "../../components/pages/LeafTxs";
 import ResetAccount from "../../components/molecules/ResetAccount";
-
-import Leaves from "../../components/atoms/Leaves";
-
-const leavesMetadata = {
-  "0x0000000000000000000000000000000000000000": {
-    blockNumber: 0,
-    txHash: 123,
-  },
-  "0x0000000000000000000000000000000000000001": {
-    blockNumber: 1,
-    txHash: 456,
-  },
-};
 
 function AppRoutes() {
   const navigate = useNavigate();
@@ -32,11 +20,8 @@ function AppRoutes() {
           path="/"
           element={<LandingPage onLoginSuccess={handleLoginSuccess} />}
         />
-
-        {/* For testing... */}
-        {/* <Route path="/" element={<Leaves leafTxMetadata={leavesMetadata} />} /> */}
-
         <Route path="/home" element={<Home />} />
+        <Route path="/leaf-txs" element={<LeafTxs />} />
         {/* <Route
           path="/reset-account"
           element={
