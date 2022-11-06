@@ -8,13 +8,29 @@ import HorizontalLine from "../atoms/HorizontalLine";
 // TODO: Instead of issuer address, display something like "Holonym + Vouched". Add
 // a lookup table to constants with a mapping of issuer_address -> issuer_display_name
 
+const txMetadataNameConversion = {
+  chainId: "Chain ID",
+  blockNumber: "Block number",
+  txHash: "Transaction hash",
+};
+
 function Leaves({ leafTxMetadata }) {
   const [leavesToDisplay, setLeavesToDisplay] = useState();
 
   useEffect(() => {
     if (!leafTxMetadata) return;
-    // TODO: Change display names. E.g., change "blockNumber" to "Block number".
-    setLeavesToDisplay(leafTxMetadata);
+
+    // Change display names. E.g., change "blockNumber" to "Block number".
+    const tempMetadata = {};
+    for (const issuer of Object.keys(leafTxMetadata)) {
+      tempMetadata[issuer] = {};
+      for (const key of Object.keys(leafTxMetadata[issuer])) {
+        const newKey = txMetadataNameConversion[key];
+        tempMetadata[issuer][newKey] = leafTxMetadata[issuer][key];
+      }
+    }
+
+    setLeavesToDisplay(tempMetadata);
   }, [leafTxMetadata]);
 
   return (

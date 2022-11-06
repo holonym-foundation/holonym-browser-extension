@@ -3,10 +3,10 @@ import React from "react";
 function Row({ name, value }) {
   return (
     <div style={{ display: "flex", marginTop: "1.05rem", marginBottom: "1.05rem" }}>
-      <span style={{ flex: "45%" }} className="credential-name">
+      <span style={{ flex: "50%" }} className="credential-name">
         {name}
       </span>
-      <span style={{ flex: "55%" }}>{value}</span>
+      <span style={{ flex: "50%" }}>{value}</span>
     </div>
   );
 }

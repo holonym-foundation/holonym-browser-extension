@@ -56,6 +56,7 @@
 
 /**
  * @typedef {object} TransactionMetadata
+ * @property {number} chainId
  * @property {number} blockNumber Block height at which the leaf was added
  * @property {string} txHash
  */

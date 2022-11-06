@@ -13,10 +13,12 @@ import { sleep } from "../../../@shared/utils";
 // For testing
 const leavesMetadata = {
   "0x0000000000000000000000000000000000000000": {
+    chainId: 69,
     blockNumber: 0,
     txHash: 123,
   },
   "0x0000000000000000000000000000000000000001": {
+    chainId: 420,
     blockNumber: 1,
     txHash: 456,
   },
