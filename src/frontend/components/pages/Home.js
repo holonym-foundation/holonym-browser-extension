@@ -147,6 +147,16 @@ function Home() {
           <div style={{ marginTop: "20px", marginBottom: "20px" }}></div>
           <button
             type="submit"
+            onClick={() => navigate("/proof-txs", { replace: true })}
+            className="x-button center-block"
+            style={{ width: "100%" }}
+          >
+            Proof Transactions
+          </button>
+
+          <div style={{ marginTop: "20px", marginBottom: "20px" }}></div>
+          <button
+            type="submit"
             onClick={() => navigate("/about", { replace: true })}
             className="x-button center-block"
             style={{ width: "100%" }}

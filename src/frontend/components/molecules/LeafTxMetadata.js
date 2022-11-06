@@ -14,7 +14,7 @@ const txMetadataNameConversion = {
   txHash: "Transaction hash",
 };
 
-function Leaves({ leafTxMetadata }) {
+function LeafTxMetadata({ leafTxMetadata }) {
   const [leavesToDisplay, setLeavesToDisplay] = useState();
 
   useEffect(() => {
@@ -56,4 +56,4 @@ function Leaves({ leafTxMetadata }) {
   );
 }
 
-export default Leaves;
+export default LeafTxMetadata;

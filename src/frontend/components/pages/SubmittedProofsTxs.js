@@ -4,19 +4,19 @@ import classNames from "classnames";
 import ArrowInBox from "../../img/share-box-fill.png";
 import InfoIcon from "../atoms/InfoIcon";
 import HorizontalLine from "../atoms/HorizontalLine";
-import LeafTxMetadata from "../molecules/LeafTxMetadata";
+import SubmittedProofsTxMetadata from "../molecules/SubmittedProofsTxMetadata";
 import { sleep } from "../../../@shared/utils";
 
 // TODO: When displaying txMetadata, add an item: a link to the tx on a block explorer
 
 // For testing
-const leavesMetadata = {
-  "0x0000000000000000000000000000000000000000": {
+const proofsTxMetadata = {
+  SybilResistance: {
     chainId: 69,
     blockNumber: 0,
     txHash: 123,
   },
-  "0x0000000000000000000000000000000000000001": {
+  USResidence: {
     chainId: 420,
     blockNumber: 1,
     txHash: 456,
@@ -24,17 +24,17 @@ const leavesMetadata = {
 };
 
 const infoMessage =
-  "This page shows metadata for transactions you have submitted that add your cloaked credentials to the Privacy Pool";
+  "This page shows metadata for transactions you have submitted that prove aspects about your cloaked credentials";
 
-function LeafTxs() {
-  const [leafTxMetadata, setLeafTxMetadata] = useState();
+function SubmittedProofsTxs() {
+  const [spTxMetadata, setSpTxMetadata] = useState();
   const [tooltipShowing, setTooltipShowing] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
-    function requestLeafTxMetadata() {
+    function requestSpTxMetadata() {
       return new Promise((resolve, reject) => {
-        const message = { command: "holoGetLeafTxMetadata" };
+        const message = { command: "holoGetSubmittedProofs" };
         const callback = (resp) => {
           if (!resp) reject();
           resolve(resp);
@@ -42,22 +42,22 @@ function LeafTxs() {
         chrome.runtime.sendMessage(message, callback);
       });
     }
-    async function getAndSetLeafTxMetadata() {
+    async function getAndSetSpTxMetadata() {
       let numAttempts = 0;
       // try 50 times in case of port closed error
       while (numAttempts < 50) {
         try {
-          const leafTxMetadataTemp = await requestLeafTxMetadata();
-          if (!leafTxMetadataTemp) continue;
-          setLeafTxMetadata(leafTxMetadataTemp);
+          const spTxMetadataTemp = await requestSpTxMetadata();
+          if (!spTxMetadataTemp) continue;
+          setSpTxMetadata(spTxMetadataTemp);
           break;
         } catch (err) {}
         await sleep(50);
         numAttempts += 1;
       }
     }
-    getAndSetLeafTxMetadata(); // TODO: UNCOMMENT
-    // setLeafTxMetadata(leavesMetadata); // For testing
+    getAndSetSpTxMetadata(); // TODO: UNCOMMENT
+    // setSpTxMetadata(proofsTxMetadata); // For testing
   }, []);
 
   const headerClasses = classNames({
@@ -76,17 +76,17 @@ function LeafTxs() {
         <div>
           <div style={{ textAlign: "center" }}>
             <h1 style={{ display: "inline-block" }} className={headerClasses}>
-              Privacy Pool Transactions
+              Proof Transactions
             </h1>
-            <div style={{ position: "absolute", top: "115px", left: "250px" }}>
-              <InfoIcon
-                tooltipMessage={infoMessage}
-                afterTooltipShow={(event) => setTooltipShowing(true)}
-                afterTooltipHide={(event) => setTooltipShowing(false)}
-              />
-            </div>
+            {/* <div style={{ position: "absolute", top: "100px", left: "250px" }}> */}
+            <InfoIcon
+              tooltipMessage={infoMessage}
+              afterTooltipShow={(event) => setTooltipShowing(true)}
+              afterTooltipHide={(event) => setTooltipShowing(false)}
+            />
+            {/* </div> */}
           </div>
-          <LeafTxMetadata leafTxMetadata={leafTxMetadata} />
+          <SubmittedProofsTxMetadata submittedProofsTxMetadata={spTxMetadata} />
         </div>
         <button
           type="submit"
@@ -101,4 +101,4 @@ function LeafTxs() {
   );
 }
 
-export default LeafTxs;
+export default SubmittedProofsTxs;
