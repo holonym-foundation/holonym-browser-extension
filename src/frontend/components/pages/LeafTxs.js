@@ -7,8 +7,7 @@ import HorizontalLine from "../atoms/HorizontalLine";
 import LeafTxMetadata from "../molecules/LeafTxMetadata";
 import { sleep } from "../../../@shared/utils";
 
-// TODO: Rename these "leaf" components. Use "PrivacyPool" nomenclature instead of
-// "leaf" and "merkleTree" nomenclature
+// TODO: When displaying txMetadata, add an item: a link to the tx on a block explorer
 
 // For testing
 const leavesMetadata = {
@@ -25,7 +24,7 @@ const leavesMetadata = {
 };
 
 const infoMessage =
-  "This page shows transaction metadata for transactions you have submitted that add your credentials to the Privacy Pool";
+  "This page shows metadata for transactions you have submitted that add your cloaked credentials to the Privacy Pool";
 
 function LeafTxs() {
   const [leafTxMetadata, setLeafTxMetadata] = useState();
@@ -77,13 +76,15 @@ function LeafTxs() {
         <div>
           <div style={{ textAlign: "center" }}>
             <h1 style={{ display: "inline-block" }} className={headerClasses}>
-              Leaf Transactions
+              Privacy Pool Transactions
             </h1>
-            <InfoIcon
-              tooltipMessage={infoMessage}
-              afterTooltipShow={(event) => setTooltipShowing(true)}
-              afterTooltipHide={(event) => setTooltipShowing(false)}
-            />
+            <div style={{ position: "absolute", top: "100px", left: "250px" }}>
+              <InfoIcon
+                tooltipMessage={infoMessage}
+                afterTooltipShow={(event) => setTooltipShowing(true)}
+                afterTooltipHide={(event) => setTooltipShowing(false)}
+              />
+            </div>
           </div>
           <LeafTxMetadata leafTxMetadata={leafTxMetadata} />
         </div>

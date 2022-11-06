@@ -21,7 +21,7 @@ function AppRoutes() {
           element={<LandingPage onLoginSuccess={handleLoginSuccess} />}
         />
         <Route path="/home" element={<Home />} />
-        <Route path="/leaf-txs" element={<LeafTxs />} />
+        <Route path="/privacy-pool-txs" element={<LeafTxs />} />
         {/* <Route
           path="/reset-account"
           element={

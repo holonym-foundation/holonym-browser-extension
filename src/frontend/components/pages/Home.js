@@ -137,11 +137,11 @@ function Home() {
           <div style={{ marginTop: "20px", marginBottom: "20px" }}></div>
           <button
             type="submit"
-            onClick={() => navigate("/leaf-txs", { replace: true })}
+            onClick={() => navigate("/privacy-pool-txs", { replace: true })}
             className="x-button center-block"
             style={{ width: "100%" }}
           >
-            Leaf Transactions
+            Privacy Pool Transactions
           </button>
 
           <div style={{ marginTop: "20px", marginBottom: "20px" }}></div>
