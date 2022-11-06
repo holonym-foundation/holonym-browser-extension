@@ -2,12 +2,18 @@
 
 This extension stores credentials that can be used to generate zk proofs about aspects of one's identity.
 
-Holonym website: https://holonym.io/
+Download the extension here: [https://chrome.google.com/webstore/detail/holonym/obhgknpelgngeabaclepndihajndjjnb](https://chrome.google.com/webstore/detail/holonym/obhgknpelgngeabaclepndihajndjjnb).
+
+Holonym website: [https://holonym.io/](https://holonym.io/).
 
 ## Requirements
 
 - Node ^16.14.2
 - Rollup (used for general bundling)
+
+## Contributing
+
+NOTE: Please do not include the dist/ folder in any commits. This folder is included in version control so that we can take snapshots of each version published to the Chrome Web Store. Changes to this folder only need to be committed immediately before a new version of this extension is submitted to Chrome for review.
 
 ### Credential object schema
 

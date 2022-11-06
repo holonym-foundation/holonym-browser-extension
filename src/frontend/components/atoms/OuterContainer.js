@@ -4,10 +4,11 @@ const OuterContainer = ({ children }) => (
   <>
     <div
       style={{
-        marginLeft: "20px",
-        marginRight: "20px",
-        marginTop: "10px",
-        marginBottom: "10px",
+        paddingLeft: "20px",
+        paddingRight: "20px",
+        paddingTop: "10px",
+        // marginBottom: "10px",
+        // paddingBottom: "20px",
       }}
     >
       {children}

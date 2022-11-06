@@ -183,6 +183,8 @@ describe("Message passing", async () => {
         expect(result).to.not.equal(undefined);
       });
     });
+
+    // TODO: Test holoGetSubmittedProofs
   });
 
   describe("Atomic messages from frontend to service worker", async () => {

@@ -22,6 +22,7 @@ function AppRoutes() {
       setCredentials(sortedCreds);
       navigate("/confirm-credentials", { replace: true });
     }
+    // TODO: Display message to user that there are no staged credentials
   }
 
   function requestStagedCredentials() {

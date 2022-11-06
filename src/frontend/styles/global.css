@@ -28,7 +28,8 @@ content scripts--Doing so would overwrite the styles in the webpage.
 .popup-container {
   min-width: 350px;
   max-width: 90vw;
-  height: 500px;
+  height: 570px;
+  max-height: 570px;
   padding-top: 1vh;
   padding-bottom: 1vh;
   margin-left: auto;
@@ -75,12 +76,42 @@ button:hover {
   font-size: 0.7rem;
 }
 
+/* TODO: Rename to two-d-table-container */
 .holo-credentials-container {
   font-size: 14px;
 }
 
+/* TODO: Rename to two-d-table-key-name */
 .credential-name {
   color: #fdc094;
+}
+
+/* .w-embed:before,
+.w-embed:after {
+  content: " ";
+  display: table;
+  grid-column-start: 1;
+  grid-row-start: 1;
+  grid-column-end: 2;
+  grid-row-end: 2;
+}
+.w-embed:after {
+  clear: both;
+} */
+.info-img {
+  margin-top: 3px;
+  margin-left: 5px;
+  -webkit-transition: color 500ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition: color 500ms cubic-bezier(0.23, 1, 0.32, 1);
+  color: #8b8b8b;
+}
+
+.info-img:hover {
+  color: #bebebe;
+}
+
+.info-img.no-margin {
+  margin-top: 0px;
 }
 
 .text-field {
@@ -260,6 +291,10 @@ button:hover {
 
 .not-allowed-base {
   cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.four-tenths-opacity {
   opacity: 0.4;
 }
 
