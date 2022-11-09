@@ -70,8 +70,6 @@ class PopupMessageHandler {
     }
   }
 
-  // TODO: Ensure frontend (for calls to setCredentials and to getCredentials),
-  // popup frontend, and all other parts of code are compatible with these changes
   static async confirmCredentials(request) {
     try {
       await HoloCache.setConfirmCredentials(true);
